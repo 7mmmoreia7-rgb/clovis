@@ -2,6 +2,10 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galeria</title>
+<link rel="icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;background:#000;}
@@ -81,7 +85,6 @@ function resize(){
 }
 resize();window.addEventListener('resize',resize);
 
-// Play + duplo clique para avançar
 var vid=document.getElementById('vid');
 document.getElementById('play').onclick=function(){
   this.classList.add('gone');
@@ -222,7 +225,7 @@ document.getElementById('fsin').addEventListener('change',function(){
   this.value='';
 });
 
-document.getElementById('btn-idx').onclick=function(){window.top.location.href='/version-test/indice?skip=1';};
+document.getElementById('btn-idx').onclick=function(){window.location.href='/indice';};
 
 var tt;
 function toast(msg){
