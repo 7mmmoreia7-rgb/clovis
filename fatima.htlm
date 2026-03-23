@@ -1,47 +1,94 @@
-<style>
-#btn-play { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:10%; cursor:pointer; z-index:10; transition:opacity .3s; }
-#btn-email { position:fixed; left:22%; top:48%; width:6.41%; cursor:pointer; z-index:10; opacity:0; pointer-events:none; transition:opacity .3s; }
-#btn-email { opacity:0; }
-#btn-email:hover { opacity:1; filter:drop-shadow(0 0 8px rgba(255,255,255,0.8)); }
-#foto-area { position:fixed; left:9.50%; top:19.00%; width:19%; height:33%; z-index:9; cursor:pointer; opacity:0; pointer-events:none; }
-#foto-area.show { pointer-events:all; }
-#foto-area:hover ~ #btn-email, #btn-email:hover { opacity:1 !important; }
-#btn-idx { position:fixed; bottom:10%; right:5%; width:8%; cursor:pointer; z-index:10; opacity:0; pointer-events:none; transition:opacity .5s; }
-#btn-idx.show { opacity:1; pointer-events:all; }
-#btn-email.show { pointer-events:all; }
-</style>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fátima</title>
+  <link rel="icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:100%; height:100%; overflow:hidden; background:#000; }
 
-<video id="myVideo" width="100%" height="auto">
-  <source src="https://res.cloudinary.com/dxdemxfpe/video/upload/v1773223404/fatima_c0tq29.mp4">
-</video>
+    #myVideo {
+      position:fixed; top:0; left:0;
+      width:100%; height:100%;
+      object-fit:cover; z-index:1;
+    }
+    #btn-play {
+      position:fixed; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      width:10%; cursor:pointer; z-index:10; transition:opacity .3s;
+    }
+    #btn-email {
+      position:fixed; left:22%; top:48%;
+      width:6.41%; cursor:pointer; z-index:10;
+      opacity:0; pointer-events:none; transition:opacity .3s;
+    }
+    #btn-email:hover { opacity:1; filter:drop-shadow(0 0 8px rgba(255,255,255,0.8)); }
+    #btn-email.show { pointer-events:all; }
+    #foto-area {
+      position:fixed; left:9.50%; top:19.00%;
+      width:19%; height:33%; z-index:9;
+      cursor:pointer; opacity:0; pointer-events:none;
+    }
+    #foto-area.show { pointer-events:all; }
+    #foto-area:hover ~ #btn-email, #btn-email:hover { opacity:1 !important; }
+    #btn-idx {
+      position:fixed; bottom:10%; right:5%;
+      width:8%; cursor:pointer; z-index:10;
+      opacity:0; pointer-events:none; transition:opacity .5s;
+    }
+    #btn-idx.show { opacity:1; pointer-events:all; }
 
-<img id="btn-play" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958888/26_ujjdad.png" />
-<div id="foto-area"></div>
-<img id="btn-email" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772411225/ChatGPT_Image_Jan_25__2026__01_04_01_AM-removebg-preview_juxpsr.png" />
-<img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
+    @media (max-width: 768px) {
+      #btn-play { width:20%; }
+      #btn-idx  { width:16%; }
+      #btn-email { width:12%; }
+    }
+    @media (max-width: 480px) {
+      #btn-play { width:28%; }
+      #btn-idx  { width:22%; }
+      #btn-email { width:16%; }
+    }
+  </style>
+</head>
+<body>
 
-<script>
-var play=document.getElementById('btn-play');
-var vid=document.getElementById('myVideo');
-var idx=document.getElementById('btn-idx');
+  <video id="myVideo" playsinline>
+    <source src="https://res.cloudinary.com/dxdemxfpe/video/upload/v1773223404/fatima_c0tq29.mp4" type="video/mp4">
+  </video>
 
-play.onclick=function(){
-  play.style.opacity='0';
-  play.style.pointerEvents='none';
-  vid.play();
-};
+  <img id="btn-play" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958888/26_ujjdad.png" alt="Play" />
+  <div id="foto-area"></div>
+  <img id="btn-email" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772411225/ChatGPT_Image_Jan_25__2026__01_04_01_AM-removebg-preview_juxpsr.png" alt="email" />
+  <img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" alt="Índice" />
 
-vid.onended=function(){
-  document.getElementById('btn-email').classList.add('show');
-  document.getElementById('foto-area').classList.add('show');
-  idx.classList.add('show');
-};
+  <script>
+    var play = document.getElementById('btn-play');
+    var vid  = document.getElementById('myVideo');
+    var idx  = document.getElementById('btn-idx');
 
-document.getElementById('btn-email').onclick=function(){
-  window.open('mailto:mmmoreia@hotmail.com');
-};
+    play.onclick = function () {
+      play.style.opacity = '0';
+      play.style.pointerEvents = 'none';
+      vid.play();
+    };
 
-idx.onclick=function(){
-  window.top.location.href='/version-test/indice?skip=1';
-};
-</script>
+    vid.onended = function () {
+      document.getElementById('btn-email').classList.add('show');
+      document.getElementById('foto-area').classList.add('show');
+      idx.classList.add('show');
+    };
+
+    document.getElementById('btn-email').onclick = function () {
+      window.open('mailto:mmmoreia@hotmail.com');
+    };
+
+    idx.onclick = function () {
+      window.location.href = '/indice';
+    };
+  </script>
+
+</body>
+</html>
