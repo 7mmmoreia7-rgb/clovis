@@ -3,16 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<script>
-if(window.frameElement){
-  window.frameElement.setAttribute('scrolling','no');
-  window.frameElement.style.overflow='hidden';
-  window.frameElement.style.width='100%';
-  window.frameElement.style.height='100%';
-  window.frameElement.style.border='none';
-  window.frameElement.style.display='block';
-}
-</script>
+<title>Chat</title>
+<link rel="icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -28,10 +21,7 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
 #bg-login, #bg-chat { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
 #login-input { position:absolute; left:31%; top:59%; width:37%; height:6%; z-index:20; border:none; outline:none; background:transparent; font-size:1.2em; font-family:'Caveat',cursive; text-align:center; color:#111; }
 #btn-entra { position:absolute; left:38%; top:69%; width:24%; height:12%; z-index:20; background:transparent; border:none; cursor:pointer; }
-
-/* CAIXA DO CHAT — margem igual dos dois lados */
 #msgs-box { position:absolute; left:14.48%; top:20.46%; width:71%; height:46.20%; z-index:10; overflow:hidden; padding:1.5% 3% 0.5% 3%; display:flex; flex-direction:column; gap:2px; overflow-y:scroll; }
-
 .msg { display:block; flex-shrink:0; line-height:1.6; overflow-wrap:break-word; word-break:break-word; animation:fadeIn .2s ease; }
 .msg .autor { font-family:'Caveat',cursive; font-size:1.05em; font-weight:700; color:#c00; margin-right:3px; }
 .msg .texto { font-family:Georgia,serif; font-size:0.85em; color:#111; overflow-wrap:break-word; word-break:break-word; }
@@ -41,28 +31,20 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
 .msg .texto video { max-height:3.5em; border-radius:4px; cursor:pointer; display:inline-block; vertical-align:middle; }
 .msg .texto video.sel { outline:3px solid #00c; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(2px);}to{opacity:1;transform:none;} }
-
-/* CAIXA DE TEXTO — desce um pouco para não mostrar letras por baixo da caixa do chat */
 #chat-input { position:absolute; left:20%; top:71%; width:59%; height:9.35%; z-index:10; border:none; outline:none; background:transparent; font-family:Georgia,serif; font-size:0.9em; color:#111; padding:0.7em 0.8em 0.4em 0.8em; overflow:hidden; overflow-wrap:break-word; word-break:break-word; white-space:pre-wrap; line-height:1.4; display:none; cursor:text; }
 #chat-input:empty::before { content:attr(data-ph); color:#bbb; pointer-events:none; }
 #chat-input img.emoji { min-height:3.5em; min-width:3.5em; max-height:5em; max-width:5em; object-fit:contain; vertical-align:middle; display:inline-block; }
-
 #btn-enviar { position:absolute; left:81.5%; top:63.5%; width:9.5%; height:16%; z-index:15; background:transparent; border:none; cursor:pointer; }
 #btn-clovis { position:absolute; left:14.48%; top:63.5%; width:6%; height:16%; z-index:15; background:transparent; border:none; cursor:pointer; }
 #btn-export { position:absolute; left:64.7%; top:0%; width:11%; height:14%; z-index:15; background:transparent; border:none; cursor:pointer; }
 #btn-import { position:absolute; left:78.9%; top:0%; width:11%; height:14%; z-index:15; background:transparent; border:none; cursor:pointer; }
 #file-import { display:none; }
-
-/* BOTÃO ÍNDICE — tamanho igual às outras páginas */
 #btn-idx { position:absolute; right:3%; bottom:10%; width:8%; height:auto; object-fit:contain; cursor:pointer; z-index:10; opacity:0; pointer-events:none; transition:opacity .5s; }
 #btn-idx.show { opacity:1; pointer-events:all; }
-
 #emoji-panel { position:absolute; left:14.48%; top:26%; width:46%; height:36%; z-index:30; background:rgba(255,255,255,0.97); border-radius:10px; border:2px solid #ddd; display:none; flex-wrap:wrap; align-items:flex-start; justify-content:flex-start; gap:8px; padding:10px; box-shadow:0 4px 20px rgba(0,0,0,0.2); overflow-y:auto; }
 #emoji-panel.open { display:flex; }
 #emoji-panel img { width:80px; height:80px; object-fit:contain; cursor:pointer; transition:transform .15s; flex-shrink:0; }
 #emoji-panel img:hover { transform:scale(1.15); }
-
-/* FULLSCREEN OVERLAY — para imagens e vídeos */
 #fs-overlay { position:fixed; inset:0; z-index:500; background:url(https://res.cloudinary.com/dxdemxfpe/image/upload/v1771887590/isto_f3c09e.png) center/cover; display:none; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
 #fs-overlay.open { display:flex; }
 #fs-overlay img#fs-img { max-width:90%; max-height:80%; border-radius:8px; object-fit:contain; }
@@ -318,22 +300,14 @@ document.getElementById('file-import').onchange=function(){
   });this.value='';
 };
 
-// FULLSCREEN para imagens e vídeos
 var fsAtualSrc=null,fsAtualTipo=null;
 document.getElementById('msgs-box').addEventListener('click',function(e){
   var t=e.target;
-  if(t.tagName==='VIDEO'){
-    abrirFs('video',t.getAttribute('data-vsrc')||t.src);return;
-  }
-  if(t.tagName==='IMG'&&t.classList.contains('media-img')){
-    abrirFs('img',t.getAttribute('data-f')||t.src);return;
-  }
+  if(t.tagName==='VIDEO'){abrirFs('video',t.getAttribute('data-vsrc')||t.src);return;}
+  if(t.tagName==='IMG'&&t.classList.contains('media-img')){abrirFs('img',t.getAttribute('data-f')||t.src);return;}
 });
 
-document.getElementById('btn-export').onclick=function(){
-  if(!fsAtualSrc)return;
-  guardarFs();
-};
+document.getElementById('btn-export').onclick=function(){if(!fsAtualSrc)return;guardarFs();};
 
 function abrirFs(tipo,src){
   if(!src)return;
@@ -356,11 +330,9 @@ function guardarFs(){
   .then(function(blob){
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
-    a.href=url;
-    a.download=fsAtualTipo==='video'?'video.mp4':'imagem.jpg';
+    a.href=url;a.download=fsAtualTipo==='video'?'video.mp4':'imagem.jpg';
     document.body.appendChild(a);a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);URL.revokeObjectURL(url);
   }).catch(function(){
     var a=document.createElement('a');a.href=fsAtualSrc;a.download=fsAtualTipo==='video'?'video.mp4':'imagem.jpg';a.target='_blank';
     document.body.appendChild(a);a.click();document.body.removeChild(a);
@@ -372,7 +344,7 @@ document.getElementById('fs-save').addEventListener('click',function(e){e.stopPr
 document.getElementById('fs-overlay').addEventListener('click',function(e){if(e.target===this)fecharFs();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')fecharFs();});
 
-document.getElementById('btn-idx').onclick=function(){window.top.location.href='/version-test/indice?skip=1';};
+document.getElementById('btn-idx').onclick=function(){window.location.href='/indice';};
 </script>
 </body>
 </html>
