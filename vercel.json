@@ -1,0 +1,18 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/indice", "destination": "/indice.html" },
+    { "source": "/a_regras", "destination": "/a_regras.html" },
+    { "source": "/carolina", "destination": "/carolina.html" },
+    { "source": "/gloria", "destination": "/gloria.html" },
+    { "source": "/daniela", "destination": "/daniela.html" },
+    { "source": "/beatriz", "destination": "/beatriz.html" },
+    { "source": "/lurdes", "destination": "/lurdes.html" },
+    { "source": "/clovis", "destination": "/clovis.html" },
+    { "source": "/fatima", "destination": "/fatima.html" },
+    { "source": "/interativo", "destination": "/interativo.html" },
+    { "source": "/galeria", "destination": "/galeria.html" },
+    { "source": "/chat", "destination": "/chat.html" }
+  ]
+}
