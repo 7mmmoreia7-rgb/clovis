@@ -1,0 +1,32 @@
+<style>
+#btn-play { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:10%; cursor:pointer; z-index:10; transition:opacity .3s; }
+#btn-idx { position:fixed; bottom:10%; right:5%; width:8%; cursor:pointer; z-index:10; opacity:0; pointer-events:none; transition:opacity .5s; }
+#btn-idx.show { opacity:1; pointer-events:all; }
+</style>
+
+<video id="myVideo" width="100%" height="auto">
+  <source src="https://res.cloudinary.com/dxdemxfpe/video/upload/v1773223406/carolina_laxvoe.mp4">
+</video>
+
+<img id="btn-play" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958888/26_ujjdad.png" />
+<img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
+
+<script>
+var play=document.getElementById('btn-play');
+var vid=document.getElementById('myVideo');
+var idx=document.getElementById('btn-idx');
+
+play.onclick=function(){
+  play.style.opacity='0';
+  play.style.pointerEvents='none';
+  vid.play();
+};
+
+vid.onended=function(){
+  idx.classList.add('show');
+};
+
+idx.onclick=function(){
+  window.top.location.href='/version-test/indice?skip=1';
+};
+</script>
