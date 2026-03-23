@@ -2,6 +2,10 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Índice</title>
+<link rel="icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html, body { width:100%; height:100%; overflow:hidden; background:#000; }
@@ -46,10 +50,8 @@ function resize(){
 resize(); window.addEventListener('resize',resize);
 
 var vid=document.getElementById('vid');
-var pageUrl='';
-try{pageUrl=window.top.location.href;}catch(e){pageUrl=window.location.href;}
 
-if(pageUrl.indexOf('skip=1')!==-1){
+if(window.location.href.indexOf('skip=1')!==-1){
   vid.style.display='none';
   document.getElementById('play').style.display='none';
   showPage();
@@ -58,7 +60,6 @@ if(pageUrl.indexOf('skip=1')!==-1){
     this.classList.add('gone');
     vid.play().catch(function(){vid.muted=true;vid.play();});
   };
-  // duplo clique para avançar
   var lastTap=0;
   vid.addEventListener('dblclick',showPage);
   vid.addEventListener('touchend',function(){
@@ -79,27 +80,27 @@ function showPage(){
 }
 
 var nav={
-  'hs-ignora':   '/version-test/a_regras',
-  'hs-carolina': '/version-test/carolina',
-  'hs-gloria':   '/version-test/gloria',
-  'hs-daniela':  '/version-test/daniela',
-  'hs-beatriz':  '/version-test/beatriz',
-  'hs-lurdes':   '/version-test/lurdes',
-  'hs-clovis':   '/version-test/clovis',
-  'hs-fatima':   '/version-test/fatima',
-  'hs-rabisca':  '/version-test/interativo',
-  'hs-clicks':   '/version-test/galeria',
-  'hs-blabla':   '/version-test/chat'
+  'hs-ignora':   '/a_regras',
+  'hs-carolina': '/carolina',
+  'hs-gloria':   '/gloria',
+  'hs-daniela':  '/daniela',
+  'hs-beatriz':  '/beatriz',
+  'hs-lurdes':   '/lurdes',
+  'hs-clovis':   '/clovis',
+  'hs-fatima':   '/fatima',
+  'hs-rabisca':  '/interativo',
+  'hs-clicks':   '/galeria',
+  'hs-blabla':   '/chat'
 };
 
 Object.keys(nav).forEach(function(id){
   document.getElementById(id).onclick=function(){
-    window.top.location.href=nav[id]+'?skip=1';
+    window.location.href=nav[id];
   };
 });
 
 document.getElementById('btn-home').onclick=function(){
-  window.top.location.href='/version-test/';
+  window.location.href='/';
 };
 </script>
 </body>
