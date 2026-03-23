@@ -2,7 +2,10 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clube Interativo</title>
+<link rel="icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Pacifico&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -198,7 +201,7 @@ function TT(e,t){tip.textContent=t;tip.style.left=(e.clientX+10)+'px';tip.style.
 function HT(){tip.classList.remove('v');}
 let locked=false;
 function toggleLock(){locked=!locked;document.getElementById('btn-lock').textContent=locked?'🔒':'🔓';const cam=document.getElementById('camada-elementos');cam.style.pointerEvents=locked?'none':'auto';cv.style.zIndex=locked?'10':'3';cv.style.pointerEvents='all';if(locked){deselAll();}}
-function irIndice(){window.top.location.href='/version-test/indice?skip=1';}
+function irIndice(){window.location.href='/indice';}
 </script>
 </body>
 </html>
