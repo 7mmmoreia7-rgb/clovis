@@ -15,21 +15,16 @@
         height: 100%;
         overflow: hidden;
         background: #000;
-        margin: 0;
-        padding: 0;
     }
 
     #vid {
         position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        min-width: 100%;
-        min-height: 100%;
-        width: auto;
-        height: auto;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;        /* ← Esta é a linha mais importante */
         z-index: 1;
-        object-fit: cover;
     }
 
     #play {
@@ -55,7 +50,10 @@
         z-index: 2;
         pointer-events: none;
     }
-    #gbg.show { opacity: 1; pointer-events: all; }
+    #gbg.show { 
+        opacity: 1; 
+        pointer-events: all; 
+    }
 
     .hs {
         position: absolute;
@@ -85,7 +83,7 @@
         pointer-events: all;
     }
 
-    /* Ajustes mobile */
+    /* Ajustes para mobile */
     @media (max-width: 768px) {
         #play { width: 20%; }
         #btn-home { width: 16%; }
@@ -123,21 +121,18 @@
   const gbg = document.getElementById('gbg');
   const btnHome = document.getElementById('btn-home');
 
-  // Botão Play
   playBtn.onclick = function() {
     playBtn.style.opacity = '0';
     playBtn.style.pointerEvents = 'none';
     vid.play().catch(() => { vid.muted = true; vid.play(); });
   };
 
-  // Quando o vídeo termina
   vid.onended = function() {
     gbg.classList.add('show');
     document.querySelectorAll('.hs').forEach(h => h.classList.add('show'));
     btnHome.classList.add('show');
   };
 
-  // Skip direto com ?skip=1
   if (window.location.search.includes('skip=1')) {
     playBtn.style.display = 'none';
     gbg.classList.add('show');
@@ -145,7 +140,6 @@
     btnHome.classList.add('show');
   }
 
-  // Navegação
   const nav = {
     'hs-ignora':   '/regras',
     'hs-carolina': '/carolina',
@@ -167,7 +161,7 @@
 
   btnHome.onclick = () => window.location.href = '/';
 
-  // Double tap para saltar (mantido)
+  // Double tap para saltar
   let lastTap = 0;
   vid.addEventListener('touchend', function() {
     const now = Date.now();
