@@ -4,8 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Regras</title>
+  
   <link rel="icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
   <link rel="apple-touch-icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
+
   <style>
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html, body { width:100%; height:100%; overflow:hidden; background:#000; }
@@ -15,11 +17,13 @@
       width:100%; height:100%;
       object-fit:cover; z-index:1;
     }
+
     #btn-play {
       position:fixed; top:50%; left:50%;
       transform:translate(-50%,-50%);
       width:10%; cursor:pointer; z-index:10; transition:opacity .3s;
     }
+
     #btn-idx {
       position:fixed; bottom:10%; right:5%;
       width:8%; cursor:pointer; z-index:10;
@@ -28,11 +32,11 @@
 
     @media (max-width: 768px) {
       #btn-play { width:20%; }
-      #btn-idx  { width:16%; }
+      #btn-idx { width:16%; }
     }
     @media (max-width: 480px) {
       #btn-play { width:28%; }
-      #btn-idx  { width:22%; }
+      #btn-idx { width:22%; }
     }
   </style>
 </head>
@@ -46,14 +50,14 @@
   <img id="btn-idx"  src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" alt="Índice" />
 
   <script>
-    var play = document.getElementById('btn-play');
-    var vid  = document.getElementById('myVideo');
-    var idx  = document.getElementById('btn-idx');
+    const play = document.getElementById('btn-play');
+    const vid  = document.getElementById('myVideo');
+    const idx  = document.getElementById('btn-idx');
 
     play.onclick = function () {
       play.style.opacity = '0';
       play.style.pointerEvents = 'none';
-      vid.play();
+      vid.play().catch(() => { vid.muted = true; vid.play(); });
     };
 
     vid.onended = function () {
@@ -62,7 +66,7 @@
     };
 
     idx.onclick = function () {
-      window.location.href = '/indice';
+      window.location.href = 'indice.html?skip=1';
     };
   </script>
 
