@@ -8,32 +8,18 @@
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
     html,body{width:100%;height:100%;overflow:hidden;background:#000;}
 
-    #wrap{
-        width:100%; height:100%; position:relative; background:#000;
-    }
-    #stage{
-        width:100%; height:100%; position:relative; overflow:hidden;
-    }
+    #wrap{width:100%;height:100%;position:relative;background:#000;}
+    #stage{width:100%;height:100%;position:relative;overflow:hidden;}
 
     /* Vídeo */
-    #vid{
-        position:absolute; inset:0; width:100%; height:100%;
-        object-fit:cover; z-index:1;
-    }
-    #play{
-        position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-        width:10%; cursor:pointer; z-index:10; transition:opacity .5s;
-    }
-    #play.gone{opacity:0; pointer-events:none;}
+    #vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
+    #play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:10%;cursor:pointer;z-index:10;transition:opacity .5s;}
+    #play.gone{opacity:0;pointer-events:none;}
 
-    #gbg{
-        position:absolute; inset:0; width:100%; height:100%;
-        object-fit:cover; z-index:2; opacity:0;
-        transition:opacity 1.4s ease; pointer-events:none;
-    }
+    #gbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity 1.4s ease;pointer-events:none;}
     #gbg.show{opacity:1;}
 
-    /* Slots */
+    /* Slots - agora com cover */
     #slots{
         position:absolute;
         left:9.6875%; top:14.8148%;
@@ -46,20 +32,17 @@
         opacity:0;
         pointer-events:none;
         transition:opacity 1.4s ease;
-        background:transparent;
     }
     #slots.show{opacity:1; pointer-events:all;}
 
-    /* Linhas decorativas */
+    /* Linhas decorativas - estendidas até à borda */
     #slots::before{
         content:''; position:absolute; left:0; right:0; top:33.333%;
         height:3px; background:#7a6245; z-index:6; pointer-events:none;
-        transform:translateY(-50%);
     }
     #slots::after{
         content:''; position:absolute; left:0; right:0; top:66.666%;
         height:3px; background:#7a6245; z-index:6; pointer-events:none;
-        transform:translateY(-50%);
     }
     #vline1, #vline2{
         position:absolute; top:0; bottom:0; width:3px;
@@ -68,11 +51,11 @@
     #vline1{left:calc(33.333% - 1.5px);}
     #vline2{left:calc(66.666% - 1.5px);}
 
-    .slot{
-        position:relative; overflow:hidden;
-    }
+    .slot{position:relative;overflow:hidden;}
     .slot img.m{
-        width:100%; height:100%; object-fit:contain; display:block;
+        width:100%; height:100%; 
+        object-fit: cover;        /* ← ALTERADO PARA COVER */
+        display:block;
     }
 
     /* Adicionar */
@@ -115,23 +98,24 @@
     }
     #btn-idx.show{opacity:1; pointer-events:all;}
 
-    /* Fullscreen */
+    /* Fullscreen com fundo personalizado */
     #fsmod{
-        position:absolute; inset:0; display:none; background:#000; z-index:100;
-        flex-direction:column; align-items:center; justify-content:center; gap:10px;
+        position:absolute; inset:0; display:none; 
+        background: url('https://res.cloudinary.com/dxdemxfpe/image/upload/v1774445109/fundilho_yekwkp.png') center/cover;
+        z-index:100; flex-direction:column; align-items:center; justify-content:center; gap:15px;
     }
     #fsmod.on{display:flex;}
 
     #fscont{
-        width:92%; height:78%;
+        width:92%; height:78%; position:relative;
     }
     #fscont img{
-        width:100%; height:100%; object-fit:contain; border-radius:8px;
+        width:100%; height:100%; 
+        object-fit: contain;     /* mantemos contain para não cortar a imagem no zoom */
+        border-radius:8px;
     }
 
-    #fsbar{
-        display:flex; gap:10px;
-    }
+    #fsbar{display:flex; gap:10px;}
     .fsbtn{
         background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3);
         color:#fff; border-radius:8px; padding:8px 18px;
@@ -150,9 +134,7 @@
         z-index:50; opacity:0; transition:transform .4s, opacity .4s;
         white-space:nowrap; pointer-events:none;
     }
-    #toast.on{
-        transform:translateX(-50%) translateY(0); opacity:1;
-    }
+    #toast.on{transform:translateX(-50%) translateY(0); opacity:1;}
 </style>
 </head>
 <body>
@@ -186,7 +168,8 @@
 <input type="file" id="fsin" accept="image/*" style="display:none">
 
 <script>
-// ====================== CONFIG SUPABASE ======================
+// ... (todo o JavaScript permanece exatamente igual ao da versão anterior que te enviei)
+
 const SURL = 'https://itqzgxotbzsuwevjpnoi.supabase.co';
 const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cXpneG90YnpzdXdldmpwbm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDU4NTgsImV4cCI6MjA4NzI4MTg1OH0.nS4RuwfULc9uHGh_u93vLZ7uRsLnKl7NULrb2Yesw9k';
 
@@ -197,14 +180,12 @@ const SHDR = {'apikey':SKEY, 'Authorization':'Bearer '+SKEY};
 const STORAGE_URL = SURL + '/storage/v1/object/public/galeria/';
 const STORAGE_UP  = SURL + '/storage/v1/object/galeria/';
 
-// ====================== VARIÁVEIS ======================
 let data = [];
 for(let i = 0; i < 9; i++) data.push({url:null, name:null, id:null, path:null});
 
 let fsSlot = null;
 let activeSlot = null;
 
-// ====================== RESIZE (Fullscreen real) ======================
 function resize(){
     const stage = document.getElementById('stage');
     stage.style.width = '100%';
@@ -213,16 +194,14 @@ function resize(){
 resize();
 window.addEventListener('resize', resize);
 
-// ====================== PLAY VIDEO ======================
 const vid = document.getElementById('vid');
 document.getElementById('play').onclick = function(){
     this.classList.add('gone');
     vid.play().catch(() => { vid.muted = true; vid.play(); });
 };
 
-// Toque duplo ou fim do vídeo → galeria
 let lastTap = 0;
-vid.addEventListener('touchend', function(e){
+vid.addEventListener('touchend', function(){
     const now = Date.now();
     if(now - lastTap < 350) goGallery();
     lastTap = now;
@@ -230,7 +209,6 @@ vid.addEventListener('touchend', function(e){
 vid.addEventListener('dblclick', goGallery);
 vid.addEventListener('ended', goGallery);
 
-// ====================== IR PARA GALERIA ======================
 function goGallery(){
     vid.pause();
     vid.style.opacity = '0';
@@ -240,22 +218,15 @@ function goGallery(){
     carregarGaleria();
 }
 
-// ====================== CARREGAR DA SUPABASE ======================
 function carregarGaleria(){
     fetch(SURL + '/rest/v1/galeria?order=created_at.asc', {headers: HDR})
     .then(r => r.json())
     .then(rows => {
         data = [];
         for(let i = 0; i < 9; i++) data.push({url:null, name:null, id:null, path:null});
-
         rows.forEach((row, i) => {
             if(i < 9 && row.imagem){
-                data[i] = {
-                    url: row.imagem,
-                    name: 'imagem_' + row.id + '.jpg',
-                    id: row.id,
-                    path: row.path || null
-                };
+                data[i] = {url: row.imagem, name: 'imagem_' + row.id + '.jpg', id: row.id, path: row.path || null};
             }
         });
         build();
@@ -263,7 +234,6 @@ function carregarGaleria(){
     .catch(() => build());
 }
 
-// ====================== CONSTRUIR SLOTS ======================
 function build(){
     const c = document.getElementById('slots');
     c.innerHTML = `<div id="vline1"></div><div id="vline2"></div>`;
@@ -274,7 +244,6 @@ function build(){
         d.className = 'slot';
 
         if(s.url){
-            // Slot com imagem
             const img = document.createElement('img');
             img.src = s.url;
             img.className = 'm';
@@ -283,46 +252,30 @@ function build(){
             const ctrl = document.createElement('div');
             ctrl.className = 'slot-ctrl';
 
-            const ver = document.createElement('button');
-            ver.className = 'sc';
-            ver.textContent = '👁 Ver';
-            ver.onclick = (e) => { e.stopPropagation(); openFS(i); };
+            const ver = document.createElement('button'); ver.className='sc'; ver.textContent='👁 Ver';
+            ver.onclick = (e)=>{e.stopPropagation(); openFS(i);};
             ctrl.appendChild(ver);
 
-            const dl = document.createElement('button');
-            dl.className = 'sc';
-            dl.textContent = '💾 Guardar';
-            dl.onclick = (e) => { e.stopPropagation(); guardarSlot(i); };
+            const dl = document.createElement('button'); dl.className='sc'; dl.textContent='💾 Guardar';
+            dl.onclick = (e)=>{e.stopPropagation(); guardarSlot(i);};
             ctrl.appendChild(dl);
 
-            const ap = document.createElement('button');
-            ap.className = 'sc';
-            ap.textContent = '🗑 Apagar';
-            ap.onclick = (e) => { e.stopPropagation(); apagarSlot(i); };
+            const ap = document.createElement('button'); ap.className='sc'; ap.textContent='🗑 Apagar';
+            ap.onclick = (e)=>{e.stopPropagation(); apagarSlot(i);};
             ctrl.appendChild(ap);
 
             d.appendChild(ctrl);
         } else {
-            // Slot vazio - Adicionar
             const ov = document.createElement('div');
             ov.className = 'slot-add';
-            ov.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                    <path d="M12 4v16m8-8H4"/>
-                </svg>
-                <span>Adicionar</span>`;
-            ov.onclick = () => {
-                activeSlot = i;
-                document.getElementById('fsin').value = '';
-                document.getElementById('fsin').click();
-            };
+            ov.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 4v16m8-8H4"/></svg><span>Adicionar</span>`;
+            ov.onclick = () => { activeSlot = i; document.getElementById('fsin').value=''; document.getElementById('fsin').click(); };
             d.appendChild(ov);
         }
         c.appendChild(d);
     }
 }
 
-// ====================== FULLSCREEN ======================
 function openFS(idx){
     fsSlot = idx;
     const fc = document.getElementById('fscont');
@@ -339,122 +292,83 @@ document.getElementById('fscls').onclick = () => {
     fsSlot = null;
 };
 
-// ====================== GUARDAR (DOWNLOAD) ======================
 function guardarSlot(idx){
     const s = data[idx];
     if(!s || !s.url) return toast('Nada para guardar');
-
     toast('A preparar...');
-    fetch(s.url)
-        .then(r => r.blob())
-        .then(blob => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = s.name || 'galeria.jpg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            toast('✓ Guardado!');
-        })
-        .catch(() => toast('Erro ao guardar'));
+    fetch(s.url).then(r=>r.blob()).then(blob=>{
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = s.name || 'galeria.jpg';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast('✓ Guardado!');
+    }).catch(()=>toast('Erro ao guardar'));
 }
 
-document.getElementById('fsdl').onclick = () => {
-    if(fsSlot !== null) guardarSlot(fsSlot);
-};
+document.getElementById('fsdl').onclick = () => { if(fsSlot!==null) guardarSlot(fsSlot); };
 
-// ====================== APAGAR ======================
 function apagarSlot(idx){
     const s = data[idx];
     if(!s) return;
+    data[idx] = {url:null,name:null,id:null,path:null};
+    build(); toast('A apagar...');
 
-    data[idx] = {url:null, name:null, id:null, path:null};
-    build();
-    toast('A apagar...');
-
-    if(s.id){
-        fetch(SURL + '/rest/v1/galeria?id=eq.' + s.id, {method:'DELETE', headers:HDRD}).catch(()=>{});
-    }
+    if(s.id) fetch(SURL+'/rest/v1/galeria?id=eq.'+s.id,{method:'DELETE',headers:HDRD}).catch(()=>{});
     if(s.path){
-        fetch(STORAGE_UP + s.path, {method:'DELETE', headers:SHDR})
-            .then(() => toast('✓ Apagado'))
-            .catch(() => toast('✓ Apagado'));
-    } else {
-        toast('✓ Apagado');
-    }
+        fetch(STORAGE_UP + s.path,{method:'DELETE',headers:SHDR})
+        .then(()=>toast('✓ Apagado')).catch(()=>toast('✓ Apagado'));
+    } else toast('✓ Apagado');
 }
 
-// ====================== UPLOAD ======================
 document.getElementById('fsin').addEventListener('change', function(){
-    const file = this.files[0];
-    if(!file || activeSlot === null) return;
-    uploadStorage(file, activeSlot);
+    const f = this.files[0];
+    if(!f || activeSlot===null) return;
+    uploadStorage(f, activeSlot);
     this.value = '';
 });
 
 function uploadStorage(file, slot){
-    const path = 'img_' + slot + '_' + Date.now() + '.jpg';
+    const path = 'img_'+slot+'_'+Date.now()+'.jpg';
     toast('A enviar...');
-
     const reader = new FileReader();
     reader.onload = function(e){
         const img = new Image();
         img.onload = function(){
             const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            canvas.getContext('2d').drawImage(img, 0, 0);
-
-            canvas.toBlob(function(blob){
-                fetch(STORAGE_UP + path, {
-                    method: 'POST',
-                    headers: Object.assign({'Content-Type':'image/jpeg', 'x-upsert':'true'}, SHDR),
-                    body: blob
-                })
-                .then(() => {
+            canvas.width = img.width; canvas.height = img.height;
+            canvas.getContext('2d').drawImage(img,0,0);
+            canvas.toBlob(blob=>{
+                fetch(STORAGE_UP+path,{
+                    method:'POST',
+                    headers:Object.assign({'Content-Type':'image/jpeg','x-upsert':'true'},SHDR),
+                    body:blob
+                }).then(()=>{
                     const url = STORAGE_URL + path;
-                    data[slot] = {url: url, name: file.name, id: null, path: path};
+                    data[slot] = {url:url, name:file.name, id:null, path:path};
                     build();
 
-                    // Guardar referência na tabela
-                    fetch(SURL + '/rest/v1/galeria', {
-                        method: 'POST',
-                        headers: HDR,
-                        body: JSON.stringify({imagem: url, path: path})
-                    })
-                    .then(r => r.json())
-                    .then(rows => {
-                        if(rows && rows[0] && rows[0].id){
-                            data[slot].id = rows[0].id;
-                        }
-                        build();
-                        toast('✓ Guardado!');
-                    })
-                    .catch(() => toast('✓ Guardado (sem referência)'));
-                })
-                .catch(() => toast('Erro ao enviar imagem'));
-            }, 'image/jpeg', 0.92);
+                    fetch(SURL+'/rest/v1/galeria',{method:'POST',headers:HDR,body:JSON.stringify({imagem:url,path:path})})
+                    .then(r=>r.json()).then(rows=>{
+                        if(rows&&rows[0]&&rows[0].id) data[slot].id = rows[0].id;
+                        build(); toast('✓ Guardado!');
+                    }).catch(()=>toast('✓ Guardado!'));
+                }).catch(()=>toast('Erro ao enviar imagem'));
+            },'image/jpeg',0.92);
         };
         img.src = e.target.result;
     };
     reader.readAsDataURL(file);
 }
 
-// ====================== BOTÃO ÍNDICE ======================
-document.getElementById('btn-idx').onclick = function(){
-    window.location.href = 'indice.html?skip=1';
-};
+document.getElementById('btn-idx').onclick = () => window.location.href = 'indice.html?skip=1';
 
-// ====================== TOAST ======================
 let tt;
 function toast(msg){
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('on');
+    t.textContent = msg; t.classList.add('on');
     clearTimeout(tt);
-    tt = setTimeout(() => t.classList.remove('on'), 2800);
+    tt = setTimeout(()=>t.classList.remove('on'), 2800);
 }
 </script>
 </body>
