@@ -18,7 +18,7 @@
     #gbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity 1.4s ease;pointer-events:none;}
     #gbg.show{opacity:1;}
 
-    /* Slots - preenchimento total */
+    /* Slots */
     #slots{
         position:absolute;
         left:9.6875%; top:14.8148%;
@@ -34,7 +34,7 @@
     }
     #slots.show{opacity:1; pointer-events:all;}
 
-    /* LINHAS - corrigidas para chegar exactamente à moldura colorida */
+    /* LINHAS - todas iguais e estendidas */
     #slots::before{
         content:''; position:absolute; left:0; right:0; top:33.333%;
         height:3px; background:#7a6245; z-index:6; pointer-events:none;
@@ -44,12 +44,12 @@
         height:3px; background:#7a6245; z-index:6; pointer-events:none;
     }
     #vline1, #vline2{
-        position:absolute; 
-        top:-3px;          /* estende um pouco para cima */
-        bottom:-3px;       /* estende um pouco para baixo */
+        position:absolute;
+        top: -12px;      /* estendido para cima */
+        bottom: -12px;   /* estendido para baixo (+1cm aprox.) */
         width:3px;
-        background:#7a6245; 
-        z-index:6; 
+        background:#7a6245;
+        z-index:6;
         pointer-events:none;
     }
     #vline1{left:calc(33.333% - 1.5px);}
@@ -57,9 +57,9 @@
 
     .slot{position:relative;overflow:hidden;}
     .slot img.m{
-        width:100%; 
-        height:100%; 
-        object-fit: cover;        /* preenche TODA a slot */
+        width:100%;
+        height:100%;
+        object-fit: cover;   /* preenche toda a slot */
         display:block;
     }
 
@@ -103,32 +103,28 @@
     }
     #btn-idx.show{opacity:1; pointer-events:all;}
 
-    /* Fullscreen com o teu fundo personalizado */
+    /* Fullscreen */
     #fsmod{
-        position:absolute; inset:0; display:none; 
+        position:absolute; inset:0; display:none;
         background: url('https://res.cloudinary.com/dxdemxfpe/image/upload/v1774445109/fundilho_yekwkp.png') center/cover no-repeat;
-        z-index:100; 
-        flex-direction:column; 
-        align-items:center; 
-        justify-content:center; 
+        z-index:100;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
         gap:15px;
     }
     #fsmod.on{display:flex;}
 
-    #fscont{
-        width:92%; height:78%; 
-    }
+    #fscont{width:92%; height:78%;}
     #fscont img{
-        width:100%; 
-        height:100%; 
+        width:100%; height:100%;
         object-fit: contain;
         border-radius:8px;
     }
 
     #fsbar{display:flex; gap:10px;}
     .fsbtn{
-        background:rgba(255,255,255,.18); 
-        border:1px solid rgba(255,255,255,.3);
+        background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3);
         color:#fff; border-radius:8px; padding:8px 18px;
         font-family:sans-serif; font-size:clamp(11px,1.2vw,15px); font-weight:600;
         cursor:pointer; transition:background .2s;
@@ -260,7 +256,6 @@ function build(){
 
             const ctrl = document.createElement('div');
             ctrl.className = 'slot-ctrl';
-
             const ver = document.createElement('button'); ver.className='sc'; ver.textContent='👁 Ver';
             ver.onclick = (e)=>{e.stopPropagation(); openFS(i);};
             ctrl.appendChild(ver);
@@ -308,7 +303,7 @@ function guardarSlot(idx){
     fetch(s.url).then(r=>r.blob()).then(blob=>{
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; a.download = s.name || 'galeria.jpg';
+        a.href = url; a.download = s.name || 'galeria.png';
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
         URL.revokeObjectURL(url);
         toast('✓ Guardado!');
@@ -338,7 +333,7 @@ document.getElementById('fsin').addEventListener('change', function(){
 });
 
 function uploadStorage(file, slot){
-    const path = 'img_'+slot+'_'+Date.now()+'.png';   /* ← PNG para transparência */
+    const path = 'img_'+slot+'_'+Date.now()+'.png';   // PNG para transparência
     toast('A enviar...');
     const reader = new FileReader();
     reader.onload = function(e){
@@ -347,7 +342,7 @@ function uploadStorage(file, slot){
             const canvas = document.createElement('canvas');
             canvas.width = img.width; canvas.height = img.height;
             canvas.getContext('2d').drawImage(img,0,0);
-            canvas.toBlob(blob=>{                          /* ← PNG (mantém transparência) */
+            canvas.toBlob(blob=>{
                 fetch(STORAGE_UP+path,{
                     method:'POST',
                     headers:Object.assign({'Content-Type':'image/png','x-upsert':'true'},SHDR),
@@ -363,7 +358,7 @@ function uploadStorage(file, slot){
                         build(); toast('✓ Guardado!');
                     }).catch(()=>toast('✓ Guardado!'));
                 }).catch(()=>toast('Erro ao enviar imagem'));
-            },'image/png');   /* ← PNG (sem fundo preto) */
+            },'image/png');
         };
         img.src = e.target.result;
     };
