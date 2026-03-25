@@ -11,7 +11,6 @@
     #wrap{width:100%;height:100%;position:relative;background:#000;}
     #stage{width:100%;height:100%;position:relative;overflow:hidden;}
 
-    /* Vídeo */
     #vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
     #play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:10%;cursor:pointer;z-index:10;transition:opacity .5s;}
     #play.gone{opacity:0;pointer-events:none;}
@@ -19,7 +18,7 @@
     #gbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity 1.4s ease;pointer-events:none;}
     #gbg.show{opacity:1;}
 
-    /* Slots - agora com cover */
+    /* Slots */
     #slots{
         position:absolute;
         left:9.6875%; top:14.8148%;
@@ -35,7 +34,7 @@
     }
     #slots.show{opacity:1; pointer-events:all;}
 
-    /* Linhas decorativas - estendidas até à borda */
+    /* Linhas - corrigidas para chegar à borda */
     #slots::before{
         content:''; position:absolute; left:0; right:0; top:33.333%;
         height:3px; background:#7a6245; z-index:6; pointer-events:none;
@@ -48,17 +47,18 @@
         position:absolute; top:0; bottom:0; width:3px;
         background:#7a6245; z-index:6; pointer-events:none;
     }
-    #vline1{left:calc(33.333% - 1.5px);}
-    #vline2{left:calc(66.666% - 1.5px);}
+    #vline1{left:33.333%;}
+    #vline2{left:66.666%;}
 
     .slot{position:relative;overflow:hidden;}
     .slot img.m{
-        width:100%; height:100%; 
-        object-fit: cover;        /* ← ALTERADO PARA COVER */
+        width:100%; 
+        height:100%; 
+        object-fit: cover;        /* Preenche toda a slot */
         display:block;
     }
 
-    /* Adicionar */
+    /* Slot vazio */
     .slot-add{
         position:absolute; inset:0;
         display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -101,23 +101,30 @@
     /* Fullscreen com fundo personalizado */
     #fsmod{
         position:absolute; inset:0; display:none; 
-        background: url('https://res.cloudinary.com/dxdemxfpe/image/upload/v1774445109/fundilho_yekwkp.png') center/cover;
-        z-index:100; flex-direction:column; align-items:center; justify-content:center; gap:15px;
+        background: url('https://res.cloudinary.com/dxdemxfpe/image/upload/v1774445109/fundilho_yekwkp.png') center/cover no-repeat;
+        z-index:100; 
+        flex-direction:column; 
+        align-items:center; 
+        justify-content:center; 
+        gap:15px;
     }
     #fsmod.on{display:flex;}
 
     #fscont{
-        width:92%; height:78%; position:relative;
+        width:92%; height:78%; 
+        background: transparent;
     }
     #fscont img{
-        width:100%; height:100%; 
-        object-fit: contain;     /* mantemos contain para não cortar a imagem no zoom */
+        width:100%; 
+        height:100%; 
+        object-fit: contain;   /* Mantém proporção sem cortar */
         border-radius:8px;
     }
 
     #fsbar{display:flex; gap:10px;}
     .fsbtn{
-        background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3);
+        background:rgba(255,255,255,.18); 
+        border:1px solid rgba(255,255,255,.3);
         color:#fff; border-radius:8px; padding:8px 18px;
         font-family:sans-serif; font-size:clamp(11px,1.2vw,15px); font-weight:600;
         cursor:pointer; transition:background .2s;
@@ -168,12 +175,10 @@
 <input type="file" id="fsin" accept="image/*" style="display:none">
 
 <script>
-// ... (todo o JavaScript permanece exatamente igual ao da versão anterior que te enviei)
-
 const SURL = 'https://itqzgxotbzsuwevjpnoi.supabase.co';
 const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cXpneG90YnpzdXdldmpwbm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDU4NTgsImV4cCI6MjA4NzI4MTg1OH0.nS4RuwfULc9uHGh_u93vLZ7uRsLnKl7NULrb2Yesw9k';
 
-const HDR  = {'apikey':SKEY, 'Authorization':'Bearer '+SKEY, 'Content-Type':'application/json', 'Prefer':'return=representation'};
+const HDR = {'apikey':SKEY, 'Authorization':'Bearer '+SKEY, 'Content-Type':'application/json', 'Prefer':'return=representation'};
 const HDRD = {'apikey':SKEY, 'Authorization':'Bearer '+SKEY, 'Content-Type':'application/json', 'Prefer':'return=minimal'};
 const SHDR = {'apikey':SKEY, 'Authorization':'Bearer '+SKEY};
 
