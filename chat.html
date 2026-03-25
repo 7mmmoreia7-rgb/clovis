@@ -11,10 +11,9 @@
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 ::-webkit-scrollbar { display:none!important; width:0!important; height:0!important; }
 * { scrollbar-width:none!important; -ms-overflow-style:none!important; }
-html { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
-body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
-#wrap { position:fixed; top:0; left:0; width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; background:#c8b99a; overflow:hidden; }
-#stage { position:relative; overflow:hidden; background:#c8b99a; flex-shrink:0; }
+html, body { width:100%; height:100%; overflow:hidden; background:#000; }
+#wrap { position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#000; overflow:hidden; }
+#stage { position:relative; width:100%; height:100%; overflow:hidden; }
 .pagina { position:absolute; inset:0; }
 #pag-login { z-index:5; }
 #pag-chat  { z-index:4; display:none; }
@@ -39,8 +38,6 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
 #btn-export { position:absolute; left:64.7%; top:0%; width:11%; height:14%; z-index:15; background:transparent; border:none; cursor:pointer; }
 #btn-import { position:absolute; left:78.9%; top:0%; width:11%; height:14%; z-index:15; background:transparent; border:none; cursor:pointer; }
 #file-import { display:none; }
-#btn-idx { position:absolute; right:5%; bottom:10%; width:8%; height:auto; object-fit:contain; cursor:pointer; z-index:10; opacity:0; pointer-events:none; transition:opacity .5s; }
-#btn-idx.show { opacity:1; pointer-events:all; }
 #emoji-panel { position:absolute; left:14.48%; top:26%; width:46%; height:36%; z-index:30; background:rgba(255,255,255,0.97); border-radius:10px; border:2px solid #ddd; display:none; flex-wrap:wrap; align-items:flex-start; justify-content:flex-start; gap:8px; padding:10px; box-shadow:0 4px 20px rgba(0,0,0,0.2); overflow-y:auto; }
 #emoji-panel.open { display:flex; }
 #emoji-panel img { width:80px; height:80px; object-fit:contain; cursor:pointer; transition:transform .15s; flex-shrink:0; }
@@ -53,6 +50,10 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
 #fs-close:hover { background:rgba(0,0,0,.8); }
 #fs-save { background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,0.4); color:#fff; border-radius:8px; padding:8px 24px; font-size:1em; font-weight:700; cursor:pointer; transition:background .2s; }
 #fs-save:hover { background:rgba(0,0,0,.8); }
+
+/* btn-idx — fora do wrap, fixed, acima de tudo */
+#btn-idx { position:fixed; bottom:3.5%; right:3.4%; width:8%; cursor:pointer; z-index:9999; opacity:0; pointer-events:none; transition:opacity .5s; }
+#btn-idx.show { opacity:1; pointer-events:all; }
 </style>
 </head>
 <body>
@@ -104,7 +105,6 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
     <button id="btn-export"></button>
     <button id="btn-import"></button>
     <input id="file-import" type="file" accept="image/*,video/*" multiple />
-    <img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" alt="índice" />
     <div id="fs-overlay">
       <img id="fs-img" src="" alt="" style="display:none;" />
       <video id="fs-vid" controls playsinline style="display:none;"></video>
@@ -116,18 +116,11 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
   </div>
 
 </div></div>
+
+<!-- btn-idx fora do wrap — acima de tudo -->
+<img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" alt="índice" />
+
 <script>
-function resize(){
-  var ww=window.innerWidth, wh=window.innerHeight;
-  var r=16/9, sw, sh;
-  if(ww/wh>r){sh=wh;sw=sh*r;}else{sw=ww;sh=sw/r;}
-  var s=document.getElementById('stage');
-  s.style.width=sw+'px';
-  s.style.height=sh+'px';
-  s.style.fontSize=(sw/1920*26)+'px';
-}
-resize();
-window.addEventListener('resize',resize);
 document.addEventListener('touchmove',function(e){e.preventDefault();},{passive:false});
 
 var SURL='https://itqzgxotbzsuwevjpnoi.supabase.co';
@@ -344,7 +337,10 @@ document.getElementById('fs-save').addEventListener('click',function(e){e.stopPr
 document.getElementById('fs-overlay').addEventListener('click',function(e){if(e.target===this)fecharFs();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')fecharFs();});
 
-document.getElementById('btn-idx').onclick=function(){window.location.href='/indice';};
+document.getElementById('btn-idx').onclick=function(e){
+  e.stopPropagation();
+  window.location.href='indice.html?skip=1';
+};
 </script>
 </body>
 </html>
