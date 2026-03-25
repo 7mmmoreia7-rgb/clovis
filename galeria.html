@@ -2,163 +2,174 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Galeria</title>
 <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
     html,body{width:100%;height:100%;overflow:hidden;background:#000;}
-
-    #wrap{width:100%;height:100%;position:relative;background:#000;}
-    #stage{width:100%;height:100%;position:relative;overflow:hidden;}
+    #wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#000;}
+    #stage{position:relative;width:100%;height:100%;overflow:hidden;}
 
     #vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
-    #play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:10%;cursor:pointer;z-index:10;transition:opacity .5s;}
+    #play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:10%;object-fit:contain;cursor:pointer;z-index:10;transition:opacity .5s;}
     #play.gone{opacity:0;pointer-events:none;}
 
     #gbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity 1.4s ease;pointer-events:none;}
     #gbg.show{opacity:1;}
 
-    /* Slots */
+    /* ── SLOTS: grid que cobre EXACTAMENTE o interior da moldura colorida ── */
     #slots{
         position:absolute;
-        left:9.6875%; top:14.8148%;
-        width:80.3125%; height:70.0926%;
+        left:9.75%;
+        right:9.9%;
+        top:8.87%;
+        bottom:8.87%;
+        width:auto;
+        height:auto;
         display:grid;
-        grid-template-columns:repeat(3,1fr);
-        grid-template-rows:repeat(3,1fr);
-        gap:0;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows:    repeat(3, 1fr);
         z-index:5;
         opacity:0;
         pointer-events:none;
         transition:opacity 1.4s ease;
+        gap:0;
+        overflow:hidden;
     }
-    #slots.show{opacity:1; pointer-events:all;}
+    #slots.show{opacity:1;pointer-events:none;}
+    #slots.show .slot{pointer-events:all;}
 
-    /* LINHAS - todas iguais e estendidas */
+    /* ── cada célula do grid — tamanho 100% da célula, nunca cresce ── */
+    .slot{
+        position:relative;
+        overflow:hidden;
+        width:100%;
+        height:100%;
+        min-width:0;
+        min-height:0;
+        background:transparent;
+    }
+
+    /* Linhas separadoras horizontais */
     #slots::before{
-        content:''; position:absolute; left:0; right:0; top:33.333%;
-        height:3px; background:#7a6245; z-index:6; pointer-events:none;
+        content:'';
+        position:absolute;
+        left:0;right:0;
+        top:calc(100% / 3);
+        height:3px;
+        background:#7a6245;
+        z-index:6;
+        pointer-events:none;
     }
     #slots::after{
-        content:''; position:absolute; left:0; right:0; top:66.666%;
-        height:3px; background:#7a6245; z-index:6; pointer-events:none;
-    }
-    #vline1, #vline2{
+        content:'';
         position:absolute;
-        top: -12px;      /* estendido para cima */
-        bottom: -12px;   /* estendido para baixo (+1cm aprox.) */
+        left:0;right:0;
+        top:calc(200% / 3);
+        height:3px;
+        background:#7a6245;
+        z-index:6;
+        pointer-events:none;
+    }
+
+    /* Linhas verticais (pseudo-elementos num wrapper separado) */
+    #vline1,#vline2{
+        position:absolute;
+        /* estendem-se ligeiramente para cobrir a moldura */
+        top:-20px;
+        bottom:-20px;
         width:3px;
         background:#7a6245;
         z-index:6;
         pointer-events:none;
     }
-    #vline1{left:calc(33.333% - 1.5px);}
-    #vline2{left:calc(66.666% - 1.5px);}
+    #vline1{left:calc(100% / 3 - 1.5px);}
+    #vline2{left:calc(200% / 3 - 1.5px);}
 
-    .slot{position:relative;overflow:hidden;}
+
+
+    /* imagem dentro do slot: preenche 100% da célula sem distorção */
     .slot img.m{
+        position:absolute;
+        inset:0;
         width:100%;
         height:100%;
-        object-fit: cover;   /* preenche toda a slot */
+        object-fit:cover;
         display:block;
     }
 
-    /* Slot vazio */
     .slot-add{
-        position:absolute; inset:0;
-        display:flex; flex-direction:column; align-items:center; justify-content:center;
-        cursor:pointer; transition:background .2s;
+        position:absolute;inset:0;
+        display:flex;flex-direction:column;
+        align-items:center;justify-content:center;
+        cursor:pointer;
+        transition:background .2s;
     }
     .slot-add:hover{background:rgba(0,0,0,.08);}
-    .slot-add svg{width:8%; min-width:18px; max-width:44px; opacity:.15;}
-    .slot-add span{
-        font-family:sans-serif; font-size:clamp(8px,1.1vw,15px); font-weight:600;
-        margin-top:5px; color:rgba(80,65,50,.3);
-    }
+    .slot-add svg{width:8%;min-width:18px;max-width:44px;opacity:.15;}
+    .slot-add span{font-family:sans-serif;font-size:clamp(8px,1.1vw,15px);font-weight:600;margin-top:5px;color:rgba(80,65,50,.3);}
 
-    /* Controlos */
     .slot-ctrl{
-        position:absolute; bottom:0; left:0; right:0;
-        display:flex; justify-content:center; gap:4px;
+        position:absolute;bottom:0;left:0;right:0;
+        display:flex;justify-content:center;gap:4px;
         padding:4px 6px;
         background:linear-gradient(transparent,rgba(0,0,0,.65));
-        opacity:0; transition:opacity .25s; z-index:5;
+        opacity:0;transition:opacity .25s;z-index:5;
     }
     .slot:hover .slot-ctrl{opacity:1;}
 
     .sc{
-        background:rgba(255,255,255,.22); border:none; border-radius:5px;
-        color:#fff; cursor:pointer; padding:4px 8px;
-        font-family:sans-serif; font-size:clamp(8px,.9vw,12px); font-weight:600;
-        display:flex; align-items:center; gap:3px;
-        transition:background .15s;
+        background:rgba(255,255,255,.22);border:none;border-radius:5px;
+        color:#fff;cursor:pointer;padding:4px 8px;
+        font-family:sans-serif;font-size:clamp(8px,.9vw,12px);font-weight:600;
+        display:flex;align-items:center;gap:3px;transition:background .15s;
     }
     .sc:hover{background:rgba(255,255,255,.38);}
 
-    /* Botão Índice */
-    #btn-idx{
-        position:absolute; bottom:10%; right:3%; width:8%;
-        cursor:pointer; z-index:10; opacity:0; pointer-events:none;
-        transition:opacity .5s;
-    }
-    #btn-idx.show{opacity:1; pointer-events:all;}
+    #btn-idx{position:fixed;bottom:3.5%;right:3.4%;width:8%;cursor:pointer;z-index:9999;opacity:0;pointer-events:none;transition:opacity .5s;}
+    #btn-idx.show{opacity:1;pointer-events:all;}
 
     /* Fullscreen */
     #fsmod{
-        position:absolute; inset:0; display:none;
-        background: url('https://res.cloudinary.com/dxdemxfpe/image/upload/v1774445109/fundilho_yekwkp.png') center/cover no-repeat;
-        z-index:100;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        gap:15px;
+        display:none;position:absolute;inset:0;z-index:100;
+        background:url(https://res.cloudinary.com/dxdemxfpe/image/upload/v1774445109/fundilho_yekwkp.png) center/cover;
+        flex-direction:column;align-items:center;justify-content:center;gap:10px;
     }
     #fsmod.on{display:flex;}
+    #fscont{width:92%;height:78%;}
+    #fscont img{width:100%;height:100%;object-fit:contain;display:block;border-radius:8px;}
 
-    #fscont{width:92%; height:78%;}
-    #fscont img{
-        width:100%; height:100%;
-        object-fit: contain;
-        border-radius:8px;
-    }
-
-    #fsbar{display:flex; gap:10px;}
+    #fsbar{display:flex;gap:10px;}
     .fsbtn{
-        background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3);
-        color:#fff; border-radius:8px; padding:8px 18px;
-        font-family:sans-serif; font-size:clamp(11px,1.2vw,15px); font-weight:600;
-        cursor:pointer; transition:background .2s;
+        background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+        color:#fff;border-radius:8px;padding:8px 18px;
+        font-family:sans-serif;font-size:clamp(11px,1.2vw,15px);font-weight:600;
+        cursor:pointer;transition:background .2s;
     }
     .fsbtn:hover{background:rgba(255,255,255,.32);}
 
-    /* Toast */
     #toast{
-        position:absolute; bottom:3%; left:50%; transform:translateX(-50%) translateY(40px);
-        background:rgba(10,10,10,.92); color:#fff;
-        font-family:sans-serif; font-size:clamp(11px,1.4vw,17px); font-weight:600;
+        position:absolute;bottom:3%;left:50%;
+        transform:translateX(-50%) translateY(40px);
+        background:rgba(10,10,10,.92);color:#fff;
+        font-family:sans-serif;font-size:clamp(11px,1.4vw,17px);font-weight:600;
         padding:clamp(6px,1vw,11px) clamp(12px,2vw,26px);
-        border-radius:22px; border:1px solid rgba(255,255,255,.15);
-        z-index:50; opacity:0; transition:transform .4s, opacity .4s;
-        white-space:nowrap; pointer-events:none;
+        border-radius:22px;border:1px solid rgba(255,255,255,.15);
+        z-index:50;opacity:0;transition:transform .4s,opacity .4s;
+        white-space:nowrap;pointer-events:none;
     }
-    #toast.on{transform:translateX(-50%) translateY(0); opacity:1;}
+    #toast.on{transform:translateX(-50%) translateY(0);opacity:1;}
 </style>
 </head>
 <body>
-
 <div id="wrap">
   <div id="stage">
     <video id="vid" src="https://res.cloudinary.com/dxdemxfpe/video/upload/v1773223413/galeria_l9s4l4.mp4" preload="auto" playsinline></video>
-    <img id="play" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958888/26_ujjdad.png" alt="Play">
-
-    <img id="gbg" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773593841/isto_n%C3%A3o_%C3%A9_para_todos_2_nrkc13.png" alt="">
+    <img id="play" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958888/26_ujjdad.png" alt="Play"/>
+    <img id="gbg" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773593841/isto_n%C3%A3o_%C3%A9_para_todos_2_nrkc13.png" alt=""/>
 
     <div id="slots">
       <div id="vline1"></div>
       <div id="vline2"></div>
     </div>
-
-    <img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" alt="Índice">
 
     <div id="fsmod">
       <div id="fscont"></div>
@@ -167,212 +178,167 @@
         <button class="fsbtn" id="fsdl">💾 Guardar</button>
       </div>
     </div>
-
     <div id="toast"></div>
   </div>
 </div>
 
+<img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" alt="índice"/>
+
 <input type="file" id="fsin" accept="image/*" style="display:none">
 
 <script>
-const SURL = 'https://itqzgxotbzsuwevjpnoi.supabase.co';
-const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cXpneG90YnpzdXdldmpwbm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDU4NTgsImV4cCI6MjA4NzI4MTg1OH0.nS4RuwfULc9uHGh_u93vLZ7uRsLnKl7NULrb2Yesw9k';
+const SURL='https://itqzgxotbzsuwevjpnoi.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cXpneG90YnpzdXdldmpwbm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDU4NTgsImV4cCI6MjA4NzI4MTg1OH0.nS4RuwfULc9uHGh_u93vLZ7uRsLnKl7NULrb2Yesw9k';
+const HDR={'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json','Prefer':'return=representation'};
+const HDRD={'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json','Prefer':'return=minimal'};
+const STORAGE_URL=SURL+'/storage/v1/object/public/galeria/';
+const STORAGE_UP=SURL+'/storage/v1/object/galeria/';
+const SHDR={'apikey':SKEY,'Authorization':'Bearer '+SKEY};
 
-const HDR = {'apikey':SKEY, 'Authorization':'Bearer '+SKEY, 'Content-Type':'application/json', 'Prefer':'return=representation'};
-const HDRD = {'apikey':SKEY, 'Authorization':'Bearer '+SKEY, 'Content-Type':'application/json', 'Prefer':'return=minimal'};
-const SHDR = {'apikey':SKEY, 'Authorization':'Bearer '+SKEY};
-
-const STORAGE_URL = SURL + '/storage/v1/object/public/galeria/';
-const STORAGE_UP  = SURL + '/storage/v1/object/galeria/';
-
-let data = [];
-for(let i = 0; i < 9; i++) data.push({url:null, name:null, id:null, path:null});
-
-let fsSlot = null;
-let activeSlot = null;
+var data=[];
+for(var i=0;i<9;i++)data.push({url:null,name:null,id:null,path:null});
+var fsSlot=null,activeSlot=null;
 
 function resize(){
-    const stage = document.getElementById('stage');
-    stage.style.width = '100%';
-    stage.style.height = '100%';
+  var stage=document.getElementById('stage');
+  stage.style.width='100%';
+  stage.style.height='100%';
 }
-resize();
-window.addEventListener('resize', resize);
+resize();window.addEventListener('resize',resize);
 
-const vid = document.getElementById('vid');
-document.getElementById('play').onclick = function(){
-    this.classList.add('gone');
-    vid.play().catch(() => { vid.muted = true; vid.play(); });
+var vid=document.getElementById('vid');
+document.getElementById('play').onclick=function(){
+  this.classList.add('gone');
+  vid.play().catch(function(){vid.muted=true;vid.play();});
 };
 
-let lastTap = 0;
-vid.addEventListener('touchend', function(){
-    const now = Date.now();
-    if(now - lastTap < 350) goGallery();
-    lastTap = now;
+var lastTap=0;
+vid.addEventListener('touchend',function(){
+  var now=Date.now();
+  if(now-lastTap<350)goGallery();
+  lastTap=now;
 });
-vid.addEventListener('dblclick', goGallery);
-vid.addEventListener('ended', goGallery);
+vid.addEventListener('dblclick',goGallery);
+vid.addEventListener('ended',goGallery);
 
 function goGallery(){
-    vid.pause();
-    vid.style.opacity = '0';
-    document.getElementById('gbg').classList.add('show');
-    document.getElementById('slots').classList.add('show');
-    document.getElementById('btn-idx').classList.add('show');
-    carregarGaleria();
+  vid.pause();
+  vid.style.opacity='0';
+  document.getElementById('gbg').classList.add('show');
+  document.getElementById('slots').classList.add('show');
+  document.getElementById('btn-idx').classList.add('show');
+  carregarGaleria();
 }
 
 function carregarGaleria(){
-    fetch(SURL + '/rest/v1/galeria?order=created_at.asc', {headers: HDR})
-    .then(r => r.json())
-    .then(rows => {
-        data = [];
-        for(let i = 0; i < 9; i++) data.push({url:null, name:null, id:null, path:null});
-        rows.forEach((row, i) => {
-            if(i < 9 && row.imagem){
-                data[i] = {url: row.imagem, name: 'imagem_' + row.id + '.jpg', id: row.id, path: row.path || null};
-            }
-        });
-        build();
-    })
-    .catch(() => build());
+  fetch(SURL+'/rest/v1/galeria?order=created_at.asc',{headers:HDR})
+  .then(r=>r.json())
+  .then(rows=>{
+    data=[];
+    for(var i=0;i<9;i++)data.push({url:null,name:null,id:null,path:null});
+    rows.forEach((row,i)=>{
+      if(i<9&&row.imagem){
+        data[i]={url:row.imagem,name:'imagem_'+row.id+'.png',id:row.id,path:row.path||null};
+      }
+    });
+    build();
+  }).catch(()=>build());
 }
 
 function build(){
-    const c = document.getElementById('slots');
-    c.innerHTML = `<div id="vline1"></div><div id="vline2"></div>`;
-
-    for(let i = 0; i < 9; i++){
-        const s = data[i];
-        const d = document.createElement('div');
-        d.className = 'slot';
-
-        if(s.url){
-            const img = document.createElement('img');
-            img.src = s.url;
-            img.className = 'm';
-            d.appendChild(img);
-
-            const ctrl = document.createElement('div');
-            ctrl.className = 'slot-ctrl';
-            const ver = document.createElement('button'); ver.className='sc'; ver.textContent='👁 Ver';
-            ver.onclick = (e)=>{e.stopPropagation(); openFS(i);};
-            ctrl.appendChild(ver);
-
-            const dl = document.createElement('button'); dl.className='sc'; dl.textContent='💾 Guardar';
-            dl.onclick = (e)=>{e.stopPropagation(); guardarSlot(i);};
-            ctrl.appendChild(dl);
-
-            const ap = document.createElement('button'); ap.className='sc'; ap.textContent='🗑 Apagar';
-            ap.onclick = (e)=>{e.stopPropagation(); apagarSlot(i);};
-            ctrl.appendChild(ap);
-
-            d.appendChild(ctrl);
-        } else {
-            const ov = document.createElement('div');
-            ov.className = 'slot-add';
-            ov.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 4v16m8-8H4"/></svg><span>Adicionar</span>`;
-            ov.onclick = () => { activeSlot = i; document.getElementById('fsin').value=''; document.getElementById('fsin').click(); };
-            d.appendChild(ov);
-        }
-        c.appendChild(d);
-    }
+  var c=document.getElementById('slots');
+  c.innerHTML='<div id="vline1"></div><div id="vline2"></div>';
+  for(var i=0;i<9;i++){
+    (function(idx){
+      var s=data[idx],d=document.createElement('div');d.className='slot';
+      if(s.url){
+        var img=document.createElement('img');img.src=s.url;img.className='m';d.appendChild(img);
+        var ctrl=document.createElement('div');ctrl.className='slot-ctrl';
+        var ver=document.createElement('button');ver.className='sc';ver.textContent='👁 Ver';
+        ver.onclick=function(e){e.stopPropagation();openFS(idx);};ctrl.appendChild(ver);
+        var dl=document.createElement('button');dl.className='sc';dl.textContent='💾 Guardar';
+        dl.onclick=function(e){e.stopPropagation();guardarSlot(idx);};ctrl.appendChild(dl);
+        var ap=document.createElement('button');ap.className='sc';ap.textContent='🗑 Apagar';
+        ap.onclick=function(e){e.stopPropagation();apagarSlot(idx);};ctrl.appendChild(ap);
+        d.appendChild(ctrl);
+      }else{
+        var ov=document.createElement('div');ov.className='slot-add';
+        ov.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 4v16m8-8H4"/></svg><span>Adicionar</span>';
+        ov.onclick=function(){activeSlot=idx;document.getElementById('fsin').value='';document.getElementById('fsin').click();};
+        d.appendChild(ov);
+      }
+      c.appendChild(d);
+    })(i);
+  }
 }
 
 function openFS(idx){
-    fsSlot = idx;
-    const fc = document.getElementById('fscont');
-    fc.innerHTML = '';
-    const img = document.createElement('img');
-    img.src = data[idx].url;
-    fc.appendChild(img);
-    document.getElementById('fsmod').classList.add('on');
+  fsSlot=idx;
+  var fc=document.getElementById('fscont');fc.innerHTML='';
+  var img=document.createElement('img');img.src=data[idx].url;fc.appendChild(img);
+  document.getElementById('fsmod').classList.add('on');
 }
-
-document.getElementById('fscls').onclick = () => {
-    document.getElementById('fsmod').classList.remove('on');
-    document.getElementById('fscont').innerHTML = '';
-    fsSlot = null;
-};
+document.getElementById('fscls').onclick=function(){document.getElementById('fsmod').classList.remove('on');};
 
 function guardarSlot(idx){
-    const s = data[idx];
-    if(!s || !s.url) return toast('Nada para guardar');
-    toast('A preparar...');
-    fetch(s.url).then(r=>r.blob()).then(blob=>{
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = s.name || 'galeria.png';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        toast('✓ Guardado!');
-    }).catch(()=>toast('Erro ao guardar'));
+  var s=data[idx];if(!s||!s.url)return toast('Nada para guardar');
+  fetch(s.url).then(r=>r.blob()).then(blob=>{
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download=s.name||'imagem.png';
+    a.click(); URL.revokeObjectURL(url); toast('✓ Guardado!');
+  });
 }
-
-document.getElementById('fsdl').onclick = () => { if(fsSlot!==null) guardarSlot(fsSlot); };
+document.getElementById('fsdl').onclick=function(){if(fsSlot!==null)guardarSlot(fsSlot);};
 
 function apagarSlot(idx){
-    const s = data[idx];
-    if(!s) return;
-    data[idx] = {url:null,name:null,id:null,path:null};
-    build(); toast('A apagar...');
-
-    if(s.id) fetch(SURL+'/rest/v1/galeria?id=eq.'+s.id,{method:'DELETE',headers:HDRD}).catch(()=>{});
-    if(s.path){
-        fetch(STORAGE_UP + s.path,{method:'DELETE',headers:SHDR})
-        .then(()=>toast('✓ Apagado')).catch(()=>toast('✓ Apagado'));
-    } else toast('✓ Apagado');
+  var s=data[idx];
+  data[idx]={url:null,name:null,id:null,path:null};
+  build(); toast('A apagar...');
+  if(s.id)fetch(SURL+'/rest/v1/galeria?id=eq.'+s.id,{method:'DELETE',headers:HDRD}).catch(()=>{});
+  if(s.path)fetch(STORAGE_UP+s.path,{method:'DELETE',headers:SHDR}).then(()=>toast('✓ Apagado')).catch(()=>toast('✓ Apagado'));
 }
 
-document.getElementById('fsin').addEventListener('change', function(){
-    const f = this.files[0];
-    if(!f || activeSlot===null) return;
-    uploadStorage(f, activeSlot);
-    this.value = '';
+function uploadStorage(file,slot){
+  var path='img_'+slot+'_'+Date.now()+'.png';
+  toast('A enviar...');
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      var canvas=document.createElement('canvas');
+      canvas.width=img.width;canvas.height=img.height;
+      canvas.getContext('2d').drawImage(img,0,0);
+      canvas.toBlob(function(blob){
+        fetch(STORAGE_UP+path,{method:'POST',headers:Object.assign({'Content-Type':'image/png','x-upsert':'true'},SHDR),body:blob})
+        .then(()=>{
+          var url=STORAGE_URL+path;
+          data[slot]={url:url,name:file.name,id:null,path:path};
+          build();
+          fetch(SURL+'/rest/v1/galeria',{method:'POST',headers:HDR,body:JSON.stringify({imagem:url,path:path})})
+          .then(r=>r.json()).then(rows=>{if(rows&&rows[0])data[slot].id=rows[0].id;build();toast('✓ Guardado!');});
+        });
+      },'image/png');
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+document.getElementById('fsin').addEventListener('change',function(){
+  var f=this.files[0];if(!f||activeSlot===null)return;
+  uploadStorage(f,activeSlot);
+  this.value='';
 });
 
-function uploadStorage(file, slot){
-    const path = 'img_'+slot+'_'+Date.now()+'.png';   // PNG para transparência
-    toast('A enviar...');
-    const reader = new FileReader();
-    reader.onload = function(e){
-        const img = new Image();
-        img.onload = function(){
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width; canvas.height = img.height;
-            canvas.getContext('2d').drawImage(img,0,0);
-            canvas.toBlob(blob=>{
-                fetch(STORAGE_UP+path,{
-                    method:'POST',
-                    headers:Object.assign({'Content-Type':'image/png','x-upsert':'true'},SHDR),
-                    body:blob
-                }).then(()=>{
-                    const url = STORAGE_URL + path;
-                    data[slot] = {url:url, name:file.name, id:null, path:path};
-                    build();
+document.getElementById('btn-idx').onclick=function(e){
+  e.stopPropagation();
+  window.location.href='indice.html?skip=1';
+};
 
-                    fetch(SURL+'/rest/v1/galeria',{method:'POST',headers:HDR,body:JSON.stringify({imagem:url,path:path})})
-                    .then(r=>r.json()).then(rows=>{
-                        if(rows&&rows[0]&&rows[0].id) data[slot].id = rows[0].id;
-                        build(); toast('✓ Guardado!');
-                    }).catch(()=>toast('✓ Guardado!'));
-                }).catch(()=>toast('Erro ao enviar imagem'));
-            },'image/png');
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-document.getElementById('btn-idx').onclick = () => window.location.href = 'indice.html?skip=1';
-
-let tt;
+var tt;
 function toast(msg){
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('on');
-    clearTimeout(tt);
-    tt = setTimeout(()=>t.classList.remove('on'), 2800);
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');
+  clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('on');},2800);
 }
 </script>
 </body>
