@@ -18,7 +18,7 @@
     #gbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity 1.4s ease;pointer-events:none;}
     #gbg.show{opacity:1;}
 
-    /* Slots */
+    /* Slots - preenchimento total */
     #slots{
         position:absolute;
         left:9.6875%; top:14.8148%;
@@ -34,7 +34,7 @@
     }
     #slots.show{opacity:1; pointer-events:all;}
 
-    /* Linhas - corrigidas para chegar à borda */
+    /* LINHAS - corrigidas para chegar exactamente à moldura colorida */
     #slots::before{
         content:''; position:absolute; left:0; right:0; top:33.333%;
         height:3px; background:#7a6245; z-index:6; pointer-events:none;
@@ -44,17 +44,22 @@
         height:3px; background:#7a6245; z-index:6; pointer-events:none;
     }
     #vline1, #vline2{
-        position:absolute; top:0; bottom:0; width:3px;
-        background:#7a6245; z-index:6; pointer-events:none;
+        position:absolute; 
+        top:-3px;          /* estende um pouco para cima */
+        bottom:-3px;       /* estende um pouco para baixo */
+        width:3px;
+        background:#7a6245; 
+        z-index:6; 
+        pointer-events:none;
     }
-    #vline1{left:33.333%;}
-    #vline2{left:66.666%;}
+    #vline1{left:calc(33.333% - 1.5px);}
+    #vline2{left:calc(66.666% - 1.5px);}
 
     .slot{position:relative;overflow:hidden;}
     .slot img.m{
         width:100%; 
         height:100%; 
-        object-fit: cover;        /* Preenche toda a slot */
+        object-fit: cover;        /* preenche TODA a slot */
         display:block;
     }
 
@@ -98,7 +103,7 @@
     }
     #btn-idx.show{opacity:1; pointer-events:all;}
 
-    /* Fullscreen com fundo personalizado */
+    /* Fullscreen com o teu fundo personalizado */
     #fsmod{
         position:absolute; inset:0; display:none; 
         background: url('https://res.cloudinary.com/dxdemxfpe/image/upload/v1774445109/fundilho_yekwkp.png') center/cover no-repeat;
@@ -112,12 +117,11 @@
 
     #fscont{
         width:92%; height:78%; 
-        background: transparent;
     }
     #fscont img{
         width:100%; 
         height:100%; 
-        object-fit: contain;   /* Mantém proporção sem cortar */
+        object-fit: contain;
         border-radius:8px;
     }
 
@@ -334,7 +338,7 @@ document.getElementById('fsin').addEventListener('change', function(){
 });
 
 function uploadStorage(file, slot){
-    const path = 'img_'+slot+'_'+Date.now()+'.jpg';
+    const path = 'img_'+slot+'_'+Date.now()+'.png';   /* ← PNG para transparência */
     toast('A enviar...');
     const reader = new FileReader();
     reader.onload = function(e){
@@ -343,10 +347,10 @@ function uploadStorage(file, slot){
             const canvas = document.createElement('canvas');
             canvas.width = img.width; canvas.height = img.height;
             canvas.getContext('2d').drawImage(img,0,0);
-            canvas.toBlob(blob=>{
+            canvas.toBlob(blob=>{                          /* ← PNG (mantém transparência) */
                 fetch(STORAGE_UP+path,{
                     method:'POST',
-                    headers:Object.assign({'Content-Type':'image/jpeg','x-upsert':'true'},SHDR),
+                    headers:Object.assign({'Content-Type':'image/png','x-upsert':'true'},SHDR),
                     body:blob
                 }).then(()=>{
                     const url = STORAGE_URL + path;
@@ -359,7 +363,7 @@ function uploadStorage(file, slot){
                         build(); toast('✓ Guardado!');
                     }).catch(()=>toast('✓ Guardado!'));
                 }).catch(()=>toast('Erro ao enviar imagem'));
-            },'image/jpeg',0.92);
+            },'image/png');   /* ← PNG (sem fundo preto) */
         };
         img.src = e.target.result;
     };
