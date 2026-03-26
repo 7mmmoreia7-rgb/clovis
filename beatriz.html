@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -22,9 +21,9 @@
     #foto-area.show { pointer-events:all; opacity:0; }
     #foto-area:hover ~ #btn-email, #btn-email:hover { opacity:1 !important; }
     #btn-idx { position:fixed; bottom:3.5%; right:3.4%; width:8%; cursor:pointer; z-index:9999; opacity:0; pointer-events:none; transition:opacity .8s; }
-#btn-idx.show { opacity:1; pointer-events:all; }
-    @media (max-width: 768px) { #play { width:20%; } #btn-idx { width:16%; } }
-    @media (max-width: 480px) { #play { width:28%; } #btn-idx { width:22%; } }
+    #btn-idx.show { opacity:1; pointer-events:all; }
+    @media (max-width: 768px) { #play { width:20%; } }
+    @media (max-width: 480px) { #play { width:28%; } }
   </style>
 </head>
 <body>
@@ -33,8 +32,8 @@
   <img id="play" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958888/26_ujjdad.png" />
   <div id="foto-area"></div>
   <img id="btn-email" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772411225/ChatGPT_Image_Jan_25__2026__01_04_01_AM-removebg-preview_juxpsr.png" alt="email" />
-  <img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
 </div></div>
+<img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
 <script>
 function resize(){
   var wrap=document.getElementById('wrap'), stage=document.getElementById('stage');
@@ -45,7 +44,6 @@ function resize(){
 resize(); window.addEventListener('resize',resize);
 
 var vid=document.getElementById('vid');
-
 document.getElementById('play').onclick=function(){
   this.classList.add('gone');
   vid.play().catch(function(){vid.muted=true;vid.play();});
@@ -54,15 +52,16 @@ document.getElementById('play').onclick=function(){
 vid.addEventListener('ended',function(){
   document.getElementById('btn-email').classList.add('show');
   document.getElementById('foto-area').classList.add('show');
-  document.getElementById('btn-idx').onclick = function(e){ e.stopPropagation(); window.location.href='indice.html?skip=1'; };
-
+  document.getElementById('btn-idx').classList.add('show');
+});
 
 document.getElementById('btn-email').onclick=function(){
   window.open('mailto:beatrizfreimor4@gmail.com');
 };
 
-document.getElementById('btn-idx').onclick=function(){
-  window.location.href='/indice';
+document.getElementById('btn-idx').onclick=function(e){
+  e.stopPropagation();
+  window.location.href='indice.html?skip=1';
 };
 </script>
 </body>
