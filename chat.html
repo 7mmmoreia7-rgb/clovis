@@ -33,9 +33,9 @@
     /* ==================== LOGIN ==================== */
     #login-input {
         position:absolute;
-        left:50%; top:58%;
-        transform:translate(-50%, -50%);
-        width:38%; height:7%;
+        left:50%; top:57%;
+        transform: translate(-50%, -50%);
+        width:38%; height:7.5%;
         border:none; outline:none; background:transparent;
         font-family:'Caveat', cursive; font-size:1.45em; text-align:center; color:#111;
         z-index:20;
@@ -43,7 +43,7 @@
     #btn-entra {
         position:absolute;
         left:50%; top:69%;
-        transform:translate(-50%, -50%);
+        transform: translate(-50%, -50%);
         width:26%; height:14%;
         background:transparent; border:none; cursor:pointer;
         z-index:20;
@@ -52,11 +52,11 @@
     /* ==================== CHAT ==================== */
     #msgs-box {
         position:absolute;
-        left:14.5%; top:17.5%;
-        width:71%; height:50%;
+        left:14.5%; top:17%;
+        width:71%; height:51%;
         overflow-y:auto; overflow-x:hidden;
-        padding:20px 25px;
-        display:flex; flex-direction:column; gap:8px;
+        padding:18px 25px;
+        display:flex; flex-direction:column; gap:7px;
         z-index:10;
     }
     .msg {
@@ -81,7 +81,7 @@
     #chat-input {
         position:absolute;
         left:19%; top:72.5%;
-        width:60%; height:9.8%;
+        width:60%; height:10%;
         border:none; outline:none; background:transparent;
         font-family:Georgia, serif; font-size:0.97em; color:#111;
         padding:14px 20px; line-height:1.45; overflow-y:auto;
@@ -91,7 +91,7 @@
         content:attr(data-ph); color:#777;
     }
 
-    /* Botões Chat */
+    /* Botões */
     #btn-clovis  { position:absolute; left:14.5%; top:71.5%; width:6.8%; height:15%; background:transparent; border:none; cursor:pointer; }
     #btn-enviar  { position:absolute; left:81%;   top:71.5%; width:9.2%; height:15%; background:transparent; border:none; cursor:pointer; }
     #btn-export  { position:absolute; left:64.5%; top:4%;    width:10%;  height:12%; background:transparent; border:none; cursor:pointer; }
@@ -109,7 +109,7 @@
     #emoji-panel.open { display:flex; }
     #emoji-panel img { width:70px; height:70px; object-fit:contain; cursor:pointer; }
 
-    /* Fullscreen */
+    /* Fullscreen Overlay */
     #fs-overlay {
         position:fixed; inset:0; z-index:500;
         background:ur[](https://res.cloudinary.com/dxdemxfpe/image/upload/v1771887590/isto_f3c09e.png) center/cover;
@@ -173,8 +173,8 @@
 </div>
 
 <script>
-// ==================== TEU JAVASCRIPT AQUI ====================
-// Cola aqui todo o teu script original (a partir de "function resize()" até o final)
+// ==================== TEU CÓDIGO JAVASCRIPT ORIGINAL ====================
+// Cola aqui todo o teu script original (desde "function resize()" até o final)
 
 function resize(){
   document.getElementById('stage').style.width = '100%';
@@ -183,28 +183,86 @@ function resize(){
 resize();
 window.addEventListener('resize', resize);
 
-// ... resto do teu código (entrar, iniciarChat, addMsg, enviar, etc.)
+var SURL='https://itqzgxotbzsuwevjpnoi.supabase.co';
+var SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cXpneG90YnpzdXdldmpwbm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDU4NTgsImV4cCI6MjA4NzI4MTg1OH0.nS4RuwfULc9uHGh_u93vLZ7uRsLnKl7NULrb2Yesw9k';
+var HDR={'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json'};
+function sGet(q){return fetch(SURL+'/rest/v1/mensagens?'+q,{headers:HDR}).then(function(r){return r.json();});}
+function sInsert(d){return fetch(SURL+'/rest/v1/mensagens',{method:'POST',headers:Object.assign({'Prefer':'return=representation'},HDR),body:JSON.stringify(d)}).then(function(r){return r.json();}).then(function(rows){if(rows&&rows.length&&rows[0].id){idsEnviados[rows[0].id]=true;}});}
+var nome='',ultimoId=0,idsEnviados={};
 
-// Exemplo mínimo para o login funcionar:
-document.getElementById('btn-entra').onclick = function(){
-  const v = document.getElementById('login-input').value.trim();
-  if(v){
-    nome = v;
-    document.getElementById('pag-login').style.display = 'none';
-    document.getElementById('pag-chat').style.display = 'block';
-    document.getElementById('btn-idx').classList.add('show');
-    document.getElementById('chat-input').style.display = 'block';
-    iniciarChat();
-  }
+var EU={
+  // ... (cola aqui todo o teu object EU original com os emojis)
+  // Para não ficar muito longo, podes colar o teu EU completo aqui
 };
 
-document.getElementById('login-input').onkeydown = function(e){
-  if(e.key === 'Enter') document.getElementById('btn-entra').onclick();
-};
+function entrar(){
+  var v=document.getElementById('login-input').value.trim();if(!v)return;
+  nome=v;
+  document.getElementById('pag-login').style.display='none';
+  document.getElementById('pag-chat').style.display='block';
+  document.getElementById('btn-idx').classList.add('show');
+  document.getElementById('chat-input').style.display='block';
+  iniciarChat();
+}
+document.getElementById('btn-entra').onclick=entrar;
+document.getElementById('login-input').onkeydown=function(e){if(e.key==='Enter')entrar();};
 
-document.getElementById('btn-idx').onclick = function(){ window.location.href = 'indice.html'; };
+function iniciarChat(){
+  sGet('select=*&order=created_at.asc&limit=80').then(function(data){
+    if(!Array.isArray(data))return;
+    data.forEach(addMsg);
+    if(data.length)ultimoId=data[data.length-1].id;
+    scrollDown();
+  });
+  setInterval(function(){
+    if(!ultimoId)return;
+    sGet('select=*&order=created_at.asc&id=gt.'+ultimoId).then(function(data){
+      if(!Array.isArray(data)||!data.length)return;
+      data.forEach(function(m){if(!idsEnviados[m.id])addMsg(m);delete idsEnviados[m.id];});
+      ultimoId=data[data.length-1].id;scrollDown();
+    });
+  },2000);
+}
 
-// ... continua com o teu código original de mensagens, emojis, upload, etc.
+function addMsg(m){
+  var b=document.getElementById('msgs-box'),d=document.createElement('div');d.className='msg';
+  d.innerHTML='<span class="autor">'+esc(m.nome)+':</span> <span class="texto">'+toHtml(m.texto)+'</span>';
+  b.appendChild(d);
+  scrollDown();
+}
+
+function scrollDown(){var b=document.getElementById('msgs-box');b.scrollTop=b.scrollHeight;}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function toHtml(t){
+  if(!t)return'';
+  // Aqui podes colocar a tua função toHtml original completa
+  return t; // temporário - substitui pela tua função real
+}
+
+function lerInput(){
+  var i=document.getElementById('chat-input'),t='';
+  i.childNodes.forEach(function(n){
+    if(n.nodeType===Node.TEXT_NODE)t+=n.textContent;
+    else if(n.nodeName==='IMG'){var c=U2C[n.getAttribute('src')];if(c)t+=':'+c+':';}
+    else if(n.nodeName==='BR')t+=' ';
+    else t+=n.textContent;
+  });
+  return t.trim();
+}
+function enviar(){
+  var t=lerInput();if(!t||!nome)return;
+  document.getElementById('chat-input').innerHTML='';
+  addMsg({nome:nome,texto:t});scrollDown();sInsert({nome:nome,texto:t});
+}
+document.getElementById('btn-enviar').onclick=enviar;
+document.getElementById('chat-input').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();enviar();}});
+
+document.getElementById('btn-clovis').onclick=function(e){e.stopPropagation();document.getElementById('emoji-panel').classList.toggle('open');};
+
+// ... continua com o teu código de emojis, upload, fullscreen, etc.
+
+document.getElementById('btn-idx').onclick=function(){window.location.href='indice.html';};
 </script>
 </body>
 </html>
