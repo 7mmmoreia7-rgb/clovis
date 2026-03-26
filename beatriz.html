@@ -21,8 +21,8 @@
     #foto-area { position:absolute; left:9.50%; top:19.00%; width:19%; height:33%; z-index:9; cursor:pointer; opacity:0; pointer-events:none; }
     #foto-area.show { pointer-events:all; opacity:0; }
     #foto-area:hover ~ #btn-email, #btn-email:hover { opacity:1 !important; }
-    #btn-idx { position:absolute; bottom:10%; right:5%; width:8%; cursor:pointer; z-index:10; opacity:0; pointer-events:none; transition:opacity .8s; }
-    #btn-idx.show { opacity:1; pointer-events:all; }
+    #btn-idx { position:fixed; bottom:3.5%; right:3.4%; width:8%; cursor:pointer; z-index:9999; opacity:0; pointer-events:none; transition:opacity .8s; }
+#btn-idx.show { opacity:1; pointer-events:all; }
     @media (max-width: 768px) { #play { width:20%; } #btn-idx { width:16%; } }
     @media (max-width: 480px) { #play { width:28%; } #btn-idx { width:22%; } }
   </style>
@@ -54,8 +54,8 @@ document.getElementById('play').onclick=function(){
 vid.addEventListener('ended',function(){
   document.getElementById('btn-email').classList.add('show');
   document.getElementById('foto-area').classList.add('show');
-  document.getElementById('btn-idx').classList.add('show');
-});
+  document.getElementById('btn-idx').onclick = function(e){ e.stopPropagation(); window.location.href='indice.html?skip=1'; };
+
 
 document.getElementById('btn-email').onclick=function(){
   window.open('mailto:beatrizfreimor4@gmail.com');
