@@ -3,185 +3,133 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Chat</title>
 <link rel="icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
 <style>
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html, body {
-        width:100%; height:100%; overflow:hidden; background:#c8b99a;
-    }
-    #wrap {
-        position:fixed; top:0; left:0; width:100%; height:100%;
-        display:flex; align-items:center; justify-content:center;
-    }
-    #stage {
-        position:relative; width:100%; height:100%; overflow:hidden;
-    }
-
-    /* Backgrounds */
-    #bg-login, #bg-chat {
-        position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-    }
-
-    /* Páginas */
-    .pagina { position:absolute; inset:0; }
-    #pag-login { z-index:5; }
-    #pag-chat  { z-index:4; display:none; }
-
-    /* ==================== LOGIN ==================== */
-    #login-input {
-        position:absolute;
-        left:50%; top:57%;
-        transform: translate(-50%, -50%);
-        width:38%; height:7.5%;
-        border:none; outline:none; background:transparent;
-        font-family:'Caveat', cursive; font-size:1.45em; text-align:center; color:#111;
-        z-index:20;
-    }
-    #btn-entra {
-        position:absolute;
-        left:50%; top:69%;
-        transform: translate(-50%, -50%);
-        width:26%; height:14%;
-        background:transparent; border:none; cursor:pointer;
-        z-index:20;
-    }
-
-    /* ==================== CHAT ==================== */
-    #msgs-box {
-        position:absolute;
-        left:14.5%; top:17%;
-        width:71%; height:51%;
-        overflow-y:auto; overflow-x:hidden;
-        padding:18px 25px;
-        display:flex; flex-direction:column; gap:7px;
-        z-index:10;
-    }
-    .msg {
-        display:flex; flex-shrink:0; line-height:1.6;
-        animation:fadeIn 0.3s ease;
-    }
-    .msg .autor {
-        font-family:'Caveat', cursive; font-size:1.18em; font-weight:700;
-        color:#c00; margin-right:8px; white-space:nowrap;
-    }
-    .msg .texto {
-        font-family:Georgia, serif; font-size:0.96em; color:#111;
-        overflow-wrap:break-word;
-    }
-    .msg .texto img.emoji, .msg .texto img.media-img, .msg .texto video {
-        max-height:3.8em; vertical-align:middle; margin:3px 5px; border-radius:6px;
-    }
-
-    @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1;} }
-
-    /* Input Chat */
-    #chat-input {
-        position:absolute;
-        left:19%; top:72.5%;
-        width:60%; height:10%;
-        border:none; outline:none; background:transparent;
-        font-family:Georgia, serif; font-size:0.97em; color:#111;
-        padding:14px 20px; line-height:1.45; overflow-y:auto;
-        display:none; cursor:text;
-    }
-    #chat-input:empty::before {
-        content:attr(data-ph); color:#777;
-    }
-
-    /* Botões */
-    #btn-clovis  { position:absolute; left:14.5%; top:71.5%; width:6.8%; height:15%; background:transparent; border:none; cursor:pointer; }
-    #btn-enviar  { position:absolute; left:81%;   top:71.5%; width:9.2%; height:15%; background:transparent; border:none; cursor:pointer; }
-    #btn-export  { position:absolute; left:64.5%; top:4%;    width:10%;  height:12%; background:transparent; border:none; cursor:pointer; }
-    #btn-import  { position:absolute; left:77.5%; top:4%;    width:10%;  height:12%; background:transparent; border:none; cursor:pointer; }
-    #btn-idx     { position:absolute; right:3%; bottom:9%; width:8%; cursor:pointer; z-index:30; opacity:0; transition:opacity .5s; }
-    #btn-idx.show { opacity:1; pointer-events:all; }
-
-    /* Emoji Panel */
-    #emoji-panel {
-        position:absolute; left:14.5%; top:24%; width:47%; height:40%;
-        background:rgba(255,255,255,0.97); border:2px solid #ccc; border-radius:14px;
-        box-shadow:0 8px 35px rgba(0,0,0,0.3); padding:15px; gap:12px;
-        display:none; flex-wrap:wrap; overflow-y:auto; z-index:40;
-    }
-    #emoji-panel.open { display:flex; }
-    #emoji-panel img { width:70px; height:70px; object-fit:contain; cursor:pointer; }
-
-    /* Fullscreen Overlay */
-    #fs-overlay {
-        position:fixed; inset:0; z-index:500;
-        background:ur[](https://res.cloudinary.com/dxdemxfpe/image/upload/v1771887590/isto_f3c09e.png) center/cover;
-        display:none; align-items:center; justify-content:center; flex-direction:column; gap:15px;
-    }
-    #fs-overlay.open { display:flex; }
-    #fs-overlay img, #fs-overlay video { max-width:90%; max-height:76%; border-radius:10px; object-fit:contain; }
-
-    .fs-btn {
-        background:rgba(0,0,0,0.65); color:#fff; border:1px solid rgba(255,255,255,0.5);
-        padding:10px 28px; border-radius:8px; font-weight:700; cursor:pointer;
-    }
-    .fs-btn:hover { background:rgba(0,0,0,0.9); }
-
-    /* Scrollbar escondida */
-    #msgs-box::-webkit-scrollbar, #chat-input::-webkit-scrollbar { display:none; }
-    #msgs-box, #chat-input { scrollbar-width:none; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+::-webkit-scrollbar { display:none!important; width:0!important; height:0!important; }
+* { scrollbar-width:none!important; -ms-overflow-style:none!important; }
+html { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
+body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
+#wrap { position:fixed; top:0; left:0; width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; background:#c8b99a; overflow:hidden; }
+#stage { position:relative; overflow:hidden; background:#c8b99a; flex-shrink:0; }
+.pagina { position:absolute; inset:0; }
+#pag-login { z-index:5; }
+#pag-chat  { z-index:4; display:none; }
+#bg-login, #bg-chat { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+#login-input { position:absolute; left:31%; top:59%; width:37%; height:6%; z-index:20; border:none; outline:none; background:transparent; font-size:1.2em; font-family:'Caveat',cursive; text-align:center; color:#111; }
+#btn-entra { position:absolute; left:38%; top:69%; width:24%; height:12%; z-index:20; background:transparent; border:none; cursor:pointer; }
+#msgs-box { position:absolute; left:14.48%; top:20.46%; width:71%; height:46.20%; z-index:10; overflow:hidden; padding:1.5% 3% 0.5% 3%; display:flex; flex-direction:column; gap:2px; overflow-y:scroll; }
+.msg { display:block; flex-shrink:0; line-height:1.6; overflow-wrap:break-word; word-break:break-word; animation:fadeIn .2s ease; }
+.msg .autor { font-family:'Caveat',cursive; font-size:1.05em; font-weight:700; color:#c00; margin-right:3px; }
+.msg .texto { font-family:Georgia,serif; font-size:0.85em; color:#111; overflow-wrap:break-word; word-break:break-word; }
+.msg .texto img.emoji { min-height:3.5em; min-width:3.5em; max-height:5em; max-width:5em; object-fit:contain; vertical-align:middle; display:inline-block; }
+.msg .texto img.media-img { max-height:3.5em; border-radius:4px; cursor:pointer; display:inline-block; vertical-align:middle; }
+.msg .texto img.media-img.sel { outline:3px solid #c00; }
+.msg .texto video { max-height:3.5em; border-radius:4px; cursor:pointer; display:inline-block; vertical-align:middle; }
+.msg .texto video.sel { outline:3px solid #00c; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(2px);}to{opacity:1;transform:none;} }
+#chat-input { position:absolute; left:20%; top:71%; width:59%; height:9.35%; z-index:10; border:none; outline:none; background:transparent; font-family:Georgia,serif; font-size:0.9em; color:#111; padding:0.7em 0.8em 0.4em 0.8em; overflow:hidden; overflow-wrap:break-word; word-break:break-word; white-space:pre-wrap; line-height:1.4; display:none; cursor:text; }
+#chat-input:empty::before { content:attr(data-ph); color:#bbb; pointer-events:none; }
+#chat-input img.emoji { min-height:3.5em; min-width:3.5em; max-height:5em; max-width:5em; object-fit:contain; vertical-align:middle; display:inline-block; }
+#btn-enviar { position:absolute; left:81.5%; top:63.5%; width:9.5%; height:16%; z-index:15; background:transparent; border:none; cursor:pointer; }
+#btn-clovis { position:absolute; left:14.48%; top:63.5%; width:6%; height:16%; z-index:15; background:transparent; border:none; cursor:pointer; }
+#btn-export { position:absolute; left:64.7%; top:0%; width:11%; height:14%; z-index:15; background:transparent; border:none; cursor:pointer; }
+#btn-import { position:absolute; left:78.9%; top:0%; width:11%; height:14%; z-index:15; background:transparent; border:none; cursor:pointer; }
+#file-import { display:none; }
+#btn-idx { position:absolute; right:3%; bottom:10%; width:8%; height:auto; object-fit:contain; cursor:pointer; z-index:10; opacity:0; pointer-events:none; transition:opacity .5s; }
+#btn-idx.show { opacity:1; pointer-events:all; }
+#emoji-panel { position:absolute; left:14.48%; top:26%; width:46%; height:36%; z-index:30; background:rgba(255,255,255,0.97); border-radius:10px; border:2px solid #ddd; display:none; flex-wrap:wrap; align-items:flex-start; justify-content:flex-start; gap:8px; padding:10px; box-shadow:0 4px 20px rgba(0,0,0,0.2); overflow-y:auto; }
+#emoji-panel.open { display:flex; }
+#emoji-panel img { width:80px; height:80px; object-fit:contain; cursor:pointer; transition:transform .15s; flex-shrink:0; }
+#emoji-panel img:hover { transform:scale(1.15); }
+#fs-overlay { position:fixed; inset:0; z-index:500; background:url(https://res.cloudinary.com/dxdemxfpe/image/upload/v1771887590/isto_f3c09e.png) center/cover; display:none; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
+#fs-overlay.open { display:flex; }
+#fs-overlay img#fs-img { max-width:90%; max-height:80%; border-radius:8px; object-fit:contain; }
+#fs-overlay video#fs-vid { max-width:90%; max-height:80%; border-radius:8px; }
+#fs-close { background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.4); color:#fff; border-radius:8px; padding:8px 28px; font-size:1em; font-weight:700; cursor:pointer; z-index:501; transition:background .2s; }
+#fs-close:hover { background:rgba(0,0,0,.8); }
+#fs-save { background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,0.4); color:#fff; border-radius:8px; padding:8px 24px; font-size:1em; font-weight:700; cursor:pointer; transition:background .2s; }
+#fs-save:hover { background:rgba(0,0,0,.8); }
 </style>
 </head>
 <body>
+<div id="wrap"><div id="stage">
 
-<div id="wrap">
-  <div id="stage">
+  <div id="pag-login" class="pagina">
+    <img id="bg-login" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1771845348/chat_2_xxurxp.png" alt="" />
+    <input id="login-input" type="text" maxlength="20" autocomplete="off" spellcheck="false" />
+    <button id="btn-entra"></button>
+  </div>
 
-    <!-- LOGIN -->
-    <div id="pag-login" class="pagina">
-      <img id="bg-login" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1771845348/chat_2_xxurxp.png" alt="">
-      <input id="login-input" type="text" maxlength="20" autocomplete="off" spellcheck="false" placeholder="">
-      <button id="btn-entra"></button>
+  <div id="pag-chat" class="pagina">
+    <img id="bg-chat" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773599543/isto_n%C3%A3o_%C3%A9_para_todos_3_ntshdn.png" alt="" />
+    <div id="msgs-box"></div>
+    <div id="emoji-panel">
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946627/1_pz5cc5.png" data-e="e1" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946627/2_dsh9ek.png" data-e="e2" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946628/3_ac3mhj.png" data-e="e3" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946628/4_xwaihb.png" data-e="e4" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946632/5_s1ahp6.png" data-e="e5" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946633/6_ugbsc8.png" data-e="e6" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946635/7_kehixy.png" data-e="e7" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946635/8_le9rad.png" data-e="e8" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946636/9_l92zm4.png" data-e="e9" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946639/10_oycjvw.png" data-e="e10" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946640/11_eylkgz.png" data-e="e11" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946642/12_vrifn2.png" data-e="e12" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946643/13_a0927x.png" data-e="e13" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946644/14_zslnxa.png" data-e="e14" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946646/15_e7ldbf.png" data-e="e15" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946647/16_puprtb.png" data-e="e16" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946648/17_g0knc8.png" data-e="e17" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946650/18_szhsqj.png" data-e="e18" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946651/19_pxdx6i.png" data-e="e19" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946652/20_wcsvn8.png" data-e="e20" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946655/21_ceocw1.png" data-e="e21" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946655/22_hmr1hw.png" data-e="e22" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946656/23_kml500.png" data-e="e23" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946659/24_g3s3tv.png" data-e="e24" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946660/25_xzzpnb.png" data-e="e25" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946661/26_x0fevy.png" data-e="e26" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946664/27_mhftar.png" data-e="e27" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946665/28_bjttw8.png" data-e="e28" />
+      <img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946669/31_dfdbpj.png" data-e="e29" />
     </div>
-
-    <!-- CHAT -->
-    <div id="pag-chat" class="pagina">
-      <img id="bg-chat" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773599543/isto_n%C3%A3o_%C3%A9_para_todos_3_ntshdn.png" alt="">
-
-      <div id="msgs-box"></div>
-      <div id="emoji-panel"></div>
-
-      <div id="chat-input" contenteditable="true" data-ph="escreve aqui…"></div>
-
-      <button id="btn-clovis"></button>
-      <button id="btn-enviar"></button>
-      <button id="btn-export"></button>
-      <button id="btn-import"></button>
-      <input id="file-import" type="file" accept="image/*,video/*" multiple style="display:none">
-
-      <img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" alt="índice">
-
-      <!-- Fullscreen Overlay -->
-      <div id="fs-overlay">
-        <img id="fs-img" src="" alt="">
-        <video id="fs-vid" controls playsinline></video>
-        <div style="display:flex; gap:15px; margin-top:15px;">
-          <button class="fs-btn" id="fs-close">✕ Fechar</button>
-          <button class="fs-btn" id="fs-save">💾 Guardar</button>
-        </div>
+    <div id="chat-input" contenteditable="true" data-ph="escreve aqui…" role="textbox"></div>
+    <button id="btn-clovis"></button>
+    <button id="btn-enviar"></button>
+    <button id="btn-export"></button>
+    <button id="btn-import"></button>
+    <input id="file-import" type="file" accept="image/*,video/*" multiple />
+    <img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" alt="índice" />
+    <div id="fs-overlay">
+      <img id="fs-img" src="" alt="" style="display:none;" />
+      <video id="fs-vid" controls playsinline style="display:none;"></video>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button id="fs-close">✕ Fechar</button>
+        <button id="fs-save">💾 Guardar</button>
       </div>
     </div>
-
   </div>
-</div>
 
+</div></div>
 <script>
-// ==================== TEU CÓDIGO JAVASCRIPT ORIGINAL ====================
-// Cola aqui todo o teu script original (desde "function resize()" até o final)
-
 function resize(){
-  document.getElementById('stage').style.width = '100%';
-  document.getElementById('stage').style.height = '100%';
+  var ww=window.innerWidth, wh=window.innerHeight;
+  var r=16/9, sw, sh;
+  if(ww/wh>r){sh=wh;sw=sh*r;}else{sw=ww;sh=sw/r;}
+  var s=document.getElementById('stage');
+  s.style.width=sw+'px';
+  s.style.height=sh+'px';
+  s.style.fontSize=(sw/1920*26)+'px';
 }
 resize();
-window.addEventListener('resize', resize);
+window.addEventListener('resize',resize);
+document.addEventListener('touchmove',function(e){e.preventDefault();},{passive:false});
 
 var SURL='https://itqzgxotbzsuwevjpnoi.supabase.co';
 var SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cXpneG90YnpzdXdldmpwbm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDU4NTgsImV4cCI6MjA4NzI4MTg1OH0.nS4RuwfULc9uHGh_u93vLZ7uRsLnKl7NULrb2Yesw9k';
@@ -191,9 +139,65 @@ function sInsert(d){return fetch(SURL+'/rest/v1/mensagens',{method:'POST',header
 var nome='',ultimoId=0,idsEnviados={};
 
 var EU={
-  // ... (cola aqui todo o teu object EU original com os emojis)
-  // Para não ficar muito longo, podes colar o teu EU completo aqui
+  e1:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946627/1_pz5cc5.png',
+  e2:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946627/2_dsh9ek.png',
+  e3:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946628/3_ac3mhj.png',
+  e4:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946628/4_xwaihb.png',
+  e5:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946632/5_s1ahp6.png',
+  e6:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946633/6_ugbsc8.png',
+  e7:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946635/7_kehixy.png',
+  e8:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946635/8_le9rad.png',
+  e9:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946636/9_l92zm4.png',
+  e10:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946639/10_oycjvw.png',
+  e11:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946640/11_eylkgz.png',
+  e12:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946642/12_vrifn2.png',
+  e13:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946643/13_a0927x.png',
+  e14:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946644/14_zslnxa.png',
+  e15:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946646/15_e7ldbf.png',
+  e16:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946647/16_puprtb.png',
+  e17:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946648/17_g0knc8.png',
+  e18:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946650/18_szhsqj.png',
+  e19:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946651/19_pxdx6i.png',
+  e20:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946652/20_wcsvn8.png',
+  e21:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946655/21_ceocw1.png',
+  e22:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946655/22_hmr1hw.png',
+  e23:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946656/23_kml500.png',
+  e24:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946659/24_g3s3tv.png',
+  e25:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946660/25_xzzpnb.png',
+  e26:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946661/26_x0fevy.png',
+  e27:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946664/27_mhftar.png',
+  e28:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946665/28_bjttw8.png',
+  e29:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946669/31_dfdbpj.png',
+  furioso:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946627/1_pz5cc5.png',
+  triste:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946627/2_dsh9ek.png',
+  oculos:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946628/3_ac3mhj.png',
+  amor:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946628/4_xwaihb.png',
+  beijo:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946632/5_s1ahp6.png',
+  rir:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946633/6_ugbsc8.png',
+  chorar:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946635/7_kehixy.png',
+  recriar:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1773946635/8_le9rad.png',
+  e28old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958889/28_slhtba.png',
+  e27old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958888/27_d8qg3d.png',
+  e26old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958888/26_ujjdad.png',
+  e25old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958885/25_o0j4dm.png',
+  e24old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958884/24_zcummy.png',
+  e23old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958884/23_jcdqhp.png',
+  e21old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958884/21_pfzygy.png',
+  e22old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958884/22_nzbwou.png',
+  e19old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958858/19_z7irbi.jpg',
+  e20old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958859/20_rrlu1k.jpg',
+  e16old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958858/16_k43ivp.png',
+  e12old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958858/12_wl0i5e.png',
+  e17old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958858/17_c8obvb.png',
+  e18old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958858/18_fkh5ge.png',
+  ewipe:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958857/Image_20260207_010943_wipe_bg_illq4e.png',
+  e15old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958858/15_hdl0mw.png',
+  e10old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958857/10_wau9uz.png',
+  ev1:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958857/v_1__wipe_bg_w6jtl9.png',
+  eulok:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958857/%C3%B9lok_po_wipe_bg_vl99e8.png',
+  e14old:'https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958857/14_tjhjdh.png'
 };
+var U2C={};Object.keys(EU).forEach(function(k){U2C[EU[k]]=k;});
 
 function entrar(){
   var v=document.getElementById('login-input').value.trim();if(!v)return;
@@ -224,21 +228,21 @@ function iniciarChat(){
   },2000);
 }
 
+function toHtml(t){
+  if(!t)return'';
+  if(t.startsWith('[img:')){var u=t.slice(5,-1);return'<img class="media-img" src="'+u+'" data-f="'+u+'">';}
+  if(t.startsWith('[vid:')){var u=t.slice(5,-1);return'<video src="'+u+'" data-vsrc="'+u+'" playsinline></video>';}
+  var p=t.split(/(:[a-z0-9]+:)/g),h='';
+  p.forEach(function(s){var m=s.match(/^:([a-z0-9]+):$/);if(m&&EU[m[1]])h+='<img class="emoji" src="'+EU[m[1]]+'">';else h+=esc(s);});
+  return h;
+}
 function addMsg(m){
   var b=document.getElementById('msgs-box'),d=document.createElement('div');d.className='msg';
   d.innerHTML='<span class="autor">'+esc(m.nome)+':</span> <span class="texto">'+toHtml(m.texto)+'</span>';
   b.appendChild(d);
-  scrollDown();
 }
-
 function scrollDown(){var b=document.getElementById('msgs-box');b.scrollTop=b.scrollHeight;}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function toHtml(t){
-  if(!t)return'';
-  // Aqui podes colocar a tua função toHtml original completa
-  return t; // temporário - substitui pela tua função real
-}
 
 function lerInput(){
   var i=document.getElementById('chat-input'),t='';
@@ -259,10 +263,89 @@ document.getElementById('btn-enviar').onclick=enviar;
 document.getElementById('chat-input').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();enviar();}});
 
 document.getElementById('btn-clovis').onclick=function(e){e.stopPropagation();document.getElementById('emoji-panel').classList.toggle('open');};
+document.querySelectorAll('#emoji-panel img').forEach(function(img){
+  img.onclick=function(e){
+    e.stopPropagation();
+    var inp=document.getElementById('chat-input');inp.focus();
+    var sel=window.getSelection(),range;
+    if(sel&&sel.rangeCount>0){range=sel.getRangeAt(0);if(!inp.contains(range.commonAncestorContainer)){range=document.createRange();range.selectNodeContents(inp);range.collapse(false);}}
+    else{range=document.createRange();range.selectNodeContents(inp);range.collapse(false);}
+    var ei=document.createElement('img');
+    ei.src=EU[this.dataset.e];ei.className='emoji';
+    ei.style.minHeight='3.5em';ei.style.minWidth='3.5em';ei.style.maxHeight='5em';ei.style.maxWidth='5em';ei.style.objectFit='contain';ei.style.verticalAlign='middle';ei.style.display='inline-block';
+    range.deleteContents();range.insertNode(ei);range.setStartAfter(ei);range.collapse(true);
+    sel.removeAllRanges();sel.addRange(range);
+    document.getElementById('emoji-panel').classList.remove('open');inp.focus();
+  };
+});
+document.addEventListener('click',function(e){
+  if(!document.getElementById('emoji-panel').contains(e.target)&&e.target!==document.getElementById('btn-clovis'))
+    document.getElementById('emoji-panel').classList.remove('open');
+});
 
-// ... continua com o teu código de emojis, upload, fullscreen, etc.
+document.getElementById('btn-import').onclick=function(){document.getElementById('file-import').click();};
+document.getElementById('file-import').onchange=function(){
+  if(!this.files.length||!nome)return;
+  Array.from(this.files).forEach(function(f){
+    var path='chat_'+Date.now()+'_'+Math.random().toString(36).slice(2)+'.'+f.name.split('.').pop();
+    var tipo=f.type.startsWith('video')?'vid':'img';
+    fetch(SURL+'/storage/v1/object/chat/'+path,{
+      method:'POST',
+      headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':f.type,'x-upsert':'true'},
+      body:f
+    }).then(function(){
+      var url=SURL+'/storage/v1/object/public/chat/'+path;
+      var texto='['+tipo+':'+url+']';
+      addMsg({nome:nome,texto:texto});scrollDown();sInsert({nome:nome,texto:texto});
+    }).catch(function(){alert('Erro ao enviar ficheiro');});
+  });this.value='';
+};
 
-document.getElementById('btn-idx').onclick=function(){window.location.href='indice.html';};
+var fsAtualSrc=null,fsAtualTipo=null;
+document.getElementById('msgs-box').addEventListener('click',function(e){
+  var t=e.target;
+  if(t.tagName==='VIDEO'){abrirFs('video',t.getAttribute('data-vsrc')||t.src);return;}
+  if(t.tagName==='IMG'&&t.classList.contains('media-img')){abrirFs('img',t.getAttribute('data-f')||t.src);return;}
+});
+
+document.getElementById('btn-export').onclick=function(){if(!fsAtualSrc)return;guardarFs();};
+
+function abrirFs(tipo,src){
+  if(!src)return;
+  fsAtualSrc=src;fsAtualTipo=tipo;
+  var img=document.getElementById('fs-img'),vid=document.getElementById('fs-vid');
+  if(tipo==='img'){img.src=src;img.style.display='block';vid.pause();vid.src='';vid.style.display='none';}
+  else{vid.src=src;vid.style.display='block';vid.play().catch(function(){});img.src='';img.style.display='none';}
+  document.getElementById('fs-overlay').classList.add('open');
+}
+function fecharFs(){
+  var vid=document.getElementById('fs-vid');vid.pause();vid.src='';vid.style.display='none';
+  var img=document.getElementById('fs-img');img.src='';img.style.display='none';
+  document.getElementById('fs-overlay').classList.remove('open');
+  fsAtualSrc=null;fsAtualTipo=null;
+}
+function guardarFs(){
+  if(!fsAtualSrc)return;
+  fetch(fsAtualSrc)
+  .then(function(r){return r.blob();})
+  .then(function(blob){
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download=fsAtualTipo==='video'?'video.mp4':'imagem.jpg';
+    document.body.appendChild(a);a.click();
+    document.body.removeChild(a);URL.revokeObjectURL(url);
+  }).catch(function(){
+    var a=document.createElement('a');a.href=fsAtualSrc;a.download=fsAtualTipo==='video'?'video.mp4':'imagem.jpg';a.target='_blank';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+  });
+}
+
+document.getElementById('fs-close').addEventListener('click',function(e){e.stopPropagation();fecharFs();});
+document.getElementById('fs-save').addEventListener('click',function(e){e.stopPropagation();guardarFs();});
+document.getElementById('fs-overlay').addEventListener('click',function(e){if(e.target===this)fecharFs();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')fecharFs();});
+
+document.getElementById('btn-idx').onclick=function(){window.location.href='/indice';};
 </script>
 </body>
 </html>
