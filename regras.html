@@ -4,71 +4,39 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Regras</title>
-  
-  <link rel="icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
-  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
-
+  <link rel="icon" href="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
+  <link rel="apple-touch-icon" href="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
   <style>
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html, body { width:100%; height:100%; overflow:hidden; background:#000; }
-
-    #myVideo {
-      position:fixed; top:0; left:0;
-      width:100%; height:100%;
-      object-fit:cover; z-index:1;
-    }
-
-    #btn-play {
-      position:fixed; top:50%; left:50%;
-      transform:translate(-50%,-50%);
-      width:10%; cursor:pointer; z-index:10; transition:opacity .3s;
-    }
-
-    #btn-idx {
-      position:fixed; bottom:10%; right:5%;
-      width:8%; cursor:pointer; z-index:10;
-      opacity:0; pointer-events:none; transition:opacity .5s;
-    }
-
-    @media (max-width: 768px) {
-      #btn-play { width:20%; }
-      #btn-idx { width:16%; }
-    }
-    @media (max-width: 480px) {
-      #btn-play { width:28%; }
-      #btn-idx { width:22%; }
-    }
+    #myVideo { position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:1; }
+    #btn-play { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:10%; cursor:pointer; z-index:10; transition:opacity .3s; }
+    #btn-idx { position:fixed; bottom:3.5%; right:3.4%; width:8%; cursor:pointer; z-index:9999; opacity:0; pointer-events:none; transition:opacity .5s; }
   </style>
 </head>
 <body>
-
   <video id="myVideo" playsinline>
-    <source src="https://res.cloudinary.com/dxdemxfpe/video/upload/v1773225480/regras_1_cg9fgj.mp4" type="video/mp4">
+    <source src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/regras/regras%20(1).mp4">
   </video>
-
-  <img id="btn-play" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958888/26_ujjdad.png" alt="Play" />
-  <img id="btn-idx"  src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" alt="Índice" />
-
+  <img id="btn-play" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/play.png" alt="Play" />
+  <img id="btn-idx" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" alt="Índice" />
   <script>
     const play = document.getElementById('btn-play');
     const vid  = document.getElementById('myVideo');
     const idx  = document.getElementById('btn-idx');
-
     play.onclick = function () {
       play.style.opacity = '0';
       play.style.pointerEvents = 'none';
-      vid.play().catch(() => { vid.muted = true; vid.play(); });
+      vid.play().catch(function(){ vid.muted = true; vid.play(); });
     };
-
     vid.onended = function () {
       idx.style.opacity = '1';
       idx.style.pointerEvents = 'all';
     };
-
     idx.onclick = function () {
       window.location.href = 'indice.html?skip=1';
     };
   </script>
-
 </body>
 </html>
+
