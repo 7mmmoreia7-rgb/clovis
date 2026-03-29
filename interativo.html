@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clube Interativo</title>
-<link rel="icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
-<link rel="apple-touch-icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
+<link rel="icon" href="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
+<link rel="apple-touch-icon" href="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Pacifico&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -87,8 +87,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;}
 <div id="app">
 <div id="tip"></div>
 <div id="ecra-video">
-  <video id="meu-video" src="https://res.cloudinary.com/dxdemxfpe/video/upload/v1773256897/voador_dtcheb.mp4" playsinline preload="auto"></video>
-  <button id="btn-play" onclick="iniciarVideo()"><img src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958888/26_ujjdad.png" alt="Play"></button>
+  <video id="meu-video" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/interativo/voador.mp4" playsinline preload="auto"></video>
+  <button id="btn-play" onclick="iniciarVideo()"><img src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/play.png" alt="Play"></button>
 </div>
 <div id="overlay-fade"></div>
 <div id="ecra-quadro">
@@ -107,7 +107,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;}
     <button id="btn-importar" onclick="document.getElementById('inp-img').click()" onmouseenter="TT(event,'Importar')"  onmouseleave="HT()"></button>
   </div>
   <button id="btn-lock" onclick="toggleLock()">🔓</button>
-  <img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" onclick="irIndice()">
+  <img id="btn-idx" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/fundilho.png" onclick="irIndice()">
 </div>
 <div class="pop-bg" id="pop-bg" onclick="FPTodos()"></div>
 <div id="pop-pinceis" class="pop-ov"><div class="pop-title">🖌️ Pincéis <button class="pop-x" onclick="FP('pop-pinceis')">×</button></div><p style="font-size:13px;font-weight:700;color:#888;margin-bottom:6px">Grossura</p><input type="range" class="sldr" id="sl-gross" min="1" max="50" value="4" oninput="setGross(this.value)"><p style="font-size:12px;color:#4D96FF;font-weight:700;margin:4px 0 16px" id="lbl-gross">4px</p><div class="grid-pb" id="g-pinceis"></div></div>
