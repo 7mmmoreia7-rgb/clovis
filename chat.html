@@ -22,7 +22,7 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
 #bg-login, #bg-chat { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
 #login-input { position:absolute; left:31%; top:54%; width:37%; height:7%; z-index:20; border:none; outline:none; background:transparent; font-size:1.8em; font-family:'Caveat',cursive; text-align:center; color:#111; }
 #btn-entra { position:absolute; left:38%; top:68%; width:22%; height:14%; z-index:20; background:transparent; border:none; cursor:pointer; }
-#msgs-box { position:absolute; left:14.3%; top:18.3%; width:71.4%; height:45.2%; z-index:10; padding:0.5% 1%; display:flex; flex-direction:column; gap:1px; overflow-y:scroll; }
+#msgs-box { position:absolute; left:14.3%; top:21%; width:71.4%; height:43%; z-index:10; padding:1% 1% 0.5% 1%; display:flex; flex-direction:column; gap:1px; overflow-y:scroll; }
 .msg { display:block; flex-shrink:0; line-height:1.4; overflow-wrap:break-word; word-break:break-word; animation:fadeIn .2s ease; }
 .msg .autor { font-family:'Caveat',cursive; font-size:1em; font-weight:700; color:#c00; margin-right:3px; }
 .msg .texto { font-family:Georgia,serif; font-size:0.88em; color:#111; overflow-wrap:break-word; word-break:break-word; }
@@ -296,7 +296,7 @@ document.getElementById('fs-save').addEventListener('click',function(e){e.stopPr
 document.getElementById('fs-overlay').addEventListener('click',function(e){if(e.target===this)fecharFs();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')fecharFs();});
 
-document.getElementById('btn-idx').onclick=function(){window.location.href='/indice';};
+document.getElementById('btn-idx').onclick=function(e){e.stopPropagation();window.location.href='indice.html?skip=1';};
 </script>
 </body>
 </html>
