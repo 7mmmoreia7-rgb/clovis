@@ -15,7 +15,7 @@
 html { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
 body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
 #wrap { position:fixed; top:0; left:0; width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; background:#c8b99a; overflow:hidden; }
-#stage { position:relative; overflow:hidden; background:#c8b99a; flex-shrink:0; }
+#stage { position:absolute; overflow:hidden; background:#c8b99a; }
 .pagina { position:absolute; inset:0; }
 #pag-login { z-index:5; }
 #pag-chat  { z-index:4; display:none; }
@@ -105,7 +105,6 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
     <button id="btn-export"></button>
     <button id="btn-import"></button>
     <input id="file-import" type="file" accept="image/*,video/*" multiple />
-    <img id="btn-idx" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" alt="índice" />
     <div id="fs-overlay">
       <img id="fs-img" src="" alt="" style="display:none;" />
       <video id="fs-vid" controls playsinline style="display:none;"></video>
@@ -117,18 +116,20 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
   </div>
 
 </div></div>
+
+<img id="btn-idx" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" alt="índice" />
 <script>
 function resize(){
+  var s=document.getElementById('stage');
   var ww=window.innerWidth, wh=window.innerHeight;
   var r=16/9, sw, sh;
-  if(ww/wh>r){sh=wh;sw=sh*r;}else{sw=ww;sh=sw/r;}
-  var s=document.getElementById('stage');
-  s.style.width=sw+'px';
-  s.style.height=sh+'px';
-  s.style.fontSize=(sw/1920*26)+'px';
+  sw=ww; sh=sw/r;
+  if(sh<wh){sh=wh;sw=sh*r;}
+  s.style.width=sw+'px'; s.style.height=sh+'px';
+  s.style.left=((ww-sw)/2)+'px';
+  s.style.top=((wh-sh)/2)+'px';
 }
-resize();
-window.addEventListener('resize',resize);
+resize(); window.addEventListener('resize',resize);
 document.addEventListener('touchmove',function(e){e.preventDefault();},{passive:false});
 
 var SURL='https://itqzgxotbzsuwevjpnoi.supabase.co';
