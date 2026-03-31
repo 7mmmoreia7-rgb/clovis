@@ -8,38 +8,46 @@
   <link rel="apple-touch-icon" href="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
   <style>
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html, body { width:100%; height:100%; overflow:hidden; background:#000; }
-    #wrap { position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#000; }
-    #stage { position:relative; overflow:hidden; }
-    #vid { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; }
-    #play { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:10%; cursor:pointer; z-index:10; transition:transform .2s, opacity .5s; }
+    html, body { width:100%; height:100%; overflow:hidden; background:#c8b99a; }
+    #vid { position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:1; }
+    #play { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:10%; cursor:pointer; z-index:10; transition:opacity .3s; }
     #play.gone { opacity:0; pointer-events:none; }
+    #btn-email { position:fixed; bottom:12%; left:3%; width:7%; cursor:pointer; z-index:9999; opacity:0; pointer-events:none; transition:opacity .5s; }
+    #btn-email.show { opacity:1; pointer-events:all; }
     #btn-idx { position:fixed; bottom:3.5%; right:3.4%; width:8%; cursor:pointer; z-index:9999; opacity:0; pointer-events:none; transition:opacity .8s; }
     #btn-idx.show { opacity:1; pointer-events:all; }
   </style>
 </head>
 <body>
-<div id="wrap"><div id="stage">
   <video id="vid" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/chat/carolina.mp4" preload="auto" playsinline></video>
   <img id="play" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/play.png" />
-</div></div>
-<img id="btn-idx" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
+  <img id="btn-idx" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
 <script>
-function resize(){
-  var wrap=document.getElementById('wrap'), stage=document.getElementById('stage');
-  var ww=wrap.clientWidth, wh=wrap.clientHeight, ratio=16/9, w, h;
-  if(ww/wh>ratio){h=wh;w=h*ratio;}else{w=ww;h=w/ratio;}
-  stage.style.width=w+'px'; stage.style.height=h+'px';
-}
-resize(); window.addEventListener('resize',resize);
+var play=document.getElementById('play');
 var vid=document.getElementById('vid');
-document.getElementById('play').onclick=function(){
+play.onclick=function(){
   this.classList.add('gone');
   vid.play().catch(function(){vid.muted=true;vid.play();});
 };
 vid.addEventListener('ended',function(){
   document.getElementById('btn-idx').classList.add('show');
+EMAILEOF
+  if [ -n "" ]; then
+    cat >> /mnt/user-data/outputs/carolina.html << EMAILEOF
+  document.getElementById('btn-email').classList.add('show');
+EMAILEOF
+  fi
+  cat >> /mnt/user-data/outputs/carolina.html << EMAILEOF
 });
+EMAILEOF
+  if [ -n "" ]; then
+    cat >> /mnt/user-data/outputs/carolina.html << EMAILEOF
+document.getElementById('btn-email').onclick=function(){
+  window.open('mailto:');
+};
+EMAILEOF
+  fi
+  cat >> /mnt/user-data/outputs/carolina.html << EMAILEOF
 document.getElementById('btn-idx').onclick=function(e){
   e.stopPropagation();
   window.location.href='indice.html?skip=1';
