@@ -9,23 +9,25 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Pacifico&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100%;height:100%;overflow:hidden;background:#000;}
+html,body{width:100%;height:100%;overflow:hidden;background:#c8b99a;}
 #app{position:relative;width:100%;height:100%;}
 #ecra-video{position:absolute;inset:0;z-index:100;transition:opacity 1s ease;}
 #ecra-video.oculto{opacity:0;pointer-events:none;}
-#meu-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+#bg-isto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
+#meu-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1;}
+*{outline:none !important;-webkit-tap-highlight-color:transparent !important;}
 #btn-play{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:10%;border:none;background:transparent;cursor:pointer;z-index:10;padding:0;}
 #btn-play img{width:100%;height:auto;display:block;}
 #overlay-fade{position:absolute;inset:0;z-index:150;background:#fff;opacity:0;pointer-events:none;transition:opacity .6s ease;}
 #overlay-fade.ativo{opacity:1;pointer-events:all;}
 #ecra-quadro{position:absolute;inset:0;display:none;z-index:5;}
 #ecra-quadro.visivel{display:block;}
-#fundo-design{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;user-select:none;pointer-events:none;z-index:1;}
-#camada-fundos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.6%;z-index:2;overflow:hidden;pointer-events:none;}
+#fundo-design{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;user-select:none;pointer-events:none;z-index:1;}
+#camada-fundos{position:absolute;left:7%;top:13%;width:88%;height:78%;z-index:2;overflow:hidden;pointer-events:none;}
 #camada-fundos video,#camada-fundos img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
 #fundo-cor{position:absolute;inset:0;width:100%;height:100%;}
-#meu-canvas{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.6%;background:transparent;cursor:crosshair;z-index:3;touch-action:none;}
-#camada-elementos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.6%;z-index:4;overflow:hidden;pointer-events:none;}
+#meu-canvas{position:absolute;left:7%;top:13%;width:88%;height:78%;background:transparent;cursor:crosshair;z-index:3;touch-action:none;}
+#camada-elementos{position:absolute;left:7%;top:13%;width:88%;height:78%;z-index:4;overflow:hidden;pointer-events:none;}
 #barra-botoes{position:absolute;top:0;left:0;width:100%;height:13.5%;z-index:10;pointer-events:none;}
 #barra-botoes button{position:absolute;background:transparent;border:none;cursor:pointer;pointer-events:all;border-radius:50%;top:8%;height:84%;aspect-ratio:1;}
 #btn-pincel   { left: 12.2%; }
@@ -92,6 +94,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;}
 <div id="app">
 <div id="tip"></div>
 <div id="ecra-video">
+  <img id="bg-isto" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/isto.png" alt="">
   <video id="meu-video" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/interativo/voador.mp4" playsinline preload="auto"></video>
   <button id="btn-play" onclick="iniciarVideo()"><img src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/play.png" alt="Play"></button>
 </div>
