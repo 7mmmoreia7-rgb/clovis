@@ -22,12 +22,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#c8b99a;}
 #overlay-fade.ativo{opacity:1;pointer-events:all;}
 #ecra-quadro{position:absolute;inset:0;display:none;z-index:5;}
 #ecra-quadro.visivel{display:block;}
-#fundo-design{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;user-select:none;pointer-events:none;z-index:1;}
-#camada-fundos{position:absolute;left:7%;top:13%;width:88%;height:78%;z-index:2;overflow:hidden;pointer-events:none;}
+#fundo-design{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;user-select:none;pointer-events:none;z-index:1;}
+#camada-fundos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.6%;z-index:2;overflow:hidden;pointer-events:none;}
 #camada-fundos video,#camada-fundos img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
 #fundo-cor{position:absolute;inset:0;width:100%;height:100%;}
-#meu-canvas{position:absolute;left:7%;top:13%;width:88%;height:78%;background:transparent;cursor:crosshair;z-index:3;touch-action:none;}
-#camada-elementos{position:absolute;left:7%;top:13%;width:88%;height:78%;z-index:4;overflow:hidden;pointer-events:none;}
+#meu-canvas{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.6%;background:transparent;cursor:crosshair;z-index:3;touch-action:none;}
+#camada-elementos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.6%;z-index:4;overflow:hidden;pointer-events:none;}
 #barra-botoes{position:absolute;top:0;left:0;width:100%;height:13.5%;z-index:10;pointer-events:none;}
 #barra-botoes button{position:absolute;background:transparent;border:none;cursor:pointer;pointer-events:all;border-radius:50%;top:8%;height:84%;aspect-ratio:1;}
 #btn-pincel   { left: 12.2%; }
@@ -171,8 +171,10 @@ const ANIMAIS=[
   {url:BASE+'animais/b1.png'},{url:BASE+'animais/b2.png'},{url:BASE+'animais/b3.png'},{url:BASE+'animais/b4.png'},{url:BASE+'animais/b5.png'},{url:BASE+'animais/b6.png'},{url:BASE+'animais/b7.png'},{url:BASE+'animais/b8.png'},{url:BASE+'animais/b9.png'},{url:BASE+'animais/b10.png'},{url:BASE+'animais/b11.png'},{url:BASE+'animais/b12.png'},{url:BASE+'animais/b13.png'},{url:BASE+'animais/b14.png'},{url:BASE+'animais/b15.png'},{url:BASE+'animais/b16.png'},{url:BASE+'animais/b17.png'},{url:BASE+'animais/b18.jpg'},{url:BASE+'animais/b19.png'},{url:BASE+'animais/b20.jpg'},{url:BASE+'animais/b21.png'},{url:BASE+'animais/b22.png'},{url:BASE+'animais/b23.png'},{url:BASE+'animais/b24.png'},{url:BASE+'animais/b25.png'},{url:BASE+'animais/b26.png'},
   {url:BASE+'animais/doninha.png'},{url:BASE+'animais/elefante.gif'},{url:BASE+'animais/galinha.gif'},{url:BASE+'animais/gato.gif'},{url:BASE+'animais/golfinho.gif'},{url:BASE+'animais/lama.gif'},{url:BASE+'animais/panda.gif'},{url:BASE+'animais/peixe.gif'},{url:BASE+'animais/pombos.gif'},{url:BASE+'animais/rato.gif'},{url:BASE+'animais/thumb%20(26).png'},{url:BASE+'animais/unicornio.gif'}
 ];
+const BASE2='https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/interativo/';
 const GAROTOS=[
-  {url:BASE+'garotos/29.png'},{url:BASE+'garotos/30.png'},{url:BASE+'garotos/bonecaA.png'},{url:BASE+'garotos/bonecaB.png'},{url:BASE+'garotos/ca.png'},{url:BASE+'garotos/ela.gif'},{url:BASE+'garotos/go.png'},{url:BASE+'garotos/pocoyo%20(2).gif'},{url:BASE+'garotos/pocoyo.gif'}
+  {url:BASE+'garotos/bonecaA.png'},{url:BASE+'garotos/bonecaB.png'},{url:BASE+'garotos/ca.png'},{url:BASE+'garotos/ela.gif'},{url:BASE+'garotos/go.png'},{url:BASE+'garotos/pocoyo%20(2).gif'},{url:BASE+'garotos/pocoyo.gif'},
+  {url:BASE2+'111.png'},{url:BASE2+'112.png'},{url:BASE2+'113.png'},{url:BASE2+'114.png'},{url:BASE2+'115.png'},{url:BASE2+'116.png'},{url:BASE2+'117.png'}
 ];
 const NATUREZA=[
   {url:BASE+'natureza/a.png'},{url:BASE+'natureza/b.png'},{url:BASE+'natureza/c.png'},{url:BASE+'natureza/d.png'},{url:BASE+'natureza/e.png'},{url:BASE+'natureza/f.png'},{url:BASE+'natureza/g.png'},{url:BASE+'natureza/h.png'},{url:BASE+'natureza/i.png'},{url:BASE+'natureza/j.png'},{url:BASE+'natureza/k.png'},{url:BASE+'natureza/l.png'},{url:BASE+'natureza/m.png'},{url:BASE+'natureza/o%20(2).png'},{url:BASE+'natureza/p.png'},{url:BASE+'natureza/q.png'},{url:BASE+'natureza/r.png'},{url:BASE+'natureza/s.png'},{url:BASE+'natureza/sol.gif'},{url:BASE+'natureza/t.png'},{url:BASE+'natureza/u.png'},{url:BASE+'natureza/v.png'},{url:BASE+'natureza/w.png'},{url:BASE+'natureza/x.png'},{url:BASE+'natureza/z.png'},{url:BASE+'natureza/n1.png'},{url:BASE+'natureza/arvore.png'},{url:BASE+'natureza/cogumelo.png'},{url:BASE+'natureza/fj,f.png'},{url:BASE+'natureza/n2.png'},{url:BASE+'natureza/n3.jpg'},{url:BASE+'natureza/n4.jpg'},{url:BASE+'natureza/n5.png'},{url:BASE+'natureza/n6.png'},{url:BASE+'natureza/n7.png'},{url:BASE+'natureza/n8.png'},{url:BASE+'natureza/n9.png'},{url:BASE+'natureza/n10.png'},{url:BASE+'natureza/n12.png'}
@@ -224,7 +226,14 @@ function ini(x,y){desenhar=true;cfgCtx();cx.beginPath();cx.moveTo(x,y);}
 function cont(x,y){if(!desenhar)return;cx.lineTo(x,y);cx.stroke();}
 function fim(){if(!desenhar)return;desenhar=false;cx.closePath();guardar();}
 function guardar(){if(hist.length>30)hist.shift();hist.push(cv.toDataURL());}
-function undo(){const cam=document.getElementById('camada-elementos');if(cam.children.length>0){cam.removeChild(cam.lastChild);return;}if(hist.length>1){hist.pop();const i=new Image();i.src=hist[hist.length-1];const r=cv.getBoundingClientRect();i.onload=()=>{cx.clearRect(0,0,r.width,r.height);cx.drawImage(i,0,0,r.width,r.height);};return;}document.getElementById('camada-fundos').querySelector('video,img:not(#fundo-cor)')&&(document.getElementById('camada-fundos').innerHTML='<canvas id="fundo-cor" style="position:absolute;inset:0;width:100%;height:100%;display:none;"></canvas>');}
+function undo(){
+  const cam=document.getElementById('camada-elementos');
+  if(cam.children.length>0){cam.removeChild(cam.lastChild);return;}
+  if(hist.length>1){hist.pop();const i=new Image();i.src=hist[hist.length-1];const r=cv.getBoundingClientRect();i.onload=()=>{cx.clearRect(0,0,r.width,r.height);cx.drawImage(i,0,0,r.width,r.height);};return;}
+  // limpar cenário/fundo
+  limparFundoCor();
+  Array.from(document.getElementById('camada-fundos').children).forEach(el=>{if(el.id!=='fundo-cor')el.remove();});
+}
 function setBorracha(v){tamBorracha=parseInt(v);ferramenta='borracha';cv.style.cursor='cell';document.getElementById('lbl-borracha').textContent=v+'px';FP('pop-borracha');}
 function setGross(v){grossura=parseInt(v);ferramenta='pincel';cv.style.cursor='crosshair';document.getElementById('lbl-gross').textContent=v+'px';}
 function setCor(c,fechar=true){cor=c;ferramenta='pincel';cv.style.cursor='crosshair';document.querySelectorAll('.bl-cor').forEach(b=>b.classList.toggle('sel',b.dataset.c===c));prvTxt();if(fechar)FP('pop-cores');}
