@@ -4,12 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Clube Interativo</title>
-<link rel="icon" href="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
-<link rel="apple-touch-icon" href="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
+<link rel="icon" href="/icon-192.png" />
+<link rel="apple-touch-icon" href="/icon-512.png" />
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Pacifico&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100%;height:100%;overflow:hidden;background:#c8b99a;}
+html,body{width:100%;height:100%;overflow:hidden;background:url("https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/isto.png") center/cover no-repeat;
+}
 #app{position:relative;width:100%;height:100%;}
 #ecra-video{position:absolute;inset:0;z-index:100;transition:opacity 1s ease;}
 #ecra-video.oculto{opacity:0;pointer-events:none;}
@@ -20,7 +21,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#c8b99a;}
 #btn-play img{width:100%;height:auto;display:block;}
 #overlay-fade{position:absolute;inset:0;z-index:150;background:#fff;opacity:0;pointer-events:none;transition:opacity .6s ease;}
 #overlay-fade.ativo{opacity:1;pointer-events:all;}
-#ecra-quadro{position:absolute;inset:0;display:none;z-index:5;}
+#ecra-quadro {
+  position:absolute;
+  width:100%;
+  height:120%;   /* AQUI A MOLDURA CRESCE PARA BAIXO */
+  top:0;
+  left:0;
+  z-index:5;
+}
 #ecra-quadro.visivel{display:block;}
 #fundo-design{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;user-select:none;pointer-events:none;z-index:1;}
 #camada-fundos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;z-index:2;overflow:hidden;pointer-events:none;}
