@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Clube Interativo</title>
 <link rel="icon" href="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
 <link rel="apple-touch-icon" href="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
@@ -226,7 +226,10 @@ const PINCEIS=[{nome:"Fino 1px",tipo:"round",px:1},{nome:"Normal 4px",tipo:"roun
 let desenhar=false,ferramenta='pincel',tipoCap='round',cor='#000000',grossura=4,tamBorracha=20,fonte="'Nunito',sans-serif",tamTexto=32,hist=[],eS=null,offX=0,offY=0,resizing=false,resW=0,resX=0;
 window._playAutorizado=false;
 (function(){const v=document.getElementById('meu-video');const p=()=>{if(!window._playAutorizado){v.pause();v.currentTime=0;}};v.addEventListener('loadedmetadata',p);v.addEventListener('canplay',p);v.addEventListener('play',function o(){if(!window._playAutorizado)v.pause();else v.removeEventListener('play',o);});})();
-function iniciarVideo(){window._playAutorizado=true;const v=document.getElementById('meu-video');document.getElementById('btn-play').style.display='none';v.play().catch(()=>fazTransicao());v.addEventListener('ended',fazTransicao,{once:true});setTimeout(fazTransicao,15000);}
+function iniciarVideo(){window._playAutorizado=true;const v=document.getElementById('meu-video');document.getElementById('btn-play').style.display='none';v.play().catch(()=>fazTransicao());v.addEventListener('ended',fazTransicao,{once:true});setTimeout(fazTransicao,15000);
+  v.addEventListener('dblclick',fazTransicao);
+  let lastTap=0;v.addEventListener('touchend',function(){const now=Date.now();if(now-lastTap<350)fazTransicao();lastTap=now;});
+}
 let trOk=false;
 function fazTransicao(){if(trOk)return;trOk=true;const fade=document.getElementById('overlay-fade');fade.classList.add('ativo');setTimeout(()=>{document.getElementById('ecra-video').classList.add('oculto');document.getElementById('ecra-quadro').classList.add('visivel');document.getElementById('btn-idx').classList.add('show');initCanvas();popularPopups();setTimeout(()=>fade.classList.remove('ativo'),100);},650);}
 const cv=document.getElementById('meu-canvas'),cx=cv.getContext('2d');
@@ -361,7 +364,7 @@ function gerarCanvas(cb){const dpr=window.devicePixelRatio||1,r=cv.getBoundingCl
   const p1=fm?[new Promise(res=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>{c.drawImage(i,0,0,r.width,r.height);res();};i.onerror=res;i.src=fm.src;})]:fv?[new Promise(res=>{try{c.drawImage(fv,0,0,r.width,r.height);}catch(e){}res();})]:[Promise.resolve()];
   Promise.all(p1).then(()=>{c.drawImage(cv,0,0,r.width,r.height);const cr=document.getElementById('camada-elementos').getBoundingClientRect();const p2=[];document.querySelectorAll('#camada-elementos .elem-arr').forEach(el=>{const er=el.getBoundingClientRect();const x=er.left-cr.left,y=er.top-cr.top,w=er.width,h=er.height;const im=el.querySelector('img');if(im)p2.push(new Promise(res=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>{c.drawImage(i,x,y,w,h);res();};i.onerror=res;i.src=im.src;}));const tx=el.querySelector('.txt-elem');if(tx){const fs=parseFloat(getComputedStyle(tx).fontSize);c.font=fs+'px '+tx.style.fontFamily;c.fillStyle=tx.style.color||'#000';c.fillText(tx.textContent,x,y+fs);}});Promise.all(p2).then(()=>cb(tmp));});}
 function expDispositivo(){gerarCanvas(t=>{const a=document.createElement('a');a.download='clube-desenho.png';a.href=t.toDataURL('image/png');document.body.appendChild(a);a.click();setTimeout(()=>document.body.removeChild(a),100);FP('pop-export');});}
-function expGaleria(){gerarCanvas(function(t){var path='desenho_'+Date.now()+'.jpg';t.toBlob(function(blob){fetch(STORAGE_UP+path,{method:'POST',headers:Object.assign({'Content-Type':'image/jpeg','x-upsert':'true'},SHDR),body:blob}).then(function(){var url=STORAGE_URL+path;return fetch(SURL+'/rest/v1/galeria',{method:'POST',headers:Object.assign({'Content-Type':'application/json','Prefer':'return=minimal'},SHDR),body:JSON.stringify({imagem:url,path:path})});}).then(function(){FP('pop-export');alert('Enviado para a Galeria!');}).catch(function(){alert('Erro ao enviar para a Galeria');});},'image/jpeg',0.92);});}
+function expGaleria(){gerarCanvas(function(t){var path='desenho_'+Date.now()+'.jpg';t.toBlob(function(blob){fetch(STORAGE_UP+path,{method:'POST',headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'image/jpeg','x-upsert':'true'},body:blob}).then(function(){var url=STORAGE_URL+path;return fetch(SURL+'/rest/v1/galeria',{method:'POST',headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({imagem:url,path:path})});}).then(function(){FP('pop-export');alert('Enviado para a Galeria!');}).catch(function(err){console.error(err);alert('Erro ao enviar para a Galeria');});},'image/jpeg',0.92);});}
 
 function popularPopups(){
   PINCEIS.forEach(p=>{const b=document.createElement('button');b.className='btn-pb';b.innerHTML='<div class="prev-ln" style="height:'+Math.min(p.px,14)+'px"></div>'+p.nome;b.onclick=()=>{grossura=p.px;tipoCap=p.tipo==='square'?'square':'round';ferramenta='pincel';cv.style.cursor='crosshair';document.getElementById('sl-gross').value=p.px;document.getElementById('lbl-gross').textContent=p.px+'px';document.querySelectorAll('.btn-pb').forEach(x=>x.classList.remove('a'));b.classList.add('a');};document.getElementById('g-pinceis').appendChild(b);});
