@@ -291,16 +291,33 @@ function guardarSlot(idx){
 document.getElementById('fsdl').onclick=function(){if(fsSlot!==null)guardarSlot(fsSlot);};
 
 function apagarSlot(idx){
-  var s=data[idx];
-  data[idx]={url:null,name:null,id:null,path:null};
-  build(); toast('A apagar...');
-if(s.id)
-  fetch(SURL+'/rest/v1/galeria?id=eq.'+s.id,{method:'DELETE',headers:HDRD}).catch(()=>{});
+  var s = data[idx];
 
-if(s.path)
-  fetch(STORAGE_UP+s.path,{method:'DELETE',headers:SHDR})
+  // limpar interface
+  data[idx] = {url:null, name:null, id:null, path:null};
+  build();
+  toast('A apagar...');
+
+  // apagar linha da tabela
+  if (s.id) {
+    fetch(`${SURL}/rest/v1/galeria?id=eq.${s.id}`, {
+      method: 'DELETE',
+      headers: HDRD
+    })
+    .catch(()=>{});
+  }
+
+  // apagar ficheiro no storage
+  if (s.path) {
+    fetch(`${STORAGE_UP}${s.path}`, {
+      method: 'DELETE',
+      headers: SHDR
+    })
     .then(()=>toast('✓ Apagado'))
     .catch(()=>toast('✓ Apagado'));
+  } else {
+    toast('✓ Apagado');
+  }
 }
 
 function uploadStorage(file,slot){
