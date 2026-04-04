@@ -231,19 +231,32 @@ function goGallery(){
 }
 
 function carregarGaleria(){
-  fetch(SURL+'/rest/v1/galeria?order=created_at.asc',{headers:HDR})
+  fetch(SURL+'/rest/v1/galeria?select=*&order=created_at.desc&limit=9',{headers:HDR})
   .then(r=>r.json())
   .then(rows=>{
-    data=[];
-    for(var i=0;i<9;i++)data.push({url:null,name:null,id:null,path:null});
-    rows.forEach((row,i)=>{
-      if(i<9&&row.imagem){
-        data[i]={url:row.imagem,name:'imagem_'+row.id+'.png',id:row.id,path:row.path||null};
+    // garante sempre 9 slots
+    data = [];
+    for (let i = 0; i < 9; i++) {
+      if (rows[i] && rows[i].imagem) {
+        data.push({
+          url: rows[i].imagem,
+          name: 'imagem_'+rows[i].id+'.png',
+          id: rows[i].id,
+          path: rows[i].path || null
+        });
+      } else {
+        data.push({url:null,name:null,id:null,path:null});
       }
-    });
+    }
     build();
-  }).catch(()=>build());
+  })
+  .catch(()=>{
+    // fallback: 9 slots vazias
+    data = Array(9).fill({url:null,name:null,id:null,path:null});
+    build();
+  });
 }
+
 
 function build(){
   var c=document.getElementById('slots');
@@ -291,12 +304,30 @@ function guardarSlot(idx){
 document.getElementById('fsdl').onclick=function(){if(fsSlot!==null)guardarSlot(fsSlot);};
 
 function apagarSlot(idx){
-  var s=data[idx];
-  data[idx]={url:null,name:null,id:null,path:null};
-  build(); toast('A apagar...');
-  if(s.id)fetch(SURL+'/rest/v1/galeria?id=eq.'+s.id,{method:'DELETE',headers:HDRD}).catch(()=>{});
-  if(s.path)fetch(STORAGE_UP+s.path,{method:'DELETE',headers:SHDR}).then(()=>toast('✓ Apagado')).catch(()=>toast('✓ Apagado'));
+  var s = data[idx];
+  data[idx] = {url:null,name:null,id:null,path:null};
+  build();
+  toast('A apagar...');
+
+  // apaga da tabela
+  if(s.id){
+    fetch(SURL+'/rest/v1/galeria?id=eq.'+s.id,{method:'DELETE',headers:HDRD})
+    .finally(()=>{
+      // recarrega a galeria limpa
+      carregarGaleria();
+      toast('✓ Apagado');
+    });
+  } else {
+    carregarGaleria();
+    toast('✓ Apagado');
+  }
+
+  // apaga do storage
+  if(s.path){
+    fetch(STORAGE_UP+s.path,{method:'DELETE',headers:SHDR});
+  }
 }
+
 
 function uploadStorage(file,slot){
   var path='img_'+slot+'_'+Date.now()+'.png';
