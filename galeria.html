@@ -292,26 +292,37 @@ document.getElementById('fsdl').onclick=function(){if(fsSlot!==null)guardarSlot(
 
 function apagarSlot(idx){
   var s = data[idx];
+
   console.log("PATH RECEBIDO:", s.path);
 
+  // limpar interface
   data[idx] = {url:null, name:null, id:null, path:null};
   build();
   toast('A apagar...');
 
+  // 1) APAGAR LINHA NA TABELA
   if (s.id) {
     fetch(`${SURL}/rest/v1/galeria?id=eq.${s.id}`, {
       method: 'DELETE',
-      headers: HDRD
-    }).catch(()=>{});
+      headers: {
+        'apikey': API_KEY,
+        'Authorization': 'Bearer ' + API_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      }
+    })
+    .then(r => console.log("DELETE TABELA:", r.status))
+    .catch(err => console.error("ERRO DELETE TABELA:", err));
   }
 
+  // 2) APAGAR FICHEIRO NO STORAGE
   if (s.path) {
     fetch(`${STORAGE_UP}galeria/${s.path}`, {
       method: 'DELETE',
       headers: SHDR
     })
     .then(r => {
-      console.log("DELETE STORAGE STATUS:", r.status);
+      console.log("DELETE STORAGE:", r.status);
       toast('✓ Apagado');
     })
     .catch(err => {
