@@ -211,7 +211,6 @@ document.getElementById('play').onclick=function(){
   this.classList.add('gone');
   vid.play().catch(function(){vid.muted=true;vid.play();});
 };
-
 var lastTap=0;
 vid.addEventListener('dblclick',goGallery);
 vid.addEventListener('touchend',function(){
@@ -237,25 +236,12 @@ function carregarGaleria(){
   .then(function(rows){
     data=[];
     for(var i=0;i<9;i++)data.push({url:null,name:null,id:null,path:null});
-
     rows.forEach(function(row,i){
-      if(i<9 && row.imagem){
-        data[i]={
-          url:row.imagem,
-          name:'imagem_'+row.id+'.jpg',
-          id:row.id,
-          path:row.path||null
-        };
+      if(i<9&&row.imagem){
+        data[i]={url:row.imagem,name:'imagem_'+row.id+'.jpg',id:row.id,path:row.path||null};
       }
-      // apaga tudo o que passar de 9 → nunca acumula lixo
-      if(i>=9){
-        fetch(SURL+'/rest/v1/galeria?id=eq.'+row.id,{
-          method:'DELETE',
-          headers:HDRD
-        }).catch(function(){});
-      }
+      if(i>=9)fetch(SURL+'/rest/v1/galeria?id=eq.'+row.id,{method:'DELETE',headers:HDRD}).catch(function(){});
     });
-
     build();
   }).catch(function(){build();});
 }
@@ -268,30 +254,18 @@ function build(){
       var s=data[idx],d=document.createElement('div');d.className='slot';
       if(s.url){
         var img=document.createElement('img');img.src=s.url;img.className='m';d.appendChild(img);
-
         var ctrl=document.createElement('div');ctrl.className='slot-ctrl';
-
         var ver=document.createElement('button');ver.className='sc';ver.textContent='👁 Ver';
-        ver.onclick=function(e){e.stopPropagation();openFS(idx);};
-        ctrl.appendChild(ver);
-
+        ver.onclick=function(e){e.stopPropagation();openFS(idx);};ctrl.appendChild(ver);
         var dl=document.createElement('button');dl.className='sc';dl.textContent='💾 Guardar';
-        dl.onclick=function(e){e.stopPropagation();guardarSlot(idx);};
-        ctrl.appendChild(dl);
-
+        dl.onclick=function(e){e.stopPropagation();guardarSlot(idx);};ctrl.appendChild(dl);
         var ap=document.createElement('button');ap.className='sc';ap.textContent='🗑 Apagar';
-        ap.onclick=function(e){e.stopPropagation();apagarSlot(idx);};
-        ctrl.appendChild(ap);
-
+        ap.onclick=function(e){e.stopPropagation();apagarSlot(idx);};ctrl.appendChild(ap);
         d.appendChild(ctrl);
       }else{
         var ov=document.createElement('div');ov.className='slot-add';
         ov.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 4v16m8-8H4"/></svg><span>Adicionar</span>';
-        ov.onclick=function(){
-          activeSlot=idx;
-          document.getElementById('fsin').value='';
-          document.getElementById('fsin').click();
-        };
+        ov.onclick=function(){activeSlot=idx;document.getElementById('fsin').value='';document.getElementById('fsin').click();};
         d.appendChild(ov);
       }
       c.appendChild(d);
@@ -299,27 +273,18 @@ function build(){
   }
 }
 
-var fsSlot=null;
-
 function openFS(idx){
   fsSlot=idx;
   var fc=document.getElementById('fscont');fc.innerHTML='';
   var img=document.createElement('img');img.src=data[idx].url;fc.appendChild(img);
   document.getElementById('fsmod').classList.add('on');
 }
-
-function closeFS(){
-  document.getElementById('fsmod').classList.remove('on');
-  document.getElementById('fscont').innerHTML='';
-  fsSlot=null;
-}
-
+function closeFS(){document.getElementById('fsmod').classList.remove('on');document.getElementById('fscont').innerHTML='';fsSlot=null;}
 document.getElementById('fscls').onclick=closeFS;
 document.getElementById('fsmod').onclick=function(e){if(e.target===this)closeFS();};
 
 function guardarSlot(idx){
-  var s=data[idx];
-  if(!s || !s.url){toast('Nada para guardar');return;}
+  var s=data[idx];if(!s||!s.url){toast('Nada para guardar');return;}
   toast('A preparar...');
   fetch(s.url)
   .then(function(r){return r.blob();})
@@ -332,40 +297,22 @@ function guardarSlot(idx){
     toast('✓ Guardado!');
   }).catch(function(){toast('Erro ao guardar');});
 }
-
-document.getElementById('fsdl').onclick=function(){
-  if(fsSlot===null)return;
-  guardarSlot(fsSlot);
-};
+document.getElementById('fsdl').onclick=function(){if(fsSlot===null)return;guardarSlot(fsSlot);};
 
 function apagarSlot(idx){
   var s=data[idx],sid=s.id,spath=s.path;
   data[idx]={url:null,name:null,id:null,path:null};
-  build();
-  toast('A apagar...');
-
-  if(sid){
-    fetch(SURL+'/rest/v1/galeria?id=eq.'+sid,{
-      method:'DELETE',
-      headers:HDRD
-    }).catch(function(){});
-  }
-
+  build();toast('A apagar...');
+  if(sid)fetch(SURL+'/rest/v1/galeria?id=eq.'+sid,{method:'DELETE',headers:HDRD}).catch(function(){});
   if(spath){
-    fetch(SURL+'/storage/v1/object/galeria/'+spath,{
-      method:'DELETE',
-      headers:SHDR
-    }).then(function(){toast('✓ Apagado');})
-      .catch(function(){toast('✓ Apagado');});
-  }else{
-    toast('✓ Apagado');
-  }
+    fetch(SURL+'/storage/v1/object/galeria/'+spath,{method:'DELETE',headers:SHDR})
+    .then(function(){toast('✓ Apagado');}).catch(function(){toast('✓ Apagado');});
+  }else{toast('✓ Apagado');}
 }
 
 function uploadStorage(file,slot){
   var path='img_'+slot+'_'+Date.now()+'.jpg';
   toast('A enviar...');
-
   var reader=new FileReader();
   reader.onload=function(e){
     var img=new Image();
@@ -374,25 +321,18 @@ function uploadStorage(file,slot){
       canvas.width=img.width;canvas.height=img.height;
       canvas.getContext('2d').drawImage(img,0,0);
       canvas.toBlob(function(blob){
-        fetch(STORAGE_UP+path,{
-          method:'POST',
-          headers:Object.assign({'Content-Type':'image/jpeg','x-upsert':'true'},SHDR),
-          body:blob
-        }).then(function(){
+        fetch(STORAGE_UP+path,{method:'POST',headers:Object.assign({'Content-Type':'image/jpeg','x-upsert':'true'},SHDR),body:blob})
+        .then(function(){
           var url=STORAGE_URL+path;
           data[slot]={url:url,name:file.name,id:null,path:path};
           build();
-          return fetch(SURL+'/rest/v1/galeria',{
-            method:'POST',
-            headers:HDR,
-            body:JSON.stringify({imagem:url,path:path})
-          });
-        }).then(function(r){return r.json();})
-        .then(function(rows){
-          if(rows && rows.length && rows[0].id)data[slot].id=rows[0].id;
-          build();
-          toast('✓ Guardado!');
-        }).catch(function(){toast('Erro ao enviar/guardar');});
+          fetch(SURL+'/rest/v1/galeria',{method:'POST',headers:HDR,body:JSON.stringify({imagem:url,path:path})})
+          .then(function(r){return r.json();})
+          .then(function(rows){
+            if(rows&&rows.length&&rows[0].id)data[slot].id=rows[0].id;
+            build();toast('✓ Guardado!');
+          }).catch(function(){toast('Erro ao guardar referência');});
+        }).catch(function(){toast('Erro ao enviar imagem');});
       },'image/jpeg',0.92);
     };
     img.src=e.target.result;
@@ -401,15 +341,12 @@ function uploadStorage(file,slot){
 }
 
 document.getElementById('fsin').addEventListener('change',function(){
-  var f=this.files[0];
-  if(!f || activeSlot===null)return;
+  var f=this.files[0];if(!f||activeSlot===null)return;
   uploadStorage(f,activeSlot);
   this.value='';
 });
 
-document.getElementById('btn-idx').onclick=function(){
-  window.location.href='/indice';
-};
+document.getElementById('btn-idx').onclick=function(){window.location.href='/indice';};
 
 var tt;
 function toast(msg){
