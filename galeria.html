@@ -2,57 +2,175 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Galeria</title>
-<link rel="icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
-<link rel="apple-touch-icon" href="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" />
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100%;height:100%;overflow:hidden;background:#000;}
-#wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#000;}
-#stage{position:relative;overflow:hidden;}
-#vid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1;}
-#play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:10%;object-fit:contain;cursor:pointer;z-index:10;transition:opacity .5s;}
-#play.gone{opacity:0;pointer-events:none;}
-#gbg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;z-index:2;opacity:0;transition:opacity 1.4s ease;pointer-events:none;}
-#gbg.show{opacity:1;}
-#slots{position:absolute;left:9.6875%;top:14.8148%;width:80.3125%;height:70.0926%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);z-index:5;opacity:0;pointer-events:none;transition:opacity 1.4s ease;gap:0;background:transparent;}
-#slots::before{content:'';position:absolute;left:0;right:0;top:33.333%;height:3px;background:#7a6245;z-index:6;pointer-events:none;transform:translateY(-50%);}
-#slots::after{content:'';position:absolute;left:0;right:0;top:66.666%;height:3px;background:#7a6245;z-index:6;pointer-events:none;transform:translateY(-50%);}
-#vline1{position:absolute;top:0;bottom:0;left:calc(33.333% - 1.5px);width:3px;background:#7a6245;z-index:6;pointer-events:none;}
-#vline2{position:absolute;top:0;bottom:0;left:calc(66.666% - 1.5px);width:3px;background:#7a6245;z-index:6;pointer-events:none;}
-#slots.show{opacity:1;pointer-events:all;}
-.slot{position:relative;overflow:hidden;}
-.slot img.m{width:100%;height:100%;object-fit:contain;display:block;}
-.slot-add{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;}
-.slot-add:hover{background:rgba(0,0,0,.08);}
-.slot-add svg{width:8%;min-width:18px;max-width:44px;opacity:.15;}
-.slot-add span{font-family:sans-serif;font-size:clamp(8px,1.1vw,15px);font-weight:600;margin-top:5px;color:rgba(80,65,50,.3);}
-.slot-ctrl{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:4px;padding:4px 6px;background:linear-gradient(transparent,rgba(0,0,0,.65));opacity:0;transition:opacity .25s;z-index:5;}
-.slot:hover .slot-ctrl{opacity:1;}
-.sc{background:rgba(255,255,255,.22);border:none;border-radius:5px;color:#fff;cursor:pointer;padding:4px 8px;font-family:sans-serif;font-size:clamp(8px,.9vw,12px);font-weight:600;display:flex;align-items:center;gap:3px;transition:background .15s;}
-.sc:hover{background:rgba(255,255,255,.38);}
-#btn-idx{position:fixed;bottom:10%;right:5%;width:8%;cursor:pointer;z-index:10;opacity:0;pointer-events:none;transition:opacity .5s;}
-#btn-idx.show{opacity:1;pointer-events:all;}
-#fsmod{display:none;position:absolute;inset:0;z-index:100;background:url(https://res.cloudinary.com/dxdemxfpe/image/upload/v1771887590/isto_f3c09e.png) center/cover;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
-#fsmod.on{display:flex;}
-#fscont{width:92%;height:78%;}
-#fscont img{width:100%;height:100%;object-fit:contain;display:block;border-radius:8px;}
-#fsbar{display:flex;gap:10px;}
-.fsbtn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:8px 18px;font-family:sans-serif;font-size:clamp(11px,1.2vw,15px);font-weight:600;cursor:pointer;transition:background .2s;}
-.fsbtn:hover{background:rgba(255,255,255,.32);}
-#toast{position:absolute;bottom:3%;left:50%;transform:translateX(-50%) translateY(40px);background:rgba(10,10,10,.92);color:#fff;font-family:sans-serif;font-size:clamp(11px,1.4vw,17px);font-weight:600;padding:clamp(6px,1vw,11px) clamp(12px,2vw,26px);border-radius:22px;border:1px solid rgba(255,255,255,.15);z-index:50;opacity:0;transition:transform .4s,opacity .4s;white-space:nowrap;pointer-events:none;}
-#toast.on{transform:translateX(-50%) translateY(0);opacity:1;}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    html,body{width:100%;height:100%;overflow:hidden;background:#000;}
+    #wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#000;}
+    #stage{position:relative;width:100%;height:100%;overflow:hidden;}
+
+    #vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
+    #play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:10%;object-fit:contain;cursor:pointer;z-index:10;transition:opacity .5s;}
+    #play.gone{opacity:0;pointer-events:none;}
+
+    #gbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity 1.4s ease;pointer-events:none;}
+    #gbg.show{opacity:1;}
+
+    /* ── SLOTS: grid que cobre EXACTAMENTE o interior da moldura colorida ── */
+    #slots{
+        position:absolute;
+        left:9.2%;
+        right:9.5%;
+        top:8.87%;
+        bottom:7.70%;
+        width:auto;
+        height:auto;
+        display:grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows:    repeat(3, 1fr);
+        z-index:5;
+        opacity:0;
+        pointer-events:none;
+        transition:opacity 1.4s ease;
+        gap:0;
+        overflow:hidden;
+    }
+    #slots.show{opacity:1;pointer-events:none;}
+    #slots.show .slot{pointer-events:all;}
+
+    /* ── cada célula do grid — tamanho 100% da célula, nunca cresce ── */
+    .slot{
+        position:relative;
+        overflow:hidden;
+        width:100%;
+        height:100%;
+        min-width:0;
+        min-height:0;
+        background:transparent;
+    }
+
+    /* Linhas separadoras horizontais */
+    #slots::before{
+        content:'';
+        position:absolute;
+        left:0;right:0;
+        top:calc(100% / 3);
+        height:3px;
+        background:#7a6245;
+        z-index:6;
+        pointer-events:none;
+    }
+    #slots::after{
+        content:'';
+        position:absolute;
+        left:0;right:0;
+        top:calc(200% / 3);
+        height:3px;
+        background:#7a6245;
+        z-index:6;
+        pointer-events:none;
+    }
+
+    /* Linhas verticais (pseudo-elementos num wrapper separado) */
+    #vline1,#vline2{
+        position:absolute;
+        /* estendem-se ligeiramente para cobrir a moldura */
+        top:-20px;
+        bottom:-20px;
+        width:3px;
+        background:#7a6245;
+        z-index:6;
+        pointer-events:none;
+    }
+    #vline1{left:calc(100% / 3 - 1.5px);}
+    #vline2{left:calc(200% / 3 - 1.5px);}
+
+
+
+    /* imagem dentro do slot: preenche 100% da célula sem distorção */
+    .slot img.m{
+        position:absolute;
+        inset:0;
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        display:block;
+    }
+
+    .slot-add{
+        position:absolute;inset:0;
+        display:flex;flex-direction:column;
+        align-items:center;justify-content:center;
+        cursor:pointer;
+        transition:background .2s;
+    }
+    .slot-add:hover{background:rgba(0,0,0,.08);}
+    .slot-add svg{width:8%;min-width:18px;max-width:44px;opacity:.15;}
+    .slot-add span{font-family:sans-serif;font-size:clamp(8px,1.1vw,15px);font-weight:600;margin-top:5px;color:rgba(80,65,50,.3);}
+
+    .slot-ctrl{
+        position:absolute;bottom:0;left:0;right:0;
+        display:flex;justify-content:center;gap:4px;
+        padding:4px 6px;
+        background:linear-gradient(transparent,rgba(0,0,0,.65));
+        opacity:0;transition:opacity .25s;z-index:5;
+    }
+    .slot:hover .slot-ctrl{opacity:1;}
+
+    .sc{
+        background:rgba(255,255,255,.22);border:none;border-radius:5px;
+        color:#fff;cursor:pointer;padding:4px 8px;
+        font-family:sans-serif;font-size:clamp(8px,.9vw,12px);font-weight:600;
+        display:flex;align-items:center;gap:3px;transition:background .15s;
+    }
+    .sc:hover{background:rgba(255,255,255,.38);}
+
+    #btn-idx{position:fixed;bottom:3.5%;right:3.4%;width:8%;cursor:pointer;z-index:9999;opacity:0;pointer-events:none;transition:opacity .5s;}
+    #btn-idx.show{opacity:1;pointer-events:all;}
+
+    /* Fullscreen */
+    #fsmod{
+        display:none;position:absolute;inset:0;z-index:100;
+        background:url(https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/fundilho.png) center/cover;
+        flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    }
+    #fsmod.on{display:flex;}
+    #fscont{width:92%;height:78%;}
+    #fscont img{width:100%;height:100%;object-fit:contain;display:block;border-radius:8px;}
+
+    #fsbar{display:flex;gap:10px;}
+    .fsbtn{
+        background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+        color:#fff;border-radius:8px;padding:8px 18px;
+        font-family:sans-serif;font-size:clamp(11px,1.2vw,15px);font-weight:600;
+        cursor:pointer;transition:background .2s;
+    }
+    .fsbtn:hover{background:rgba(255,255,255,.32);}
+
+    #toast{
+        position:absolute;bottom:3%;left:50%;
+        transform:translateX(-50%) translateY(40px);
+        background:rgba(10,10,10,.92);color:#fff;
+        font-family:sans-serif;font-size:clamp(11px,1.4vw,17px);font-weight:600;
+        padding:clamp(6px,1vw,11px) clamp(12px,2vw,26px);
+        border-radius:22px;border:1px solid rgba(255,255,255,.15);
+        z-index:50;opacity:0;transition:transform .4s,opacity .4s;
+        white-space:nowrap;pointer-events:none;
+    }
+    #toast.on{transform:translateX(-50%) translateY(0);opacity:1;}
 </style>
 </head>
 <body>
 <div id="wrap">
   <div id="stage">
-    <video id="vid" src="https://res.cloudinary.com/dxdemxfpe/video/upload/v1773223413/galeria_l9s4l4.mp4" preload="auto" playsinline></video>
-    <img id="play" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1772958888/26_ujjdad.png" alt="Play"/>
-    <img id="gbg" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773593841/isto_n%C3%A3o_%C3%A9_para_todos_2_nrkc13.png" alt=""/>
-    <div id="slots"><div id="vline1"></div><div id="vline2"></div></div>
-    <img id="btn-idx" src="https://res.cloudinary.com/dxdemxfpe/image/upload/v1773223424/botao_2_eu0w6r.png" alt="índice"/>
+    <video id="vid" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/galeria/galeria.mp4" preload="auto" playsinline></video>
+    <img id="play" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/play.png"/>
+    <img id="gbg" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/galeria/galeria.png" alt=""/>
+
+    <div id="slots">
+      <div id="vline1"></div>
+      <div id="vline2"></div>
+    </div>
+
     <div id="fsmod">
       <div id="fscont"></div>
       <div id="fsbar">
@@ -63,7 +181,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;}
     <div id="toast"></div>
   </div>
 </div>
+
+<img id="btn-idx" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" alt="índice"/>
+
 <input type="file" id="fsin" accept="image/*" style="display:none">
+
 <script>
 const SURL='https://itqzgxotbzsuwevjpnoi.supabase.co';
 const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cXpneG90YnpzdXdldmpwbm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDU4NTgsImV4cCI6MjA4NzI4MTg1OH0.nS4RuwfULc9uHGh_u93vLZ7uRsLnKl7NULrb2Yesw9k';
@@ -78,10 +200,9 @@ for(var i=0;i<9;i++)data.push({url:null,name:null,id:null,path:null});
 var fsSlot=null,activeSlot=null;
 
 function resize(){
-  var wrap=document.getElementById('wrap'),stage=document.getElementById('stage');
-  var ww=wrap.clientWidth,wh=wrap.clientHeight,ratio=16/9,w,h;
-  if(ww/wh>ratio){h=wh;w=h*ratio;}else{w=ww;h=w/ratio;}
-  stage.style.width=w+'px';stage.style.height=h+'px';
+  var stage=document.getElementById('stage');
+  stage.style.width='100%';
+  stage.style.height='100%';
 }
 resize();window.addEventListener('resize',resize);
 
@@ -90,15 +211,15 @@ document.getElementById('play').onclick=function(){
   this.classList.add('gone');
   vid.play().catch(function(){vid.muted=true;vid.play();});
 };
+
 var lastTap=0;
-vid.addEventListener('dblclick',goGallery);
 vid.addEventListener('touchend',function(){
   var now=Date.now();
   if(now-lastTap<350)goGallery();
   lastTap=now;
 });
+vid.addEventListener('dblclick',goGallery);
 vid.addEventListener('ended',goGallery);
-vid.addEventListener('error',function(){setTimeout(goGallery,400);});
 
 function goGallery(){
   vid.pause();
@@ -111,18 +232,17 @@ function goGallery(){
 
 function carregarGaleria(){
   fetch(SURL+'/rest/v1/galeria?order=created_at.asc',{headers:HDR})
-  .then(function(r){return r.json();})
-  .then(function(rows){
+  .then(r=>r.json())
+  .then(rows=>{
     data=[];
     for(var i=0;i<9;i++)data.push({url:null,name:null,id:null,path:null});
-    rows.forEach(function(row,i){
+    rows.forEach((row,i)=>{
       if(i<9&&row.imagem){
-        data[i]={url:row.imagem,name:'imagem_'+row.id+'.jpg',id:row.id,path:row.path||null};
+        data[i]={url:row.imagem,name:'imagem_'+row.id+'.png',id:row.id,path:row.path||null};
       }
-      if(i>=9)fetch(SURL+'/rest/v1/galeria?id=eq.'+row.id,{method:'DELETE',headers:HDRD}).catch(function(){});
     });
     build();
-  }).catch(function(){build();});
+  }).catch(()=>build());
 }
 
 function build(){
@@ -158,39 +278,28 @@ function openFS(idx){
   var img=document.createElement('img');img.src=data[idx].url;fc.appendChild(img);
   document.getElementById('fsmod').classList.add('on');
 }
-function closeFS(){document.getElementById('fsmod').classList.remove('on');document.getElementById('fscont').innerHTML='';fsSlot=null;}
-document.getElementById('fscls').onclick=closeFS;
-document.getElementById('fsmod').onclick=function(e){if(e.target===this)closeFS();};
+document.getElementById('fscls').onclick=function(){document.getElementById('fsmod').classList.remove('on');};
 
 function guardarSlot(idx){
-  var s=data[idx];if(!s||!s.url){toast('Nada para guardar');return;}
-  toast('A preparar...');
-  fetch(s.url)
-  .then(function(r){return r.blob();})
-  .then(function(blob){
+  var s=data[idx];if(!s||!s.url)return toast('Nada para guardar');
+  fetch(s.url).then(r=>r.blob()).then(blob=>{
     var url=URL.createObjectURL(blob);
-    var a=document.createElement('a');a.href=url;a.download=s.name||'galeria.jpg';
-    document.body.appendChild(a);a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast('✓ Guardado!');
-  }).catch(function(){toast('Erro ao guardar');});
+    var a=document.createElement('a');a.href=url;a.download=s.name||'imagem.png';
+    a.click(); URL.revokeObjectURL(url); toast('✓ Guardado!');
+  });
 }
-document.getElementById('fsdl').onclick=function(){if(fsSlot===null)return;guardarSlot(fsSlot);};
+document.getElementById('fsdl').onclick=function(){if(fsSlot!==null)guardarSlot(fsSlot);};
 
 function apagarSlot(idx){
-  var s=data[idx],sid=s.id,spath=s.path;
+  var s=data[idx];
   data[idx]={url:null,name:null,id:null,path:null};
-  build();toast('A apagar...');
-  if(sid)fetch(SURL+'/rest/v1/galeria?id=eq.'+sid,{method:'DELETE',headers:HDRD}).catch(function(){});
-  if(spath){
-    fetch(SURL+'/storage/v1/object/galeria/'+spath,{method:'DELETE',headers:SHDR})
-    .then(function(){toast('✓ Apagado');}).catch(function(){toast('✓ Apagado');});
-  }else{toast('✓ Apagado');}
+  build(); toast('A apagar...');
+  if(s.id)fetch(SURL+'/rest/v1/galeria?id=eq.'+s.id,{method:'DELETE',headers:HDRD}).catch(()=>{});
+  if(s.path)fetch(STORAGE_UP+s.path,{method:'DELETE',headers:SHDR}).then(()=>toast('✓ Apagado')).catch(()=>toast('✓ Apagado'));
 }
 
 function uploadStorage(file,slot){
-  var path='img_'+slot+'_'+Date.now()+'.jpg';
+  var path='img_'+slot+'_'+Date.now()+'.png';
   toast('A enviar...');
   var reader=new FileReader();
   reader.onload=function(e){
@@ -200,19 +309,15 @@ function uploadStorage(file,slot){
       canvas.width=img.width;canvas.height=img.height;
       canvas.getContext('2d').drawImage(img,0,0);
       canvas.toBlob(function(blob){
-        fetch(STORAGE_UP+path,{method:'POST',headers:Object.assign({'Content-Type':'image/jpeg','x-upsert':'true'},SHDR),body:blob})
-        .then(function(){
+        fetch(STORAGE_UP+path,{method:'POST',headers:Object.assign({'Content-Type':'image/png','x-upsert':'true'},SHDR),body:blob})
+        .then(()=>{
           var url=STORAGE_URL+path;
           data[slot]={url:url,name:file.name,id:null,path:path};
           build();
           fetch(SURL+'/rest/v1/galeria',{method:'POST',headers:HDR,body:JSON.stringify({imagem:url,path:path})})
-          .then(function(r){return r.json();})
-          .then(function(rows){
-            if(rows&&rows.length&&rows[0].id)data[slot].id=rows[0].id;
-            build();toast('✓ Guardado!');
-          }).catch(function(){toast('Erro ao guardar referência');});
-        }).catch(function(){toast('Erro ao enviar imagem');});
-      },'image/jpeg',0.92);
+          .then(r=>r.json()).then(rows=>{if(rows&&rows[0])data[slot].id=rows[0].id;build();toast('✓ Guardado!');});
+        });
+      },'image/png');
     };
     img.src=e.target.result;
   };
@@ -225,7 +330,10 @@ document.getElementById('fsin').addEventListener('change',function(){
   this.value='';
 });
 
-document.getElementById('btn-idx').onclick=function(){window.location.href='/indice';};
+document.getElementById('btn-idx').onclick=function(e){
+  e.stopPropagation();
+  window.location.href='indice.html?skip=1';
+};
 
 var tt;
 function toast(msg){
