@@ -292,44 +292,50 @@ document.getElementById('fsdl').onclick=function(){if(fsSlot!==null)guardarSlot(
 
 function apagarSlot(idx){
   var s = data[idx];
-  if (!s || !s.url) {
-    return toast('Nada para apagar');
-  }
+  if (!s || !s.url) return toast('Nada para apagar');
 
-  if (!confirm('Tem CERTEZA que quer apagar esta imagem?')) return;
+  if (!confirm('Tem CERTEZA que quer apagar esta imagem permanentemente?')) return;
 
   toast('A apagar...');
 
-  // 1. Apagar da tabela
+  console.log("🔴 A apagar slot:", idx, "ID:", s.id, "Path:", s.path);
+
+  let deleted = false;
+
+  // Apagar da tabela
   if (s.id) {
     fetch(`${SURL}/rest/v1/galeria?id=eq.${s.id}`, {
       method: 'DELETE',
       headers: HDRD
     })
-    .then(() => console.log('Tabela apagada'))
-    .catch(err => console.error('Erro tabela:', err));
+    .then(r => {
+      console.log("✅ Tabela apagada - Status:", r.status);
+      deleted = true;
+    })
+    .catch(err => console.error("❌ Erro ao apagar tabela:", err));
   }
 
-  // 2. Apagar do Storage
+  // Apagar do Storage
   if (s.path) {
-    const caminho = s.path.includes('galeria/') ? s.path : `galeria/${s.path}`;
-    
+    const caminho = s.path.includes('/') ? s.path : `galeria/${s.path}`;
     fetch(`${STORAGE_UP}${caminho}`, {
       method: 'DELETE',
       headers: SHDR
     })
-    .then(() => console.log('Storage apagado'))
-    .catch(err => console.error('Erro storage:', err));
+    .then(r => {
+      console.log("✅ Storage apagado - Status:", r.status);
+      deleted = true;
+    })
+    .catch(err => console.error("❌ Erro ao apagar storage:", err));
   }
 
-  // Limpar interface local
-  data[idx] = {url:null, name:null, id:null, path:null};
-  build();
-  toast('✓ Imagem apagada (local)');
-  
-  // Recarregar da base de dados para confirmar
-  setTimeout(carregarGaleria, 1200);
-}
+  // Atualizar interface local
+  setTimeout(() => {
+    data[idx] = {url:null, name:null, id:null, path:null};
+    build();
+    toast(deleted ? '✓ Apagado com sucesso' : '✓ Removido localmente');
+    carregarGaleria();   // Força recarregar do servidor
+  }, 800);
 
 function uploadStorage(file,slot){
   var path='img_'+slot+'_'+Date.now()+'.png';
