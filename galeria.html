@@ -229,7 +229,6 @@ function goGallery(){
   document.getElementById('btn-idx').classList.add('show');
   carregarGaleria();
 }
-
 function carregarGaleria(){
   fetch(SURL+'/rest/v1/galeria?select=id,imagem,path,created_at&order=created_at.desc&limit=9',{headers:HDR})
   .then(r=>r.json())
@@ -256,6 +255,7 @@ function carregarGaleria(){
     build();
   });
 }
+
 
 
 
@@ -314,11 +314,11 @@ function apagarSlot(idx){
   if(s.id){
     fetch(SURL+'/rest/v1/galeria?id=eq.'+s.id,{method:'DELETE',headers:HDRD})
     .finally(()=>{
-      setTimeout(carregarGaleria, 250); // dá tempo ao Supabase para limpar
+      setTimeout(carregarGaleria, 300); // dá tempo ao Supabase para limpar
       toast('✓ Apagado');
     });
   } else {
-    setTimeout(carregarGaleria, 250);
+    setTimeout(carregarGaleria, 300);
     toast('✓ Apagado');
   }
 
@@ -327,7 +327,6 @@ function apagarSlot(idx){
     fetch(STORAGE_UP+s.path,{method:'DELETE',headers:SHDR});
   }
 }
-
 
 function uploadStorage(file,slot){
   var path='img_'+slot+'_'+Date.now()+'.png';
