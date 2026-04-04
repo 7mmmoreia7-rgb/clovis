@@ -292,47 +292,44 @@ document.getElementById('fsdl').onclick=function(){if(fsSlot!==null)guardarSlot(
 
 function apagarSlot(idx){
   var s = data[idx];
-  if (!s || !s.url) return toast('Nada para apagar');
+  if (!s || !s.url) {
+    return toast('Nada para apagar');
+  }
 
-  if (!confirm('Tem certeza que quer apagar esta imagem?')) return;
+  if (!confirm('Tem CERTEZA que quer apagar esta imagem?')) return;
 
   toast('A apagar...');
 
-  const promises = [];
-
-  // Apagar da tabela
+  // 1. Apagar da tabela
   if (s.id) {
-    promises.push(
-      fetch(`${SURL}/rest/v1/galeria?id=eq.${s.id}`, {
-        method: 'DELETE',
-        headers: HDRD
-      })
-    );
-  }
-
-  // Apagar do Storage
-  if (s.path) {
-    const filePath = s.path.startsWith('galeria/') ? s.path : `galeria/${s.path}`;
-    promises.push(
-      fetch(`${STORAGE_UP}${filePath}`, {
-        method: 'DELETE',
-        headers: SHDR
-      })
-    );
-  }
-
-  Promise.all(promises)
-    .then(() => {
-      data[idx] = {url:null, name:null, id:null, path:null};
-      build();
-      toast('✓ Imagem apagada');
+    fetch(`${SURL}/rest/v1/galeria?id=eq.${s.id}`, {
+      method: 'DELETE',
+      headers: HDRD
     })
-    .catch(() => {
-      toast('Erro ao apagar');
-      setTimeout(carregarGaleria, 1000);
-    });
-}
+    .then(() => console.log('Tabela apagada'))
+    .catch(err => console.error('Erro tabela:', err));
+  }
 
+  // 2. Apagar do Storage
+  if (s.path) {
+    const caminho = s.path.includes('galeria/') ? s.path : `galeria/${s.path}`;
+    
+    fetch(`${STORAGE_UP}${caminho}`, {
+      method: 'DELETE',
+      headers: SHDR
+    })
+    .then(() => console.log('Storage apagado'))
+    .catch(err => console.error('Erro storage:', err));
+  }
+
+  // Limpar interface local
+  data[idx] = {url:null, name:null, id:null, path:null};
+  build();
+  toast('✓ Imagem apagada (local)');
+  
+  // Recarregar da base de dados para confirmar
+  setTimeout(carregarGaleria, 1200);
+}
 
 function uploadStorage(file,slot){
   var path='img_'+slot+'_'+Date.now()+'.png';
