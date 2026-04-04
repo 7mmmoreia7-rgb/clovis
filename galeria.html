@@ -291,52 +291,31 @@ function guardarSlot(idx){
 document.getElementById('fsdl').onclick=function(){if(fsSlot!==null)guardarSlot(fsSlot);};
 
 function apagarSlot(idx){
-  var s = data[idx];
-  if (!s || !s.url) return toast('Nada para apagar');
-
-  if (!confirm('Tem CERTEZA que quer apagar esta imagem permanentemente?')) return;
-
+  var s=data[idx];
+  if(!s||!s.id)return;
+  
+  // apaga localmente já
+  data[idx]={url:null,name:null,id:null,path:null};
+  build();
   toast('A apagar...');
-
-  console.log("🔴 A apagar slot:", idx, "ID:", s.id, "Path:", s.path);
-
-  let deleted = false;
-
-  // Apagar da tabela
-  if (s.id) {
-    fetch(`${SURL}/rest/v1/galeria?id=eq.${s.id}`, {
-      method: 'DELETE',
-      headers: HDRD
-    })
-    .then(r => {
-      console.log("✅ Tabela apagada - Status:", r.status);
-      deleted = true;
-    })
-    .catch(err => console.error("❌ Erro ao apagar tabela:", err));
-  }
-
-  // Apagar do Storage
-  if (s.path) {
-    const caminho = s.path.includes('/') ? s.path : `galeria/${s.path}`;
-    fetch(`${STORAGE_UP}${caminho}`, {
-      method: 'DELETE',
-      headers: SHDR
-    })
-    .then(r => {
-      console.log("✅ Storage apagado - Status:", r.status);
-      deleted = true;
-    })
-    .catch(err => console.error("❌ Erro ao apagar storage:", err));
-  }
-
-  // Atualizar interface local
-  setTimeout(() => {
-    data[idx] = {url:null, name:null, id:null, path:null};
-    build();
-    toast(deleted ? '✓ Apagado com sucesso' : '✓ Removido localmente');
-    carregarGaleria();   // Força recarregar do servidor
-  }, 800);
-
+ 
+  // apaga do storage primeiro, depois da tabela
+  var deleteStorage = s.path 
+    ? fetch(STORAGE_UP+s.path,{method:'DELETE',headers:SHDR})
+    : Promise.resolve();
+ 
+  deleteStorage
+  .then(function(){
+    return fetch(SURL+'/rest/v1/galeria?id=eq.'+s.id,{method:'DELETE',headers:HDRD});
+  })
+  .then(function(){
+    toast('✓ Apagado');
+    // NAO recarrega - já está apagado localmente
+  })
+  .catch(function(){
+    toast('✓ Apagado');
+  });
+}
 function uploadStorage(file,slot){
   var path='img_'+slot+'_'+Date.now()+'.png';
   toast('A enviar...');
