@@ -292,7 +292,7 @@ document.getElementById('fsdl').onclick=function(){if(fsSlot!==null)guardarSlot(
 
 function apagarSlot(idx){
   var s = data[idx];
-
+console.log("PATH RECEBIDO:", s.path);
   // limpar interface
   data[idx] = {url:null, name:null, id:null, path:null};
   build();
