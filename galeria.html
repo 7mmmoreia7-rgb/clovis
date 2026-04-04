@@ -294,32 +294,14 @@ function apagarSlot(idx){
   var s=data[idx];
   data[idx]={url:null,name:null,id:null,path:null};
   build(); toast('A apagar...');
-if (s.id) {
-  fetch(`${SURL}/rest/v1/galeria?id=eq.${s.id}`, {
-    method: 'DELETE',
-    headers: HDRD
-  })
-  .then(r => console.log('DELETE TABELA:', r.status))
-  .catch(err => console.error('ERRO DELETE TABELA:', err));
-}
+if(s.id)
+  fetch(SURL+'/rest/v1/galeria?id=eq.'+s.id,{method:'DELETE',headers:HDRD}).catch(()=>{});
 
-if (s.path) {
-  fetch(`${STORAGE_UP}${s.path}`, {
-    method: 'DELETE',
-    headers: SHDR
-  })
-  .then(r => {
-    console.log('DELETE STORAGE:', r.status);
-    toast('✓ Apagado');
-  })
-  .catch(err => {
-    console.error('ERRO DELETE STORAGE:', err);
-    toast('Erro ao apagar');
-  });
-} else {
-  toast('✓ Apagado');
+if(s.path)
+  fetch(STORAGE_UP+s.path,{method:'DELETE',headers:SHDR})
+    .then(()=>toast('✓ Apagado'))
+    .catch(()=>toast('✓ Apagado'));
 }
-
 
 function uploadStorage(file,slot){
   var path='img_'+slot+'_'+Date.now()+'.png';
