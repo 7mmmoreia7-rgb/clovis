@@ -231,11 +231,11 @@ function goGallery(){
 }
 
 function carregarGaleria(){
-  fetch(SURL+'/rest/v1/galeria?select=*&order=created_at.desc&limit=9',{headers:HDR})
+  fetch(SURL+'/rest/v1/galeria?select=id,imagem,path,created_at&order=created_at.desc&limit=9',{headers:HDR})
   .then(r=>r.json())
   .then(rows=>{
-    // garante sempre 9 slots
     data = [];
+
     for (let i = 0; i < 9; i++) {
       if (rows[i] && rows[i].imagem) {
         data.push({
@@ -248,14 +248,15 @@ function carregarGaleria(){
         data.push({url:null,name:null,id:null,path:null});
       }
     }
+
     build();
   })
   .catch(()=>{
-    // fallback: 9 slots vazias
     data = Array(9).fill({url:null,name:null,id:null,path:null});
     build();
   });
 }
+
 
 
 function build(){
@@ -313,12 +314,11 @@ function apagarSlot(idx){
   if(s.id){
     fetch(SURL+'/rest/v1/galeria?id=eq.'+s.id,{method:'DELETE',headers:HDRD})
     .finally(()=>{
-      // recarrega a galeria limpa
-      carregarGaleria();
+      setTimeout(carregarGaleria, 250); // dá tempo ao Supabase para limpar
       toast('✓ Apagado');
     });
   } else {
-    carregarGaleria();
+    setTimeout(carregarGaleria, 250);
     toast('✓ Apagado');
   }
 
