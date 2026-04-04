@@ -292,46 +292,45 @@ document.getElementById('fsdl').onclick=function(){if(fsSlot!==null)guardarSlot(
 
 function apagarSlot(idx){
   var s = data[idx];
+  if (!s || !s.url) return toast('Nada para apagar');
 
-  console.log("PATH RECEBIDO:", s.path);
+  if (!confirm('Tem certeza que quer apagar esta imagem?')) return;
 
-  // limpar interface
-  data[idx] = {url:null, name:null, id:null, path:null};
-  build();
   toast('A apagar...');
 
-  // 1) APAGAR LINHA NA TABELA
+  const promises = [];
+
+  // Apagar da tabela
   if (s.id) {
-    fetch(`${SURL}/rest/v1/galeria?id=eq.${s.id}`, {
-      method: 'DELETE',
-      headers: {
-        'apikey': API_KEY,
-        'Authorization': 'Bearer ' + API_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      }
-    })
-    .then(r => console.log("DELETE TABELA:", r.status))
-    .catch(err => console.error("ERRO DELETE TABELA:", err));
+    promises.push(
+      fetch(`${SURL}/rest/v1/galeria?id=eq.${s.id}`, {
+        method: 'DELETE',
+        headers: HDRD
+      })
+    );
   }
 
-  // 2) APAGAR FICHEIRO NO STORAGE
+  // Apagar do Storage
   if (s.path) {
-    fetch(`${STORAGE_UP}galeria/${s.path}`, {
-      method: 'DELETE',
-      headers: SHDR
-    })
-    .then(r => {
-      console.log("DELETE STORAGE:", r.status);
-      toast('✓ Apagado');
-    })
-    .catch(err => {
-      console.error("ERRO DELETE STORAGE:", err);
-      toast('Erro ao apagar');
-    });
-  } else {
-    toast('✓ Apagado');
+    const filePath = s.path.startsWith('galeria/') ? s.path : `galeria/${s.path}`;
+    promises.push(
+      fetch(`${STORAGE_UP}${filePath}`, {
+        method: 'DELETE',
+        headers: SHDR
+      })
+    );
   }
+
+  Promise.all(promises)
+    .then(() => {
+      data[idx] = {url:null, name:null, id:null, path:null};
+      build();
+      toast('✓ Imagem apagada');
+    })
+    .catch(() => {
+      toast('Erro ao apagar');
+      setTimeout(carregarGaleria, 1000);
+    });
 }
 
 
