@@ -138,67 +138,49 @@ html, body {
 </div>
 
 <script>
-var vid = document.getElementById('vid');
-var play = document.getElementById('play');
+var vid=document.getElementById('vid');
+var play=document.getElementById('play');
 
-// ⭐ SKIP — SALTA O VÍDEO E MOSTRA A PÁGINA FIXA
-if (window.location.href.includes('skip=1')) {
-  vid.pause();
-  vid.currentTime = vid.duration;
-  vid.style.opacity = '0';      // vídeo invisível
-  play.style.display = 'none';  // play invisível
-  showPage();                   // mostra a página fixa
-} else {
-  // ⭐ MODO NORMAL — PLAY FUNCIONA
-  play.onclick = function () {
-    play.classList.add('gone');
-    vid.style.opacity = '1';    // vídeo visível
-    vid.play().catch(function () {
-      vid.muted = true;
-      vid.play();
-    });
-  };
-}
+play.onclick=function(){
+  play.classList.add('gone');
+  vid.style.opacity='1';
+  vid.play().catch(function(){ vid.muted=true; vid.play(); });
+};
 
-// ⭐ QUANDO O VÍDEO ACABA → MOSTRA A PÁGINA FIXA
 vid.addEventListener('ended', showPage);
 
-function showPage() {
+function showPage(){
   vid.pause();
-  vid.style.opacity = '0';
+  vid.style.opacity='0';
   document.getElementById('gbg').classList.add('show');
   document.querySelectorAll('.hs').forEach(h => h.classList.add('show'));
   document.getElementById('btn-home').classList.add('show');
 }
 
-// ⭐ HOTSPOTS
-var nav = {
-  'hs-ignora': '/a_regras',
+var nav={
+  'hs-ignora':   '/a_regras',
   'hs-carolina': '/carolina',
-  'hs-gloria': '/gloria',
-  'hs-daniela': '/daniela',
-  'hs-beatriz': '/beatriz',
-  'hs-lurdes': '/lurdes',
-  'hs-clovis': '/clovis',
-  'hs-fatima': '/fatima',
-  'hs-rabisca': '/interativo',
-  'hs-clicks': '/galeria',
-  'hs-blabla': '/chat'
+  'hs-gloria':   '/gloria',
+  'hs-daniela':  '/daniela',
+  'hs-beatriz':  '/beatriz',
+  'hs-lurdes':   '/lurdes',
+  'hs-clovis':   '/clovis',
+  'hs-fatima':   '/fatima',
+  'hs-rabisca':  '/interativo',
+  'hs-clicks':   '/galeria',
+  'hs-blabla':   '/chat'
 };
 
-Object.keys(nav).forEach(id => {
-  document.getElementById(id).onclick = function () {
-    window.location.href = nav[id];
+Object.keys(nav).forEach(id=>{
+  document.getElementById(id).onclick=function(){
+    window.location.href=nav[id];
   };
 });
 
-// ⭐ BOTÃO HOME
-document.getElementById('btn-home').onclick = function () {
-  window.location.href = '/';
+document.getElementById('btn-home').onclick=function(){
+  window.location.href='/';
 };
 </script>
-
-
 
 </body>
 </html>
