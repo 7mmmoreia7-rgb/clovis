@@ -141,13 +141,13 @@ html, body {
 var vid=document.getElementById('vid');
 var play=document.getElementById('play');
 
-// ⭐ SE VIER COM SKIP=1 → SALTA O VÍDEO
+// ⭐ SKIP — AGORA NO SÍTIO CERTO
 if (window.location.href.includes('skip=1')) {
   vid.pause();
-  vid.currentTime = vid.duration;   // força o vídeo a estar “acabado”
-  vid.style.opacity = '0';          // esconde o vídeo
-  play.style.display = 'none';      // esconde o botão play
-  showPage();                       // mostra a página fixa
+  vid.currentTime = vid.duration;
+  vid.style.opacity = '0';
+  play.style.display = 'none';
+  showPage();
 }
 
 // ⭐ PLAY NORMAL
@@ -194,6 +194,7 @@ document.getElementById('btn-home').onclick=function(){
   window.location.href='/';
 };
 </script>
+
 
 </body>
 </html>
