@@ -58,3 +58,40 @@
   <img id="bg" src=" https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png" />
   <video id="vid" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/membros/beatriz.mp4" preload="auto" playsinline></video>
   <img id="play" src=" https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" />
+
+  <!-- TIRA ESTA LINHA SE NAO TIVER EMAIL -->
+  <img id="btn-email" src=" https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mail.png" />
+  <!-- ---------------------------------- -->
+
+  <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" />
+
+<script>
+var play = document.getElementById('play');
+var vid  = document.getElementById('vid');
+
+play.onclick = function() {
+  this.classList.add('gone');
+  vid.classList.add('show');
+  vid.play().catch(function(){ vid.muted=true; vid.play(); });
+};
+
+vid.addEventListener('ended', function() {
+  document.getElementById('btn-idx').classList.add('show');
+  /* TIRA ESTA LINHA SE NAO TIVER EMAIL */
+  document.getElementById('btn-email').classList.add('show');
+  /* ---------------------------------- */
+});
+
+/* TIRA ESTE BLOCO SE NAO TIVER EMAIL */
+document.getElementById('btn-email').onclick = function() {
+  window.open('mailto:beatrizfreimor4@gmail.com');
+};
+/* ---------------------------------- */
+
+document.getElementById('btn-idx').onclick = function(e) {
+  e.stopPropagation();
+  window.location.href = 'indice.html?skip=1';
+};
+</script>
+</body>
+</html>
