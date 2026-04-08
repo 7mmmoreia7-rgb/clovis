@@ -4,43 +4,101 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nem eu</title>
+
   <link rel="manifest" href="/manifest.json" />
- <link rel="icon" href="/icon-192.png" />
-<link rel="apple-touch-icon" href="/icon-512.png" />
+  <link rel="icon" href="/icon-192.png" />
+  <link rel="apple-touch-icon" href="/icon-512.png" />
+
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Nem eu" />
   <meta name="theme-color" content="#c8b99a" />
+
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background:url("https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/isto.png") center/cover no-repeat; }
+    html, body { 
+      width: 100%; 
+      height: 100%; 
+      overflow: hidden; 
+      background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/isto.png") center/cover no-repeat; 
+    }
     * { outline:none !important; -webkit-tap-highlight-color:transparent !important; }
-    #video_intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
-    #btn-play { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10%; cursor: pointer; z-index: 10; transition: opacity .3s; }
-    #btn-idx { position: fixed; bottom: 3.5%; right: 3.4%; width: 8%; cursor: pointer; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity .5s; }
-    #install-btn { position:fixed; bottom:3%; left:50%; transform:translateX(-50%); background:#c8b99a; color:#333; border:none; border-radius:20px; padding:10px 24px; font-size:14px; font-weight:700; cursor:pointer; z-index:9999; display:none; box-shadow:0 4px 12px rgba(0,0,0,.3); }
+
+    #video_intro { 
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%; 
+      object-fit: cover; 
+      z-index: 1; 
+    }
+
+    #btn-play { 
+      position: fixed; 
+      top: 50%; left: 50%; 
+      transform: translate(-50%, -50%); 
+      width: 10%; 
+      cursor: pointer; 
+      z-index: 10; 
+      transition: opacity .3s; 
+    }
+
+    #btn-idx { 
+      position: fixed; 
+      bottom: 3.5%; right: 3.4%; 
+      width: 8%; 
+      cursor: pointer; 
+      z-index: 9999; 
+      opacity: 0; 
+      pointer-events: none; 
+      transition: opacity .5s; 
+    }
+
+    #install-btn { 
+      position:fixed; 
+      bottom:3%; left:50%; 
+      transform:translateX(-50%); 
+      background:#c8b99a; 
+      color:#333; 
+      border:none; 
+      border-radius:20px; 
+      padding:10px 24px; 
+      font-size:14px; 
+      font-weight:700; 
+      cursor:pointer; 
+      z-index:9999; 
+      display:none; 
+      box-shadow:0 4px 12px rgba(0,0,0,.3); 
+    }
   </style>
 </head>
+
 <body>
+
   <video id="video_intro" playsinline>
-    <source src=" https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/home/home.mp4" type="video/mp4">
+    <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/home/home.mp4" type="video/mp4">
   </video>
-  <img id="btn-play" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/play.png" alt="Play" />
-  <img id="btn-idx" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" alt="Índice" />
+
+  <img id="btn-play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/play.png" alt="Play" />
+  <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/botao (2).png" alt="Índice" />
+
   <button id="install-btn">📲 Instalar App</button>
+
   <script>
     var play = document.getElementById('btn-play');
     var vid  = document.getElementById('video_intro');
     var idx  = document.getElementById('btn-idx');
+
     play.onclick = function () {
       play.style.opacity = '0';
       play.style.pointerEvents = 'none';
       vid.play();
     };
+
     vid.onended = function () {
       idx.style.opacity = '1';
       idx.style.pointerEvents = 'all';
     };
+
     idx.onclick = function () {
       window.location.href = 'indice.html';
     };
@@ -53,19 +111,23 @@
     /* PWA - Install prompt */
     var deferredPrompt;
     var installBtn = document.getElementById('install-btn');
+
     window.addEventListener('beforeinstallprompt', function(e){
       e.preventDefault();
       deferredPrompt = e;
       installBtn.style.display = 'block';
     });
+
     installBtn.onclick = function(){
       installBtn.style.display = 'none';
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(function(){ deferredPrompt = null; });
     };
+
     window.addEventListener('appinstalled', function(){
       installBtn.style.display = 'none';
     });
   </script>
+
 </body>
 </html>
