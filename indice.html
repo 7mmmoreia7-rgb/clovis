@@ -141,12 +141,23 @@ html, body {
 var vid=document.getElementById('vid');
 var play=document.getElementById('play');
 
+// ⭐ SE VIER COM SKIP=1 → SALTA O VÍDEO
+if (window.location.href.includes('skip=1')) {
+  vid.pause();
+  vid.currentTime = vid.duration;   // força o vídeo a estar “acabado”
+  vid.style.opacity = '0';          // esconde o vídeo
+  play.style.display = 'none';      // esconde o botão play
+  showPage();                       // mostra a página fixa
+}
+
+// ⭐ PLAY NORMAL
 play.onclick=function(){
   play.classList.add('gone');
   vid.style.opacity='1';
   vid.play().catch(function(){ vid.muted=true; vid.play(); });
 };
 
+// ⭐ QUANDO O VÍDEO ACABA → MOSTRA A PÁGINA FIXA
 vid.addEventListener('ended', showPage);
 
 function showPage(){
@@ -157,6 +168,7 @@ function showPage(){
   document.getElementById('btn-home').classList.add('show');
 }
 
+// ⭐ HOTSPOTS
 var nav={
   'hs-ignora':   '/a_regras',
   'hs-carolina': '/carolina',
@@ -177,6 +189,7 @@ Object.keys(nav).forEach(id=>{
   };
 });
 
+// ⭐ BOTÃO HOME
 document.getElementById('btn-home').onclick=function(){
   window.location.href='/';
 };
