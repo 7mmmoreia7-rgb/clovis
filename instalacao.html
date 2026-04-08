@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Instalação - Nem Eu</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/fundilho.png');
+      background-size: cover;
+      background-position: center;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .logo {
+      width: 250px;
+      transform-style: preserve-3d;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
+      transition: box-shadow 0.2s ease-out;
+      border-radius: 50%;
+    }
+
+    .rodar {
+      animation: rodar 1.2s ease-out 2 forwards;
+    }
+
+    @keyframes rodar {
+      0%   { transform: rotateY(0deg) scale(1); }
+      40%  { transform: rotateY(180deg) scale(0.9); }
+      100% { transform: rotateY(360deg) scale(1); }
+    }
+
+    .brilhar {
+      box-shadow: 0 0 9px 3px rgba(255,255,255,0.9);
+    }
+  </style>
+</head>
+
+<body>
+
+  <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/icon-512.png" class="logo" id="logo">
+  <audio id="som-moeda" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/coin.wav"></audio>
+
+<script>
+  const som = document.getElementById('som-moeda');
+  const logo = document.getElementById('logo');
+
+  document.body.addEventListener('click', () => {
+    som.play().then(() => {
+      som.pause();
+      som.currentTime = 0;
+    }).catch(() => {});
+
+    logo.classList.add('rodar');
+  }, { once: true });
+
+  logo.addEventListener('animationstart', () => {
+    som.volume = 1;
+    som.currentTime = 0;
+    som.play();
+
+    logo.classList.add('brilhar');
+    setTimeout(() => logo.classList.remove('brilhar'), 200);
+  });
+
+  logo.addEventListener('animationiteration', () => {
+    som.volume = 0.4;
+    som.currentTime = 0;
+    som.play();
+
+    logo.classList.add('brilhar');
+    setTimeout(() => logo.classList.remove('brilhar'), 200);
+  });
+</script>
+
+</body>
+</html>
