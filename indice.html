@@ -4,43 +4,129 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Índice</title>
+
 <link rel="icon" href="/icon-192.png" />
 <link rel="apple-touch-icon" href="/icon-512.png" />
+
 <style>
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; height:100%; overflow:hidden; background:url("https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/isto.png") center/cover no-repeat;
+*, *::before, *::after { 
+  margin:0; 
+  padding:0; 
+  box-sizing:border-box; 
+  outline:none !important; 
+  -webkit-tap-highlight-color:transparent !important;
 }
+
+button:focus,
+img:focus,
+video:focus,
+a:focus {
+  outline:none !important;
+}
+
+html, body { 
+  width:100%; 
+  height:100%; 
+  overflow:hidden; 
+  background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
+}
+
 #wrap { position:fixed; top:0; left:0; width:100%; height:100%; background:#000; }
 #stage { position:fixed; top:0; left:0; width:100%; height:100%; overflow:hidden; }
-#vid { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; }
-#play { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:10%; cursor:pointer; z-index:10; transition:transform .2s, opacity .5s; }
+
+#vid { 
+  position:absolute; 
+  inset:0; 
+  width:100%; 
+  height:100%; 
+  object-fit:cover; 
+  z-index:1; 
+}
+
+#play { 
+  position:fixed; 
+  left:50%; 
+  top:50%; 
+  transform:translate(-50%,-50%); 
+  width:10%; 
+  cursor:pointer; 
+  z-index:10; 
+  transition:transform .2s, opacity .5s; 
+}
+
 #play.gone { opacity:0; pointer-events:none; }
-#gbg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:2; opacity:0; transition:opacity 1.4s ease; pointer-events:none; }
+
+#gbg { 
+  position:absolute; 
+  inset:0; 
+  width:100%; 
+  height:100%; 
+  object-fit:cover; 
+  display:block; 
+  z-index:2; 
+  opacity:0; 
+  transition:opacity 1.4s ease; 
+  pointer-events:none; 
+}
+
 #gbg.show { opacity:1; }
-.hs { position:absolute; cursor:pointer; z-index:10; background:transparent; border:none; opacity:0; pointer-events:none; border-radius:8px; }
+
+.hs { 
+  position:absolute; 
+  cursor:pointer; 
+  z-index:10; 
+  background:transparent; 
+  border:none; 
+  opacity:0; 
+  pointer-events:none; 
+  border-radius:8px; 
+}
+
 .hs.show { opacity:1; pointer-events:all; }
-#btn-home { position:fixed; bottom:3.5%; right:3.4%; width:8%; cursor:pointer; z-index:9999; opacity:0; pointer-events:none; transition:opacity .3s; }
+
+#btn-home { 
+  position:fixed; 
+  bottom:3.5%; 
+  right:3.4%; 
+  width:8%; 
+  cursor:pointer; 
+  z-index:9999; 
+  opacity:0; 
+  pointer-events:none; 
+  transition:opacity .3s; 
+}
+
 #btn-home.show { opacity:1; pointer-events:all; }
 </style>
 </head>
+
 <body>
 <div id="wrap"><div id="stage">
-  <video id="vid" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/indice/indice%20(2).mp4" preload="auto" playsinline></video>
-  <img id="play" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/play.png" />
-  <img id="gbg" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/indice/indice.png" />
+
+  <video id="vid" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/indice/indice%20(2).mp4" preload="auto" playsinline></video>
+
+  <img id="play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" />
+
+  <img id="gbg" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/indice/indice.png" />
+
   <div class="hs" id="hs-ignora"   style="left:10.422%; top:16.895%; width:18%; height:22%;"></div>
   <div class="hs" id="hs-carolina" style="left:30.737%; top:16.583%; width:18%; height:22%;"></div>
   <div class="hs" id="hs-gloria"   style="left:51.053%; top:16.895%; width:18%; height:22%;"></div>
   <div class="hs" id="hs-daniela"  style="left:71.893%; top:16.739%; width:18%; height:22%;"></div>
+
   <div class="hs" id="hs-beatriz"  style="left:10.422%; top:38.066%; width:18%; height:22%;"></div>
   <div class="hs" id="hs-lurdes"   style="left:30.562%; top:38.533%; width:18%; height:22%;"></div>
   <div class="hs" id="hs-clovis"   style="left:51.228%; top:37.755%; width:18%; height:22%;"></div>
   <div class="hs" id="hs-fatima"   style="left:71.630%; top:37.132%; width:18%; height:22%;"></div>
+
   <div class="hs" id="hs-rabisca"  style="left:16.727%; top:59.860%; width:18%; height:22%;"></div>
   <div class="hs" id="hs-clicks"   style="left:42.384%; top:60.483%; width:18%; height:22%;"></div>
   <div class="hs" id="hs-blabla"   style="left:65.851%; top:59.704%; width:18%; height:22%;"></div>
-  <img id="btn-home" src="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
+
+  <img id="btn-home" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" />
+
 </div></div>
+
 <script>
 var vid=document.getElementById('vid');
 
@@ -53,6 +139,7 @@ if(window.location.href.indexOf('skip=1')!==-1){
     this.classList.add('gone');
     vid.play().catch(function(){vid.muted=true;vid.play();});
   };
+
   var lastTap=0;
   vid.addEventListener('dblclick',showPage);
   vid.addEventListener('touchend',function(){
@@ -60,6 +147,7 @@ if(window.location.href.indexOf('skip=1')!==-1){
     if(now-lastTap<350)showPage();
     lastTap=now;
   });
+
   vid.addEventListener('ended',showPage);
 }
 
@@ -96,5 +184,6 @@ document.getElementById('btn-home').onclick=function(){
   window.location.href='/';
 };
 </script>
+
 </body>
 </html>
