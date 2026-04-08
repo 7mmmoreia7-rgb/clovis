@@ -6,58 +6,55 @@
   <title>NOME</title>
   <link rel="icon" href="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
   <link rel="apple-touch-icon" href="https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/botao%20(2).png" />
+
   <style>
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html, body { width:100%; height:100%; overflow:hidden; }
+    *, *::before, *::after { 
+      margin:0; 
+      padding:0; 
+      box-sizing:border-box; 
+      -webkit-tap-highlight-color: transparent !important; /* remove azul */
+    }
+
+    html, body { 
+      width:100%; 
+      height:100%; 
+      overflow:hidden; 
+    }
+
+    /* remove azul de foco */
+    *:focus { outline:none !important; }
+
+    /* remove flash azul do iOS */
+    img, button {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    img:active, button:active {
+      opacity: 1 !important; /* impede flash azul */
+    }
+
     /* fundo enquanto video nao carrega */
     #bg { position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+
     #vid { position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:1; opacity:0; transition:opacity .5s; }
     #vid.show { opacity:1; }
+
     #play { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:10%; cursor:pointer; z-index:10; transition:opacity .3s; }
     #play.gone { opacity:0; pointer-events:none; }
+
     /* TIRA ESTA LINHA SE NAO TIVER EMAIL */
     #btn-email { position:fixed; bottom:5%; left:7%; width:7%; cursor:pointer; z-index:9999; opacity:0; pointer-events:none; transition:opacity .5s; }
     #btn-email.show { opacity:1; pointer-events:all; }
     /* ---------------------------------- */
+
     #btn-idx { position:fixed; bottom:3.5%; right:3.4%; width:8%; cursor:pointer; z-index:9999; opacity:0; pointer-events:none; transition:opacity .8s; }
     #btn-idx.show { opacity:1; pointer-events:all; }
   </style>
 </head>
+
 <body>
   <img id="bg" src=" https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png" />
   <video id="vid" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/membros/beatriz.mp4" preload="auto" playsinline></video>
   <img id="play" src=" https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" />
-  <!-- TIRA ESTA LINHA SE NAO TIVER EMAIL -->
-  <img id="btn-email" src=" https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mail.png" />
-  <!-- ---------------------------------- -->
-  <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" />
-<script>
-var play = document.getElementById('play');
-var vid  = document.getElementById('vid');
-
-play.onclick = function() {
-  this.classList.add('gone');
-  vid.classList.add('show');
-  vid.play().catch(function(){ vid.muted=true; vid.play(); });
-};
-
-vid.addEventListener('ended', function() {
-  document.getElementById('btn-idx').classList.add('show');
-  /* TIRA ESTA LINHA SE NAO TIVER EMAIL */
-  document.getElementById('btn-email').classList.add('show');
-  /* ---------------------------------- */
-});
-
-/* TIRA ESTE BLOCO SE NAO TIVER EMAIL */
-document.getElementById('btn-email').onclick = function() {
-  window.open('mailto:beatrizfreimor4@gmail.com');
-};
-/* ---------------------------------- */
-
-document.getElementById('btn-idx').onclick = function(e) {
-  e.stopPropagation();
-  window.location.href = 'indice.html?skip=1';
-};
-</script>
-</body>
-</html>
