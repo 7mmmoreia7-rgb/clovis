@@ -66,17 +66,14 @@
 
 <body>
 
-  <!-- VÍDEO (só começa depois do PLAY) -->
   <video id="myVideo" playsinline>
     <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/regras/regras%20(1).mp4" type="video/mp4">
   </video>
 
-  <!-- BOTÃO PLAY -->
   <img id="btn-play"
        src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png"
        alt="Play" />
 
-  <!-- BOTÃO PARA O FIM DO ÍNDICE -->
   <img id="btn-idx"
        src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png"
        alt="Índice" />
@@ -99,7 +96,8 @@
       idx.classList.add('show');
     };
 
-    idx.onclick = function () {
+    document.getElementById('btn-idx').onclick = function(e) {
+      e.stopPropagation();
       window.location.href = 'indice.html?skip=1';
     };
   </script>
