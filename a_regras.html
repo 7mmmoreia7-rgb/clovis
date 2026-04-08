@@ -83,6 +83,13 @@
     const vid  = document.getElementById('myVideo');
     const idx  = document.getElementById('btn-idx');
 
+    // ⭐ SKIP — exatamente como pediste
+    if (window.location.href.includes('skip=1')) {
+      vid.style.display = 'none';
+      play.style.display = 'none';
+      idx.classList.add('show');
+    }
+
     play.onclick = function () {
       play.classList.add('gone');
       vid.style.opacity = '1';
@@ -98,7 +105,6 @@
 
     document.getElementById('btn-idx').onclick = function(e) {
       e.stopPropagation();
-      vid.pause();
       window.location.href = '/indice?skip=1';
     };
   </script>
