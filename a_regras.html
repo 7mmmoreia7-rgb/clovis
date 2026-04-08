@@ -4,42 +4,105 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Regras</title>
- <link rel="icon" href="/icon-192.png" />
-<link rel="apple-touch-icon" href="/icon-512.png" />
+
+  <link rel="icon" href="/icon-192.png" />
+  <link rel="apple-touch-icon" href="/icon-512.png" />
+
   <style>
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html, body { width:100%; height:100%; overflow:hidden; background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
-}
-    #myVideo { position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:1; background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/regras/regras%20(1).mp4
-") center/cover no-repeat;
-} 
-    #btn-play { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:10%; cursor:pointer; z-index:10; transition:opacity .3s; }
-    #btn-idx { position:fixed; bottom:3.5%; right:3.4%; width:8%; cursor:pointer; z-index:9999; opacity:0; pointer-events:none; transition:opacity .5s; }
+    *, *::before, *::after {
+      margin:0; padding:0; box-sizing:border-box;
+      outline:none !important;
+      -webkit-tap-highlight-color:transparent !important;
+    }
+
+    button:focus, img:focus, video:focus, a:focus {
+      outline:none !important;
+    }
+
+    html, body {
+      width:100%; height:100%; overflow:hidden;
+      background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
+    }
+
+    #myVideo {
+      position:fixed; top:0; left:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      z-index:1;
+      opacity:0;
+      transition:opacity .5s;
+    }
+
+    #btn-play {
+      position:fixed;
+      top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      width:10%;
+      cursor:pointer;
+      z-index:10;
+      transition:opacity .3s;
+    }
+
+    #btn-play.gone {
+      opacity:0; pointer-events:none;
+    }
+
+    #btn-idx {
+      position:fixed;
+      bottom:3.5%; right:3.4%;
+      width:8%;
+      cursor:pointer;
+      z-index:9999;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .5s;
+    }
+
+    #btn-idx.show {
+      opacity:1; pointer-events:all;
+    }
   </style>
 </head>
+
 <body>
+
+  <!-- VÍDEO (só começa depois do PLAY) -->
   <video id="myVideo" playsinline>
-    <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/regras/regras%20(1).mp4">
+    <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/regras/regras%20(1).mp4" type="video/mp4">
   </video>
-  <img id="btn-play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" alt="Play" />
-  <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" alt="Índice" />
+
+  <!-- BOTÃO PLAY -->
+  <img id="btn-play"
+       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png"
+       alt="Play" />
+
+  <!-- BOTÃO PARA O FIM DO ÍNDICE -->
+  <img id="btn-idx"
+       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png"
+       alt="Índice" />
+
   <script>
     const play = document.getElementById('btn-play');
     const vid  = document.getElementById('myVideo');
     const idx  = document.getElementById('btn-idx');
+
     play.onclick = function () {
-      play.style.opacity = '0';
-      play.style.pointerEvents = 'none';
-      vid.play().catch(function(){ vid.muted = true; vid.play(); });
+      play.classList.add('gone');
+      vid.style.opacity = '1';
+      vid.play().catch(function(){
+        vid.muted = true;
+        vid.play();
+      });
     };
+
     vid.onended = function () {
-      idx.style.opacity = '1';
-      idx.style.pointerEvents = 'all';
+      idx.classList.add('show');
     };
+
     idx.onclick = function () {
       window.location.href = 'indice.html?skip=1';
     };
   </script>
+
 </body>
 </html>
-
