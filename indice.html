@@ -45,7 +45,22 @@ html, body {
   height:100%; 
   object-fit:cover; 
   z-index:1; 
+  opacity:0;
+  transition:opacity .5s;
 }
+
+#play { 
+  position:fixed; 
+  left:50%; 
+  top:50%; 
+  transform:translate(-50%,-50%); 
+  width:10%; 
+  cursor:pointer; 
+  z-index:10; 
+  transition:opacity .5s;
+}
+
+#play.gone { opacity:0; pointer-events:none; }
 
 #gbg { 
   position:absolute; 
@@ -93,10 +108,16 @@ html, body {
 <body>
 <div id="stage">
 
-  <video id="vid" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/indice/indice%20(2).mp4" autoplay playsinline></video>
+  <!-- VÍDEO (começa só depois do PLAY) -->
+  <video id="vid" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/indice/indice%20(2).mp4" playsinline></video>
 
+  <!-- BOTÃO PLAY -->
+  <img id="play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" />
+
+  <!-- PÁGINA FIXA -->
   <img id="gbg" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/indice/indice.png" />
 
+  <!-- HOTSPOTS -->
   <div class="hs" id="hs-ignora"   style="left:10.422%; top:16.895%; width:18%; height:22%;"></div>
   <div class="hs" id="hs-carolina" style="left:30.737%; top:16.583%; width:18%; height:22%;"></div>
   <div class="hs" id="hs-gloria"   style="left:51.053%; top:16.895%; width:18%; height:22%;"></div>
@@ -111,20 +132,26 @@ html, body {
   <div class="hs" id="hs-clicks"   style="left:42.384%; top:60.483%; width:18%; height:22%;"></div>
   <div class="hs" id="hs-blabla"   style="left:65.851%; top:59.704%; width:18%; height:22%;"></div>
 
+  <!-- BOTÃO HOME -->
   <img id="btn-home" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" />
 
 </div>
 
 <script>
 var vid=document.getElementById('vid');
+var play=document.getElementById('play');
+
+play.onclick=function(){
+  play.classList.add('gone');
+  vid.style.opacity='1';
+  vid.play().catch(function(){ vid.muted=true; vid.play(); });
+};
 
 vid.addEventListener('ended', showPage);
 
 function showPage(){
   vid.pause();
-  vid.style.transition='opacity 1.4s';
   vid.style.opacity='0';
-
   document.getElementById('gbg').classList.add('show');
   document.querySelectorAll('.hs').forEach(h => h.classList.add('show'));
   document.getElementById('btn-home').classList.add('show');
