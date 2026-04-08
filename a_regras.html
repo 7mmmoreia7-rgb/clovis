@@ -98,6 +98,7 @@
 
     document.getElementById('btn-idx').onclick = function(e) {
       e.stopPropagation();
+      vid.pause();   // ⭐ A LINHA QUE FALTAVA
       window.location.href = 'indice.html?skip=1';
     };
   </script>
