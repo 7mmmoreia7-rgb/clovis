@@ -78,8 +78,17 @@
     <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/home/home.mp4" type="video/mp4">
   </video>
 
-  <img id="btn-play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/play.png" alt="Play" />
-  <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/botao (2).png" alt="Índice" />
+  <img 
+    id="btn-play" 
+    src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/play.png" 
+    alt="Play" 
+  />
+
+  <img 
+    id="btn-idx" 
+    src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/botao (2).png" 
+    alt="Índice" 
+  />
 
   <button id="install-btn">📲 Instalar App</button>
 
@@ -103,12 +112,12 @@
       window.location.href = 'indice.html';
     };
 
-    /* PWA - Service Worker */
-    if('serviceWorker' in navigator){
+    // PWA - Service Worker
+    if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(function(){});
     }
 
-    /* PWA - Install prompt */
+    // PWA - Install prompt
     var deferredPrompt;
     var installBtn = document.getElementById('install-btn');
 
