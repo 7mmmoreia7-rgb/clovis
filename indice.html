@@ -31,8 +31,12 @@ html, body {
   background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
 }
 
-#wrap { position:fixed; top:0; left:0; width:100%; height:100%; background:#000; }
-#stage { position:fixed; top:0; left:0; width:100%; height:100%; overflow:hidden; }
+#stage { 
+  position:fixed; 
+  top:0; left:0; 
+  width:100%; height:100%; 
+  overflow:hidden; 
+}
 
 #vid { 
   position:absolute; 
@@ -43,26 +47,12 @@ html, body {
   z-index:1; 
 }
 
-#play { 
-  position:fixed; 
-  left:50%; 
-  top:50%; 
-  transform:translate(-50%,-50%); 
-  width:10%; 
-  cursor:pointer; 
-  z-index:10; 
-  transition:transform .2s, opacity .5s; 
-}
-
-#play.gone { opacity:0; pointer-events:none; }
-
 #gbg { 
   position:absolute; 
   inset:0; 
   width:100%; 
   height:100%; 
   object-fit:cover; 
-  display:block; 
   z-index:2; 
   opacity:0; 
   transition:opacity 1.4s ease; 
@@ -101,11 +91,9 @@ html, body {
 </head>
 
 <body>
-<div id="wrap"><div id="stage">
+<div id="stage">
 
-  <video id="vid" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/indice/indice%20(2).mp4" preload="auto" playsinline></video>
-
-  <img id="play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" />
+  <video id="vid" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/indice/indice%20(2).mp4" autoplay playsinline></video>
 
   <img id="gbg" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/indice/indice.png" />
 
@@ -125,38 +113,20 @@ html, body {
 
   <img id="btn-home" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" />
 
-</div></div>
+</div>
 
 <script>
 var vid=document.getElementById('vid');
 
-if(window.location.href.indexOf('skip=1')!==-1){
-  vid.style.display='none';
-  document.getElementById('play').style.display='none';
-  showPage();
-} else {
-  document.getElementById('play').onclick=function(){
-    this.classList.add('gone');
-    vid.play().catch(function(){vid.muted=true;vid.play();});
-  };
-
-  var lastTap=0;
-  vid.addEventListener('dblclick',showPage);
-  vid.addEventListener('touchend',function(){
-    var now=Date.now();
-    if(now-lastTap<350)showPage();
-    lastTap=now;
-  });
-
-  vid.addEventListener('ended',showPage);
-}
+vid.addEventListener('ended', showPage);
 
 function showPage(){
   vid.pause();
   vid.style.transition='opacity 1.4s';
   vid.style.opacity='0';
+
   document.getElementById('gbg').classList.add('show');
-  document.querySelectorAll('.hs').forEach(function(h){h.classList.add('show');});
+  document.querySelectorAll('.hs').forEach(h => h.classList.add('show'));
   document.getElementById('btn-home').classList.add('show');
 }
 
@@ -174,7 +144,7 @@ var nav={
   'hs-blabla':   '/chat'
 };
 
-Object.keys(nav).forEach(function(id){
+Object.keys(nav).forEach(id=>{
   document.getElementById(id).onclick=function(){
     window.location.href=nav[id];
   };
