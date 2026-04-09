@@ -37,7 +37,8 @@ button:focus,button:active,button:hover{outline:none !important;box-shadow:none 
 #camada-fundos video,#camada-fundos img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
 #fundo-cor{position:absolute;inset:0;width:100%;height:100%;}
 #meu-canvas{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;background:transparent;cursor:crosshair;z-index:3;touch-action:none;}
-#camada-elementos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;z-index:4;pointer-events:none;overflow:hidden;}
+/* camada de elementos SEMPRE visível e clicável — canvas fica abaixo */
+#camada-elementos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;z-index:4;pointer-events:all;overflow:hidden;}
 #barra-botoes{position:absolute;top:0;left:0;width:100%;height:13.5%;z-index:10;pointer-events:none;}
 #barra-botoes button{position:absolute;background:transparent;border:none;cursor:pointer;pointer-events:all;border-radius:50%;top:8%;height:84%;aspect-ratio:1;box-shadow:none !important;}
 #barra-botoes button:focus,#barra-botoes button:active{outline:none !important;box-shadow:none !important;background:transparent !important;}
@@ -53,7 +54,8 @@ button:focus,button:active,button:hover{outline:none !important;box-shadow:none 
 #btn-idx{position:fixed;bottom:3.5%;right:3.4%;width:8%;height:auto;cursor:pointer;z-index:9999;opacity:0;pointer-events:none;transition:opacity .5s;box-shadow:none !important;}
 #btn-idx.show{opacity:1;pointer-events:all;}
 
-.elem-arr{position:absolute;cursor:grab;user-select:none;touch-action:none;pointer-events:none;}
+/* elementos sempre visíveis e interactivos */
+.elem-arr{position:absolute;cursor:grab;user-select:none;touch-action:none;pointer-events:all;}
 .elem-arr:active{cursor:grabbing;}
 .elem-arr img,.elem-arr video{display:block;pointer-events:all;width:100%;height:auto;}
 .hdl-resize{display:none;}
@@ -322,13 +324,25 @@ const cv=document.getElementById('meu-canvas'),cx=cv.getContext('2d');
 function initCanvas(){
   sizing();
   window.addEventListener('resize',sizing);
-  cv.addEventListener('mousedown',e=>{deselAll();ini(e.offsetX,e.offsetY);});
+  cv.addEventListener('mousedown',e=>{deselAll();modoDraw(true);ini(e.offsetX,e.offsetY);});
   cv.addEventListener('mousemove',e=>cont(e.offsetX,e.offsetY));
-  cv.addEventListener('mouseup',fim);
-  cv.addEventListener('mouseleave',fim);
-  cv.addEventListener('touchstart',e=>{e.preventDefault();deselAll();const p=tPos(e.touches[0]);ini(p.x,p.y);},{passive:false});
+  cv.addEventListener('mouseup',()=>{fim();modoDraw(false);});
+  cv.addEventListener('mouseleave',()=>{fim();modoDraw(false);});
+  cv.addEventListener('touchstart',e=>{e.preventDefault();deselAll();modoDraw(true);const p=tPos(e.touches[0]);ini(p.x,p.y);},{passive:false});
   cv.addEventListener('touchmove',e=>{e.preventDefault();const p=tPos(e.touches[0]);cont(p.x,p.y);},{passive:false});
-  cv.addEventListener('touchend',fim);
+  cv.addEventListener('touchend',()=>{fim();modoDraw(false);});
+}
+// ativa/desativa modo desenho: quando a desenhar, elementos ficam atrás
+function modoDraw(on){
+  const cam=document.getElementById('camada-elementos');
+  if(on){
+    cam.style.pointerEvents='none';
+    cv.style.zIndex='5'; // canvas sobe acima da camada
+    cv.style.pointerEvents='all';
+  }else{
+    cam.style.pointerEvents='all';
+    cv.style.zIndex='3';
+  }
 }
 function sizing(){
   const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
@@ -388,7 +402,6 @@ function aplicarCenario(c1,c2){
 function aplicarCorPersonalizada(){aplicarCenario(document.getElementById('cor-fundo-1').value,document.getElementById('cor-fundo-2').value);}
 function limparFundoCor(){const fc=document.getElementById('fundo-cor');fc.style.display='none';fc.getContext('2d').clearRect(0,0,fc.width,fc.height);}
 
-// ── FIX PRINCIPAL: addElem agora coloca elementos na área de trabalho ─────────
 function addElem(url,nome,tipo,ehFundo){
   if(ehFundo){
     const cam=document.getElementById('camada-fundos');
@@ -404,11 +417,7 @@ function addElem(url,nome,tipo,ehFundo){
     cam.appendChild(m);FP('pop-elem');return;
   }
 
-  // ── coloca elemento na camada de elementos com pointer-events activos ──
   const camEl=document.getElementById('camada-elementos');
-  // activar pointer-events na camada para que o drag funcione
-  camEl.style.pointerEvents='all';
-
   const camW=camEl.offsetWidth||300;
   const initW=Math.round(camW*0.20);
   const d=mkW('left:30px;top:30px;width:'+initW+'px;');
@@ -418,11 +427,9 @@ function addElem(url,nome,tipo,ehFundo){
     m=document.createElement('video');m.src=url;
     m.autoplay=true;m.loop=true;m.muted=true;m.playsinline=true;
     m.style.width='100%';m.style.height='auto';
-    m.style.pointerEvents='all';
   }else{
     m=document.createElement('img');m.src=url;m.alt=nome;
     m.crossOrigin='anonymous';m.style.width='100%';m.style.height='auto';
-    m.style.pointerEvents='all';
     m.onload=function(){
       const ratio=m.naturalHeight/m.naturalWidth;
       d.style.height=(initW*ratio)+'px';
@@ -432,9 +439,7 @@ function addElem(url,nome,tipo,ehFundo){
   const{hdlDel,hdlRes,hdlPlus,hdlMinus}=mkH(d);
   d.appendChild(m);d.appendChild(hdlDel);d.appendChild(hdlRes);d.appendChild(hdlPlus);d.appendChild(hdlMinus);
   camEl.appendChild(d);
-
-  // seleccionar imediatamente para mostrar a barra de controlo
-  setTimeout(()=>selEl(d),50);
+  ativaDrag(d,hdlRes,hdlDel);
   FP('pop-elem');
 }
 
@@ -492,7 +497,9 @@ function posBarraElem(el){
 function selEl(el){
   deselAll();
   el.classList.add('sel');
-  cv.style.pointerEvents='none';cv.style.zIndex='3';
+  // canvas fica atrás quando elemento está seleccionado
+  cv.style.pointerEvents='none';
+  cv.style.zIndex='2';
   const be=document.getElementById('barra-elem');
   be.classList.add('vis');posBarraElem(el);
   document.getElementById('be-plus').onclick=e=>{e.stopPropagation();redimElem(el,1.25);posBarraElem(el);};
@@ -502,7 +509,9 @@ function selEl(el){
 function deselAll(){
   document.querySelectorAll('.elem-arr').forEach(e=>e.classList.remove('sel'));
   eS=null;
+  // canvas volta à frente para poder desenhar
   cv.style.pointerEvents='all';
+  cv.style.zIndex='3';
   document.getElementById('barra-elem').classList.remove('vis');
 }
 function mvG(mx,my){
@@ -663,9 +672,15 @@ let locked=false;
 function toggleLock(){
   locked=!locked;document.getElementById('btn-lock').textContent=locked?'🔒':'🔓';
   const cam=document.getElementById('camada-elementos');
-  cam.style.pointerEvents=locked?'none':'all';
-  cv.style.zIndex=locked?'10':'3';cv.style.pointerEvents='all';
-  if(locked)deselAll();
+  if(locked){
+    deselAll();
+    cam.style.pointerEvents='none';
+    cv.style.zIndex='5';
+    cv.style.pointerEvents='all';
+  }else{
+    cam.style.pointerEvents='all';
+    cv.style.zIndex='3';
+  }
 }
 function irIndice(){window.location.href='indice.html?skip=1';}
 </script>
