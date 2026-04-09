@@ -1,13 +1,12 @@
 
-chat original
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Chat</title>
- <link rel="icon" href="/icon-192.png" />
-  <link rel="apple-touch-icon" href="/icon-512.png" />
+<link rel="icon" href="/icon-192.png" />
+<link rel="apple-touch-icon" href="/icon-512.png" />
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -22,8 +21,19 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
 #pag-chat  { z-index:4; display:none; }
 #bg-login, #bg-chat { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
 #login-input { position:absolute; left:31%; top:54%; width:37%; height:7%; z-index:20; border:none; outline:none; background:transparent; font-size:1.8em; font-family:'Caveat',cursive; text-align:center; color:#111; }
-#btn-entra { position:absolute; left:38%; top:68%; width:22%; height:14%; z-index:20; background:transparent; border:none; cursor:pointer; }
-#msgs-box { position:absolute; left:14.3%; top:21%; width:71.4%; height:43%; z-index:10; padding:1% 1% 0.5% 1%; display:flex; flex-direction:column; gap:1px; overflow-y:scroll; }
+#btn-entra { position:absolute; left:38%; top:68%; width:22%; height:14%; z-index:20; background:transparent; border:none; cursor:pointer; -webkit-appearance:none; appearance:none; outline:none; -webkit-tap-highlight-color:transparent; box-shadow:none; }
+
+/* FIX: msgs-box scroll - funciona no mobile */
+#msgs-box {
+  position:absolute; left:14.3%; top:21%; width:71.4%; height:43%; z-index:10;
+  padding:1% 1% 0.5% 1%;
+  display:flex; flex-direction:column; gap:1px;
+  overflow-y:scroll;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+}
+
 .msg { display:block; flex-shrink:0; line-height:1.4; overflow-wrap:break-word; word-break:break-word; animation:fadeIn .2s ease; }
 .msg .autor { font-family:'Caveat',cursive; font-size:1em; font-weight:700; color:#c00; margin-right:3px; }
 .msg .texto { font-family:Georgia,serif; font-size:0.88em; color:#111; overflow-wrap:break-word; word-break:break-word; }
@@ -33,26 +43,68 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
 .msg .texto video { max-height:2.5em; border-radius:4px; cursor:pointer; display:inline-block; vertical-align:middle; }
 .msg .texto video.sel { outline:3px solid #00c; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(2px);}to{opacity:1;transform:none;} }
-#chat-input { position:absolute; left:20.7%; top:73%; width:59.3%; height:7.5%; z-index:10; border:none; outline:none; background:transparent; font-family:Georgia,serif; font-size:0.88em; color:#111; padding:0.3em 0.5em; overflow-y:auto; overflow-wrap:break-word; word-break:break-word; white-space:pre-wrap; line-height:1.3; display:none; cursor:text; }
+
+#chat-input { position:absolute; left:20.7%; top:73%; width:59.3%; height:7.5%; z-index:10; border:none; outline:none; background:transparent; font-family:Georgia,serif; font-size:0.88em; color:#111; padding:0.3em 0.5em; overflow-y:auto; overflow-wrap:break-word; word-break:break-word; white-space:pre-wrap; line-height:1.3; display:none; cursor:text; -webkit-overflow-scrolling:touch; }
 #chat-input img.emoji { min-height:2em; min-width:2em; max-height:3em; max-width:3em; object-fit:contain; vertical-align:middle; display:inline-block; }
-#btn-enviar { position:absolute; left:83%; top:72.7%; width:9%; height:14%; z-index:15; background:transparent; border:none; cursor:pointer; }
-#btn-clovis { position:absolute; left:12%; top:70%; width:9%; height:22%; z-index:15; background:transparent; border:none; cursor:pointer; }
-#btn-export { position:absolute; left:78%; top:0.5%; width:7%; height:10%; z-index:15; background:transparent; border:none; cursor:pointer; }
-#btn-import { position:absolute; left:86%; top:6.6%; width:7%; height:10%; z-index:15; background:transparent; border:none; cursor:pointer; }
+
+/* FIX: botões - sem azul, sem outline, sem highlight */
+#btn-enviar, #btn-clovis, #btn-export, #btn-import, #btn-idx {
+  -webkit-appearance:none; appearance:none;
+  outline:none;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-touch-callout:none;
+  box-shadow:none;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+}
+#btn-enviar:focus, #btn-clovis:focus, #btn-export:focus, #btn-import:focus, #btn-idx:focus { outline:none; box-shadow:none; }
+#btn-enviar:active, #btn-clovis:active, #btn-export:active, #btn-import:active, #btn-idx:active { outline:none; box-shadow:none; background:transparent; }
+
+#btn-enviar { position:absolute; left:83%; top:72.7%; width:9%; height:14%; z-index:15; }
+#btn-clovis { position:absolute; left:12%; top:70%; width:9%; height:22%; z-index:15; }
+#btn-export { position:absolute; left:78%; top:0.5%; width:7%; height:10%; z-index:15; }
+#btn-import { position:absolute; left:86%; top:6.6%; width:7%; height:10%; z-index:15; }
 #file-import { display:none; }
-#btn-idx { position:fixed; bottom:3.5%; right:3.4%; width:8%; cursor:pointer; z-index:9999; opacity:0; pointer-events:none; transition:opacity .5s; }
+
+#btn-idx { position:fixed; bottom:3.5%; right:3.4%; width:8%; z-index:9999; opacity:0; pointer-events:none; transition:opacity .5s; }
 #btn-idx.show { opacity:1; pointer-events:all; }
-#emoji-panel { position:absolute; left:8%; top:20%; width:46%; height:36%; z-index:30; background:rgba(255,255,255,0.97); border-radius:10px; border:2px solid #ddd; display:none; flex-wrap:wrap; align-items:flex-start; justify-content:flex-start; gap:8px; padding:10px; box-shadow:0 4px 20px rgba(0,0,0,0.2); overflow-y:auto; }
+
+/* FIX: emoji panel - posição fixa no stage, não cortado no mobile */
+#emoji-panel {
+  position:absolute;
+  left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  width:80%; max-width:340px;
+  max-height:60%;
+  z-index:100;
+  background:rgba(255,255,255,0.97);
+  border-radius:10px;
+  border:2px solid #ddd;
+  display:none;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  justify-content:flex-start;
+  gap:6px;
+  padding:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+}
 #emoji-panel.open { display:flex; }
-#emoji-panel img { width:80px; height:80px; object-fit:contain; cursor:pointer; transition:transform .15s; flex-shrink:0; }
+#emoji-panel img { width:60px; height:60px; object-fit:contain; cursor:pointer; transition:transform .15s; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
 #emoji-panel img:hover { transform:scale(1.15); }
+
 #fs-overlay { position:fixed; inset:0; z-index:500; background:url(https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/fundilho.png) center/cover; display:none; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
 #fs-overlay.open { display:flex; }
 #fs-overlay img#fs-img { max-width:90%; max-height:80%; border-radius:8px; object-fit:contain; }
 #fs-overlay video#fs-vid { max-width:90%; max-height:80%; border-radius:8px; }
-#fs-close { background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.4); color:#fff; border-radius:8px; padding:8px 28px; font-size:1em; font-weight:700; cursor:pointer; z-index:501; transition:background .2s; }
+#fs-close { background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.4); color:#fff; border-radius:8px; padding:8px 28px; font-size:1em; font-weight:700; cursor:pointer; z-index:501; transition:background .2s; -webkit-tap-highlight-color:transparent; }
 #fs-close:hover { background:rgba(0,0,0,.8); }
-#fs-save { background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,0.4); color:#fff; border-radius:8px; padding:8px 24px; font-size:1em; font-weight:700; cursor:pointer; transition:background .2s; }
+#fs-save { background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,0.4); color:#fff; border-radius:8px; padding:8px 24px; font-size:1em; font-weight:700; cursor:pointer; transition:background .2s; -webkit-tap-highlight-color:transparent; }
 #fs-save:hover { background:rgba(0,0,0,.8); }
 </style>
 </head>
@@ -76,29 +128,28 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
       <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/5.png" data-e="e5" />
       <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis1/6.png" data-e="e6" />
       <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis1/7.png" data-e="e7" />
-      <img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis1/8.png data-e="e8" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis1/9.png data-e="e9" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/10.png data-e="e10" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/11.png data-e="e11" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/12.png data-e="e12" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/13.png data-e="e13" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/14.png data-e="e14" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/15.png data-e="e15" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/16.png data-e="e16" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/17.png data-e="e17" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/18.png data-e="e18" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/19.png data-e="e19" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/20.png data-e="e20" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/21.png data-e="e21" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/22.png data-e="e22" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/23.png data-e="e23" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/24.png data-e="e24" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/25.png data-e="e25" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/26.png data-e="e26" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/27.png data-e="e27" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/28.png data-e="e28" />
-<img src=https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/31.png data-e="e31" />
-     
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis1/8.png" data-e="e8" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis1/9.png" data-e="e9" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/10.png" data-e="e10" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/11.png" data-e="e11" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/12.png" data-e="e12" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/13.png" data-e="e13" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/14.png" data-e="e14" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/15.png" data-e="e15" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/16.png" data-e="e16" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/17.png" data-e="e17" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/18.png" data-e="e18" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/19.png" data-e="e19" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/20.png" data-e="e20" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/21.png" data-e="e21" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/22.png" data-e="e22" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/23.png" data-e="e23" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/24.png" data-e="e24" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/25.png" data-e="e25" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/26.png" data-e="e26" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/27.png" data-e="e27" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/28.png" data-e="e28" />
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/emojis/31.png" data-e="e31" />
     </div>
     <div id="chat-input" contenteditable="true" data-ph="escreve aqui…" role="textbox"></div>
     <button id="btn-clovis"></button>
@@ -119,7 +170,9 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
 </div></div>
 
 <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" alt="índice" />
+
 <script>
+// ─── resize ──────────────────────────────────────────────────────────────────
 function resize(){
   var s=document.getElementById('stage');
   var ww=window.innerWidth, wh=window.innerHeight;
@@ -131,15 +184,65 @@ function resize(){
   s.style.top=((wh-sh)/2)+'px';
 }
 resize(); window.addEventListener('resize',resize);
-document.addEventListener('touchmove',function(e){e.preventDefault();},{passive:false});
 
+// FIX: só bloquear touchmove fora das zonas de scroll
+document.addEventListener('touchmove',function(e){
+  var el=e.target;
+  var scrollable=false;
+  while(el&&el!==document.body){
+    if(el.id==='msgs-box'||el.id==='emoji-panel'||el.id==='chat-input'){scrollable=true;break;}
+    el=el.parentElement;
+  }
+  if(!scrollable)e.preventDefault();
+},{passive:false});
+
+// ─── FIX: mapa de emojis EU (url) e U2C (url→código) ────────────────────────
+var BASE='https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/chat/';
+var EU={
+  e1: BASE+'emojis/1.png',
+  e2: BASE+'emojis/2.png',
+  e3: BASE+'emojis/3.png',
+  e4: BASE+'emojis/4.png',
+  e5: BASE+'emojis/5.png',
+  e6: BASE+'emojis1/6.png',
+  e7: BASE+'emojis1/7.png',
+  e8: BASE+'emojis1/8.png',
+  e9: BASE+'emojis1/9.png',
+  e10: BASE+'emojis/10.png',
+  e11: BASE+'emojis/11.png',
+  e12: BASE+'emojis/12.png',
+  e13: BASE+'emojis/13.png',
+  e14: BASE+'emojis/14.png',
+  e15: BASE+'emojis/15.png',
+  e16: BASE+'emojis/16.png',
+  e17: BASE+'emojis/17.png',
+  e18: BASE+'emojis/18.png',
+  e19: BASE+'emojis/19.png',
+  e20: BASE+'emojis/20.png',
+  e21: BASE+'emojis/21.png',
+  e22: BASE+'emojis/22.png',
+  e23: BASE+'emojis/23.png',
+  e24: BASE+'emojis/24.png',
+  e25: BASE+'emojis/25.png',
+  e26: BASE+'emojis/26.png',
+  e27: BASE+'emojis/27.png',
+  e28: BASE+'emojis/28.png',
+  e31: BASE+'emojis/31.png'
+};
+// mapa inverso: url → código
+var U2C={};
+Object.keys(EU).forEach(function(k){ U2C[EU[k]]=k; });
+
+// ─── Supabase ────────────────────────────────────────────────────────────────
 var SURL='https://itqzgxotbzsuwevjpnoi.supabase.co';
 var SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cXpneG90YnpzdXdldmpwbm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDU4NTgsImV4cCI6MjA4NzI4MTg1OH0.nS4RuwfULc9uHGh_u93vLZ7uRsLnKl7NULrb2Yesw9k';
 var HDR={'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json'};
 function sGet(q){return fetch(SURL+'/rest/v1/mensagens?'+q,{headers:HDR}).then(function(r){return r.json();});}
 function sInsert(d){return fetch(SURL+'/rest/v1/mensagens',{method:'POST',headers:Object.assign({'Prefer':'return=representation'},HDR),body:JSON.stringify(d)}).then(function(r){return r.json();}).then(function(rows){if(rows&&rows.length&&rows[0].id){idsEnviados[rows[0].id]=true;}});}
+
 var nome='',ultimoId=0,idsEnviados={};
-  
+
+// ─── login ───────────────────────────────────────────────────────────────────
 function entrar(){
   var v=document.getElementById('login-input').value.trim();if(!v)return;
   nome=v;
@@ -152,6 +255,7 @@ function entrar(){
 document.getElementById('btn-entra').onclick=entrar;
 document.getElementById('login-input').onkeydown=function(e){if(e.key==='Enter')entrar();};
 
+// ─── chat ────────────────────────────────────────────────────────────────────
 function iniciarChat(){
   sGet('select=*&order=created_at.asc&limit=80').then(function(data){
     if(!Array.isArray(data))return;
@@ -169,61 +273,118 @@ function iniciarChat(){
   },2000);
 }
 
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
 function toHtml(t){
   if(!t)return'';
   if(t.startsWith('[img:')){var u=t.slice(5,-1);return'<img class="media-img" src="'+u+'" data-f="'+u+'">';}
   if(t.startsWith('[vid:')){var u=t.slice(5,-1);return'<video src="'+u+'" data-vsrc="'+u+'" playsinline></video>';}
   var p=t.split(/(:[a-z0-9]+:)/g),h='';
-  p.forEach(function(s){var m=s.match(/^:([a-z0-9]+):$/);if(m&&EU[m[1]])h+='<img class="emoji" src="'+EU[m[1]]+'">';else h+=esc(s);});
+  p.forEach(function(s){
+    var m=s.match(/^:([a-z0-9]+):$/);
+    if(m&&EU[m[1]]){
+      h+='<img class="emoji" src="'+EU[m[1]]+'" style="min-height:2em;min-width:2em;max-height:3em;max-width:3em;object-fit:contain;vertical-align:middle;display:inline-block;">';
+    } else {
+      h+=esc(s);
+    }
+  });
   return h;
 }
+
 function addMsg(m){
   var b=document.getElementById('msgs-box'),d=document.createElement('div');d.className='msg';
   d.innerHTML='<span class="autor">'+esc(m.nome)+':</span> <span class="texto">'+toHtml(m.texto)+'</span>';
   b.appendChild(d);
 }
-function scrollDown(){var b=document.getElementById('msgs-box');b.scrollTop=b.scrollHeight;}
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
+function scrollDown(){
+  var b=document.getElementById('msgs-box');
+  // requestAnimationFrame garante que o DOM já foi pintado antes do scroll
+  requestAnimationFrame(function(){ b.scrollTop=b.scrollHeight; });
+}
+
+// ─── input & envio ───────────────────────────────────────────────────────────
 function lerInput(){
   var i=document.getElementById('chat-input'),t='';
   i.childNodes.forEach(function(n){
-    if(n.nodeType===Node.TEXT_NODE)t+=n.textContent;
-    else if(n.nodeName==='IMG'){var c=U2C[n.getAttribute('src')];if(c)t+=':'+c+':';}
-    else if(n.nodeName==='BR')t+=' ';
-    else t+=n.textContent;
+    if(n.nodeType===Node.TEXT_NODE){t+=n.textContent;}
+    else if(n.nodeName==='IMG'){
+      var src=n.getAttribute('src');
+      var c=U2C[src];
+      if(c)t+=':'+c+':';
+    }
+    else if(n.nodeName==='BR'){t+=' ';}
+    else{t+=n.textContent;}
   });
   return t.trim();
 }
+
 function enviar(){
   var t=lerInput();if(!t||!nome)return;
   document.getElementById('chat-input').innerHTML='';
   addMsg({nome:nome,texto:t});scrollDown();sInsert({nome:nome,texto:t});
 }
 document.getElementById('btn-enviar').onclick=enviar;
-document.getElementById('chat-input').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();enviar();}});
+document.getElementById('chat-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();enviar();}
+});
 
-document.getElementById('btn-clovis').onclick=function(e){e.stopPropagation();document.getElementById('emoji-panel').classList.toggle('open');};
+// ─── emoji panel ─────────────────────────────────────────────────────────────
+document.getElementById('btn-clovis').onclick=function(e){
+  e.stopPropagation();
+  document.getElementById('emoji-panel').classList.toggle('open');
+};
+
 document.querySelectorAll('#emoji-panel img').forEach(function(img){
-  img.onclick=function(e){
+  img.addEventListener('click',function(e){
     e.stopPropagation();
-    var inp=document.getElementById('chat-input');inp.focus();
-    var sel=window.getSelection(),range;
-    if(sel&&sel.rangeCount>0){range=sel.getRangeAt(0);if(!inp.contains(range.commonAncestorContainer)){range=document.createRange();range.selectNodeContents(inp);range.collapse(false);}}
-    else{range=document.createRange();range.selectNodeContents(inp);range.collapse(false);}
+    var code=this.dataset.e;
+    if(!code||!EU[code])return;
+
+    var inp=document.getElementById('chat-input');
+    inp.focus();
+
     var ei=document.createElement('img');
-    ei.src=EU[this.dataset.e];ei.className='emoji';
-    ei.style.minHeight='3.5em';ei.style.minWidth='3.5em';ei.style.maxHeight='5em';ei.style.maxWidth='5em';ei.style.objectFit='contain';ei.style.verticalAlign='middle';ei.style.display='inline-block';
-    range.deleteContents();range.insertNode(ei);range.setStartAfter(ei);range.collapse(true);
-    sel.removeAllRanges();sel.addRange(range);
-    document.getElementById('emoji-panel').classList.remove('open');inp.focus();
-  };
-});
-document.addEventListener('click',function(e){
-  if(!document.getElementById('emoji-panel').contains(e.target)&&e.target!==document.getElementById('btn-clovis'))
+    ei.src=EU[code];
+    ei.className='emoji';
+    ei.style.cssText='min-height:2em;min-width:2em;max-height:3em;max-width:3em;object-fit:contain;vertical-align:middle;display:inline-block;';
+
+    var sel=window.getSelection();
+    var range;
+    if(sel&&sel.rangeCount>0&&inp.contains(sel.getRangeAt(0).commonAncestorContainer)){
+      range=sel.getRangeAt(0);
+    } else {
+      range=document.createRange();
+      range.selectNodeContents(inp);
+      range.collapse(false);
+    }
+    range.deleteContents();
+    range.insertNode(ei);
+    range.setStartAfter(ei);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+
     document.getElementById('emoji-panel').classList.remove('open');
+    inp.focus();
+  });
+
+  // suporte touch no mobile
+  img.addEventListener('touchend',function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    this.click();
+  },{passive:false});
 });
 
+document.addEventListener('click',function(e){
+  var panel=document.getElementById('emoji-panel');
+  var btnC=document.getElementById('btn-clovis');
+  if(!panel.contains(e.target)&&e.target!==btnC)
+    panel.classList.remove('open');
+});
+
+// ─── import ficheiros ─────────────────────────────────────────────────────────
 document.getElementById('btn-import').onclick=function(){document.getElementById('file-import').click();};
 document.getElementById('file-import').onchange=function(){
   if(!this.files.length||!nome)return;
@@ -242,6 +403,7 @@ document.getElementById('file-import').onchange=function(){
   });this.value='';
 };
 
+// ─── fullscreen overlay ───────────────────────────────────────────────────────
 var fsAtualSrc=null,fsAtualTipo=null;
 document.getElementById('msgs-box').addEventListener('click',function(e){
   var t=e.target;
@@ -249,7 +411,7 @@ document.getElementById('msgs-box').addEventListener('click',function(e){
   if(t.tagName==='IMG'&&t.classList.contains('media-img')){abrirFs('img',t.getAttribute('data-f')||t.src);return;}
 });
 
-document.getElementById('btn-export').onclick=function(){if(!fsAtualSrc)return;guardarFs();};
+document.getElementById('btn-export').onclick=function(){if(fsAtualSrc)guardarFs();};
 
 function abrirFs(tipo,src){
   if(!src)return;
@@ -280,12 +442,12 @@ function guardarFs(){
     document.body.appendChild(a);a.click();document.body.removeChild(a);
   });
 }
-
 document.getElementById('fs-close').addEventListener('click',function(e){e.stopPropagation();fecharFs();});
 document.getElementById('fs-save').addEventListener('click',function(e){e.stopPropagation();guardarFs();});
 document.getElementById('fs-overlay').addEventListener('click',function(e){if(e.target===this)fecharFs();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')fecharFs();});
 
+// ─── índice ───────────────────────────────────────────────────────────────────
 document.getElementById('btn-idx').onclick=function(e){e.stopPropagation();window.location.href='indice.html?skip=1';};
 </script>
 </body>
