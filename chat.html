@@ -1,5 +1,5 @@
 
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
@@ -98,7 +98,7 @@ body { width:100vw; height:100vh; overflow:hidden; background:#c8b99a; }
 #emoji-panel img { width:60px; height:60px; object-fit:contain; cursor:pointer; transition:transform .15s; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
 #emoji-panel img:hover { transform:scale(1.15); }
 
-#fs-overlay { position:fixed; inset:0; z-index:500; background:url(https://itqzgxotbzsuwevjpnoi.supabase.co/storage/v1/object/public/assets/app%20nova/comuns/fundilho.png) center/cover; display:none; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
+#fs-overlay { position:fixed; inset:0; z-index:500; background:url(https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/fundilho.png) center/cover; display:none; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
 #fs-overlay.open { display:flex; }
 #fs-overlay img#fs-img { max-width:90%; max-height:80%; border-radius:8px; object-fit:contain; }
 #fs-overlay video#fs-vid { max-width:90%; max-height:80%; border-radius:8px; }
@@ -240,6 +240,10 @@ var HDR={'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'applicatio
 function sGet(q){return fetch(SURL+'/rest/v1/mensagens?'+q,{headers:HDR}).then(function(r){return r.json();});}
 function sInsert(d){return fetch(SURL+'/rest/v1/mensagens',{method:'POST',headers:Object.assign({'Prefer':'return=representation'},HDR),body:JSON.stringify(d)}).then(function(r){return r.json();}).then(function(rows){if(rows&&rows.length&&rows[0].id){idsEnviados[rows[0].id]=true;}});}
 
+// som de notificação
+var SOM=new Audio('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/notifica%C3%A7ao.mp3');
+SOM.preload='auto';
+
 var nome='',ultimoId=0,idsEnviados={};
 
 // ─── login ───────────────────────────────────────────────────────────────────
@@ -323,6 +327,8 @@ function enviar(){
   var t=lerInput();if(!t||!nome)return;
   document.getElementById('chat-input').innerHTML='';
   addMsg({nome:nome,texto:t});scrollDown();sInsert({nome:nome,texto:t});
+  // som de notificação (clona para permitir sobreposição rápida)
+  try{var s=SOM.cloneNode();s.volume=0.7;s.play().catch(function(){});}catch(ex){}
 }
 document.getElementById('btn-enviar').onclick=enviar;
 document.getElementById('chat-input').addEventListener('keydown',function(e){
