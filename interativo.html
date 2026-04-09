@@ -324,25 +324,30 @@ const cv=document.getElementById('meu-canvas'),cx=cv.getContext('2d');
 function initCanvas(){
   sizing();
   window.addEventListener('resize',sizing);
-  cv.addEventListener('mousedown',e=>{deselAll();modoDraw(true);ini(e.offsetX,e.offsetY);});
+  cv.addEventListener('mousedown',e=>{if(locked)return;deselAll();ini(e.offsetX,e.offsetY);});
   cv.addEventListener('mousemove',e=>cont(e.offsetX,e.offsetY));
-  cv.addEventListener('mouseup',()=>{fim();modoDraw(false);});
-  cv.addEventListener('mouseleave',()=>{fim();modoDraw(false);});
-  cv.addEventListener('touchstart',e=>{e.preventDefault();deselAll();modoDraw(true);const p=tPos(e.touches[0]);ini(p.x,p.y);},{passive:false});
+  cv.addEventListener('mouseup',fim);
+  cv.addEventListener('mouseleave',fim);
+  cv.addEventListener('touchstart',e=>{if(locked)return;e.preventDefault();deselAll();const p=tPos(e.touches[0]);ini(p.x,p.y);},{passive:false});
   cv.addEventListener('touchmove',e=>{e.preventDefault();const p=tPos(e.touches[0]);cont(p.x,p.y);},{passive:false});
-  cv.addEventListener('touchend',()=>{fim();modoDraw(false);});
+  cv.addEventListener('touchend',fim);
+  modoDesenho(); // começa em modo desenho
 }
-// ativa/desativa modo desenho: quando a desenhar, elementos ficam atrás
-function modoDraw(on){
+
+// Dois modos: DESENHO (canvas recebe eventos, elementos passivos)
+//             ELEM    (elementos recebem eventos, canvas passivo)
+function modoDesenho(){
   const cam=document.getElementById('camada-elementos');
-  if(on){
-    cam.style.pointerEvents='none';
-    cv.style.zIndex='5'; // canvas sobe acima da camada
-    cv.style.pointerEvents='all';
-  }else{
-    cam.style.pointerEvents='all';
-    cv.style.zIndex='3';
-  }
+  cam.style.pointerEvents='none';
+  cv.style.zIndex='6';
+  cv.style.pointerEvents='all';
+  cv.style.cursor='crosshair';
+}
+function modoElem(){
+  const cam=document.getElementById('camada-elementos');
+  cam.style.pointerEvents='all';
+  cv.style.zIndex='3';
+  cv.style.pointerEvents='none';
 }
 function sizing(){
   const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
@@ -514,9 +519,7 @@ function posBarraElem(el){
 function selEl(el){
   deselAll();
   el.classList.add('sel');
-  // canvas fica atrás quando elemento está seleccionado
-  cv.style.pointerEvents='none';
-  cv.style.zIndex='2';
+  modoElem(); // elementos activos, canvas passivo
   const be=document.getElementById('barra-elem');
   be.classList.add('vis');posBarraElem(el);
   document.getElementById('be-plus').onclick=e=>{e.stopPropagation();redimElem(el,1.25);posBarraElem(el);};
@@ -526,19 +529,17 @@ function selEl(el){
 function deselAll(){
   document.querySelectorAll('.elem-arr').forEach(e=>e.classList.remove('sel'));
   eS=null;
-  // canvas volta à frente para poder desenhar
-  cv.style.pointerEvents='all';
-  cv.style.zIndex='3';
   document.getElementById('barra-elem').classList.remove('vis');
+  if(!locked) modoDesenho(); // volta ao modo desenho só se não estiver locked
 }
 function mvG(mx,my){
   if(!eS)return;
-  const cr=cv.getBoundingClientRect();
+  const cr=document.getElementById('camada-elementos').getBoundingClientRect();
   if(resizing){
     const delta=mx-resX;
     const tx=eS.querySelector('.txt-elem');
     if(tx){const fs=Math.min(200,Math.max(8,parseFloat(tx.style.fontSize||'32')+delta*0.3));tx.style.fontSize=fs+'px';}
-    else{const maxW=cr.width-parseFloat(eS.style.left||0);const novaW=Math.min(maxW,Math.max(30,resW+delta));eS.style.width=novaW+'px';const img=eS.querySelector('img');if(img&&img.naturalWidth)eS.style.height=(novaW*img.naturalHeight/img.naturalWidth)+'px';}
+    else{const novaW=Math.min(cr.width,Math.max(30,resW+delta));eS.style.width=novaW+'px';const img=eS.querySelector('img');if(img&&img.naturalWidth)eS.style.height=(novaW*img.naturalHeight/img.naturalWidth)+'px';}
     resX=mx;resW=eS.offsetWidth;
   }else{
     const elW=eS.offsetWidth,elH=eS.offsetHeight;
@@ -552,7 +553,8 @@ document.addEventListener('mousemove',e=>{if(eS)mvG(e.clientX,e.clientY);});
 document.addEventListener('touchmove',e=>{if(eS)mvG(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
 document.addEventListener('mouseup',()=>{eS=null;resizing=false;});
 document.addEventListener('touchend',()=>{eS=null;resizing=false;});
-document.addEventListener('click',e=>{if(!e.target.closest('.elem-arr')&&!e.target.closest('.pop-ov'))deselAll();});
+document.addEventListener('mousedown',e=>{if(!e.target.closest('.elem-arr')&&!e.target.closest('.pop-ov')&&!e.target.closest('#barra-elem'))deselAll();});
+document.addEventListener('touchstart',e=>{if(!e.target.closest('.elem-arr')&&!e.target.closest('.pop-ov')&&!e.target.closest('#barra-elem'))deselAll();},{passive:true});
 document.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&e.target.tagName!=='INPUT'){const s=document.querySelector('.elem-arr.sel');if(s){s.remove();eS=null;}}});
 
 function importar(ev){
@@ -577,38 +579,83 @@ function importar(ev){
 
 function gerarCanvas(cb){
   const dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();
-  const tmp=document.createElement('canvas');tmp.width=r.width*dpr;tmp.height=r.height*dpr;
+  const tmp=document.createElement('canvas');
+  tmp.width=Math.round(r.width*dpr);tmp.height=Math.round(r.height*dpr);
   const c=tmp.getContext('2d');c.scale(dpr,dpr);
+  const W=r.width,H=r.height;
+
+  // 1. fundo de cor
   const fc=document.getElementById('fundo-cor');
-  if(fc.style.display!=='none'){try{c.drawImage(fc,0,0,r.width,r.height);}catch(e){}}
-  else{c.fillStyle='#cfc0a0';c.fillRect(0,0,r.width,r.height);}
-  const fm=document.querySelector('#camada-fundos img:not(#fundo-cor)');
+  if(fc.style.display!=='none'){try{c.drawImage(fc,0,0,W,H);}catch(e){c.fillStyle='#cfc0a0';c.fillRect(0,0,W,H);}}
+  else{c.fillStyle='#cfc0a0';c.fillRect(0,0,W,H);}
+
+  // 2. fundo imagem/video
+  const fm=document.querySelector('#camada-fundos img:not([id])');
   const fv=document.querySelector('#camada-fundos video');
-  const p1=fm?[new Promise(res=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>{c.drawImage(i,0,0,r.width,r.height);res();};i.onerror=res;i.src=fm.src;})]:fv?[new Promise(res=>{try{c.drawImage(fv,0,0,r.width,r.height);}catch(e){}res();})]:[ Promise.resolve()];
-  Promise.all(p1).then(()=>{
-    c.drawImage(cv,0,0,r.width,r.height);
+  const p1=fm?new Promise(res=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>{c.drawImage(i,0,0,W,H);res();};i.onerror=res;i.src=fm.src+'?v=1';}):
+             fv?new Promise(res=>{try{c.drawImage(fv,0,0,W,H);}catch(e){}res();}):
+             Promise.resolve();
+
+  p1.then(()=>{
+    // 3. canvas de desenho
+    try{c.drawImage(cv,0,0,W,H);}catch(e){}
+
+    // 4. elementos
     const cr=document.getElementById('camada-elementos').getBoundingClientRect();
-    const p2=[];
-    document.querySelectorAll('#camada-elementos .elem-arr').forEach(el=>{
-      const er=el.getBoundingClientRect();const x=er.left-cr.left,y=er.top-cr.top,w=er.width,h=er.height;
+    const p2=Array.from(document.querySelectorAll('#camada-elementos .elem-arr')).map(el=>{
+      const er=el.getBoundingClientRect();
+      const x=er.left-cr.left,y=er.top-cr.top,w=er.width,h=er.height;
       const im=el.querySelector('img');
-      if(im)p2.push(new Promise(res=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>{c.drawImage(i,x,y,w,h);res();};i.onerror=res;i.src=im.src;}));
       const tx=el.querySelector('.txt-elem');
-      if(tx){const fs=parseFloat(getComputedStyle(tx).fontSize);c.font=fs+'px '+tx.style.fontFamily;c.fillStyle=tx.style.color||'#000';c.fillText(tx.textContent,x,y+fs);}
+      if(im){
+        return new Promise(res=>{
+          const i=new Image();i.crossOrigin='anonymous';
+          i.onload=()=>{c.drawImage(i,x,y,w,h);res();};
+          i.onerror=()=>{
+            // tenta sem crossOrigin como fallback
+            try{c.drawImage(im,x,y,w,h);}catch(e){}res();
+          };
+          i.src=im.src;
+        });
+      }
+      if(tx){
+        const fs=parseFloat(getComputedStyle(tx).fontSize)||32;
+        c.save();c.font=fs+'px '+tx.style.fontFamily;
+        c.fillStyle=tx.style.color||'#000';
+        c.fillText(tx.textContent,x,y+fs);c.restore();
+      }
+      return Promise.resolve();
     });
+
     Promise.all(p2).then(()=>cb(tmp));
   });
 }
-function expDispositivo(){gerarCanvas(t=>{const a=document.createElement('a');a.download='clube-desenho.png';a.href=t.toDataURL('image/png');document.body.appendChild(a);a.click();setTimeout(()=>document.body.removeChild(a),100);FP('pop-export');});}
+function expDispositivo(){
+  gerarCanvas(t=>{
+    try{
+      const a=document.createElement('a');
+      a.download='clube-desenho.png';
+      a.href=t.toDataURL('image/png');
+      document.body.appendChild(a);a.click();
+      setTimeout(()=>document.body.removeChild(a),100);
+    }catch(e){alert('Erro ao guardar: '+e.message);}
+    FP('pop-export');
+  });
+}
 function expGaleria(){
   gerarCanvas(function(t){
     var path='desenho_'+Date.now()+'.jpg';
-    t.toBlob(function(blob){
-      fetch(STORAGE_UP+path,{method:'POST',headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'image/jpeg','x-upsert':'true'},body:blob})
-      .then(function(){var url=STORAGE_URL+path;return fetch(SURL+'/rest/v1/galeria',{method:'POST',headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({imagem:url,path:path})});})
-      .then(function(){FP('pop-export');alert('Enviado para a Galeria!');})
-      .catch(function(err){console.error(err);alert('Erro ao enviar para a Galeria');});
-    },'image/jpeg',0.92);
+    try{
+      t.toBlob(function(blob){
+        if(!blob){alert('Erro ao gerar imagem');return;}
+        fetch(STORAGE_UP+path,{method:'POST',headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'image/jpeg','x-upsert':'true'},body:blob})
+        .then(function(r){if(!r.ok)throw new Error('Upload falhou: '+r.status);
+          return fetch(SURL+'/rest/v1/galeria',{method:'POST',headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({imagem:STORAGE_URL+path,path:path})});
+        })
+        .then(function(){FP('pop-export');alert('Enviado para a Galeria!');})
+        .catch(function(err){console.error(err);alert('Erro ao enviar: '+err.message);});
+      },'image/jpeg',0.92);
+    }catch(e){alert('Erro (canvas tainted?): '+e.message);}
   });
 }
 
@@ -687,16 +734,13 @@ function HT(){tip.classList.remove('v');}
 
 let locked=false;
 function toggleLock(){
-  locked=!locked;document.getElementById('btn-lock').textContent=locked?'🔒':'🔓';
-  const cam=document.getElementById('camada-elementos');
+  locked=!locked;
+  document.getElementById('btn-lock').textContent=locked?'🔒':'🔓';
   if(locked){
     deselAll();
-    cam.style.pointerEvents='none';
-    cv.style.zIndex='5';
-    cv.style.pointerEvents='all';
+    modoDesenho(); // locked = pode desenhar, elementos fixos
   }else{
-    cam.style.pointerEvents='all';
-    cv.style.zIndex='3';
+    modoDesenho(); // desbloqueado = também começa em modo desenho, clica num elemento para o mover
   }
 }
 function irIndice(){window.location.href='indice.html?skip=1';}
