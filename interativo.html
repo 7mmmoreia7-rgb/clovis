@@ -30,7 +30,7 @@ button:focus,button:active,button:hover{outline:none !important;box-shadow:none 
 
 #overlay-fade{position:absolute;inset:0;z-index:150;background:#fff;opacity:0;pointer-events:none;transition:opacity .6s ease;}
 #overlay-fade.ativo{opacity:1;pointer-events:all;}
-#ecra-quadro{position:absolute;width:100%;height:115%;top:-28px;left:0;z-index:5;}
+#ecra-quadro{position:absolute;width:100%;height:115%;top:-28px;left:0;z-index:5;display:none;}
 #ecra-quadro.visivel{display:block;}
 #fundo-design{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;user-select:none;pointer-events:none;z-index:1;}
 #camada-fundos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;z-index:2;overflow:hidden;pointer-events:none;}
@@ -409,38 +409,55 @@ function addElem(url,nome,tipo,ehFundo){
     limparFundoCor();
     let m;
     if(tipo==='video'){
-      m=document.createElement('video');m.src=url;m.crossOrigin='anonymous';
+      m=document.createElement('video');m.src=url;
       m.autoplay=true;m.loop=true;m.muted=true;m.playsinline=true;
     }else{
-      m=document.createElement('img');m.src=url;m.alt=nome;m.crossOrigin='anonymous';
+      m=document.createElement('img');m.src=url;m.alt=nome||'';
     }
     cam.appendChild(m);FP('pop-elem');return;
   }
 
-  const camEl=document.getElementById('camada-elementos');
-  const camW=camEl.offsetWidth||300;
-  const initW=Math.round(camW*0.20);
-  const d=mkW('left:30px;top:30px;width:'+initW+'px;');
+  FP('pop-elem'); // fecha popup PRIMEIRO para que o layout seja calculado
 
-  let m;
-  if(tipo==='video'){
-    m=document.createElement('video');m.src=url;
-    m.autoplay=true;m.loop=true;m.muted=true;m.playsinline=true;
-    m.style.width='100%';m.style.height='auto';
-  }else{
-    m=document.createElement('img');m.src=url;m.alt=nome;
-    m.crossOrigin='anonymous';m.style.width='100%';m.style.height='auto';
-    m.onload=function(){
-      const ratio=m.naturalHeight/m.naturalWidth;
-      d.style.height=(initW*ratio)+'px';
-    };
-  }
+  // espera o browser recalcular dimensões após fechar o popup
+  requestAnimationFrame(function(){
+    const camEl=document.getElementById('camada-elementos');
+    const r=camEl.getBoundingClientRect();
+    const camW=r.width||camEl.offsetWidth||window.innerWidth*0.8;
+    const initW=Math.round(camW*0.22);
+    const initH=initW; // quadrado inicial — o onload vai ajustar
 
-  const{hdlDel,hdlRes,hdlPlus,hdlMinus}=mkH(d);
-  d.appendChild(m);d.appendChild(hdlDel);d.appendChild(hdlRes);d.appendChild(hdlPlus);d.appendChild(hdlMinus);
-  camEl.appendChild(d);
-  ativaDrag(d,hdlRes,hdlDel);
-  FP('pop-elem');
+    const d=document.createElement('div');
+    d.className='elem-arr';
+    d.style.cssText='position:absolute;left:30px;top:30px;width:'+initW+'px;height:'+initH+'px;';
+
+    let m;
+    if(tipo==='video'){
+      m=document.createElement('video');
+      m.src=url;m.autoplay=true;m.loop=true;m.muted=true;m.playsinline=true;
+      m.style.cssText='width:100%;height:100%;object-fit:contain;display:block;';
+    }else{
+      m=document.createElement('img');
+      m.src=url;m.alt=nome||'';
+      m.style.cssText='width:100%;height:100%;object-fit:contain;display:block;';
+      m.onload=function(){
+        if(m.naturalWidth>0){
+          d.style.height=Math.round(initW*(m.naturalHeight/m.naturalWidth))+'px';
+        }
+      };
+      m.onerror=function(){
+        // se a imagem falhar, mostra placeholder rosa para debug
+        d.style.background='rgba(255,0,0,0.3)';
+      };
+    }
+
+    const{hdlDel,hdlRes,hdlPlus,hdlMinus}=mkH(d);
+    d.appendChild(m);
+    d.appendChild(hdlDel);d.appendChild(hdlRes);
+    d.appendChild(hdlPlus);d.appendChild(hdlMinus);
+    camEl.appendChild(d);
+    ativaDrag(d,hdlRes,hdlDel);
+  });
 }
 
 function mkW(s){const d=document.createElement('div');d.className='elem-arr';d.style.cssText='position:absolute;'+s;return d;}
