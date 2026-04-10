@@ -37,10 +37,10 @@ button:focus,button:active,button:hover{outline:none !important;box-shadow:none 
 #camada-fundos video,#camada-fundos img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
 #fundo-cor{position:absolute;inset:0;width:100%;height:100%;}
 #meu-canvas{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;background:transparent;cursor:crosshair;z-index:3;touch-action:none;}
-/* camada de elementos SEMPRE visível e clicável — canvas fica abaixo */
-#camada-elementos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;z-index:4;pointer-events:all;overflow:hidden;}
+/* camada de elementos sempre visível, pointer-events só nos .elem-arr */
+#camada-elementos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;z-index:7;pointer-events:none;overflow:hidden;}
 #barra-botoes{position:absolute;top:0;left:0;width:100%;height:13.5%;z-index:10;pointer-events:none;}
-#barra-botoes button{position:absolute;background:transparent;border:none;cursor:pointer;pointer-events:all;border-radius:50%;top:8%;height:84%;aspect-ratio:1;box-shadow:none !important;}
+#barra-botoes button{position:absolute;background:transparent;border:none;cursor:pointer;pointer-events:all;border-radius:50%;top:28%;height:62%;aspect-ratio:1;box-shadow:none !important;}
 #barra-botoes button:focus,#barra-botoes button:active{outline:none !important;box-shadow:none !important;background:transparent !important;}
 #btn-pincel   { left: 12.2%; }
 #btn-cores    { left: 22.3%; }
@@ -50,14 +50,15 @@ button:focus,button:active,button:hover{outline:none !important;box-shadow:none 
 #btn-undo     { left: 62.7%; }
 #btn-guardar  { left: 72.8%; }
 #btn-importar { left: 82.9%; }
-#btn-lock{position:absolute;right:6%;top:12%;background:transparent;border:none;cursor:pointer;pointer-events:all;font-size:1.8em;z-index:20;filter:drop-shadow(1px 1px 3px rgba(0,0,0,0.5));box-shadow:none !important;}
+#btn-lock{position:absolute;right:6%;top:12%;width:5%;height:auto;background:transparent;border:none;cursor:pointer;pointer-events:all;z-index:20;box-shadow:none !important;padding:0;}
+#btn-lock img{width:100%;height:auto;display:block;}
 #btn-idx{position:fixed;bottom:3.5%;right:3.4%;width:8%;height:auto;cursor:pointer;z-index:9999;opacity:0;pointer-events:none;transition:opacity .5s;box-shadow:none !important;}
 #btn-idx.show{opacity:1;pointer-events:all;}
 
-/* elementos sempre visíveis e interactivos */
+/* cada elemento recebe eventos individualmente — a camada em si é transparente */
 .elem-arr{position:absolute;cursor:grab;user-select:none;touch-action:none;pointer-events:all;}
 .elem-arr:active{cursor:grabbing;}
-.elem-arr img,.elem-arr video{display:block;pointer-events:all;width:100%;height:auto;}
+.elem-arr img,.elem-arr video{display:block;width:100%;height:auto;pointer-events:none;}
 .hdl-resize{display:none;}
 .hdl-del{display:none;}
 .hdl-plus{display:none;}
@@ -150,7 +151,7 @@ button:focus,button:active,button:hover{outline:none !important;box-shadow:none 
     <button id="btn-guardar"  onclick="AP('pop-export')"                            onmouseenter="TT(event,'Guardar')"   onmouseleave="HT()"></button>
     <button id="btn-importar" onclick="document.getElementById('inp-img').click()" onmouseenter="TT(event,'Importar')"  onmouseleave="HT()"></button>
   </div>
-  <button id="btn-lock" onclick="toggleLock()">🔓</button>
+  <button id="btn-lock" onclick="toggleLock()"><img id="lock-img" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/aloquete.png" alt="lock"></button>
   <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" onclick="irIndice()" style="cursor:pointer;">
 </div>
 
@@ -315,6 +316,7 @@ function fazTransicao(){
     document.getElementById('btn-idx').classList.add('show');
     initCanvas();
     popularPopups();
+    aplicarLock();
     setTimeout(()=>fade.classList.remove('ativo'),100);
   },650);
 }
@@ -324,30 +326,28 @@ const cv=document.getElementById('meu-canvas'),cx=cv.getContext('2d');
 function initCanvas(){
   sizing();
   window.addEventListener('resize',sizing);
-  cv.addEventListener('mousedown',e=>{if(locked)return;deselAll();ini(e.offsetX,e.offsetY);});
+  // canvas sempre recebe eventos de desenho — está em z-index 6, abaixo dos elem-arr (z-index 7)
+  cv.addEventListener('mousedown',e=>{if(locked)return;ini(e.offsetX,e.offsetY);});
   cv.addEventListener('mousemove',e=>cont(e.offsetX,e.offsetY));
   cv.addEventListener('mouseup',fim);
   cv.addEventListener('mouseleave',fim);
-  cv.addEventListener('touchstart',e=>{if(locked)return;e.preventDefault();deselAll();const p=tPos(e.touches[0]);ini(p.x,p.y);},{passive:false});
+  cv.addEventListener('touchstart',e=>{if(locked)return;e.preventDefault();const p=tPos(e.touches[0]);ini(p.x,p.y);},{passive:false});
   cv.addEventListener('touchmove',e=>{e.preventDefault();const p=tPos(e.touches[0]);cont(p.x,p.y);},{passive:false});
   cv.addEventListener('touchend',fim);
-  modoDesenho(); // começa em modo desenho
-}
-
-// Dois modos: DESENHO (canvas recebe eventos, elementos passivos)
-//             ELEM    (elementos recebem eventos, canvas passivo)
-function modoDesenho(){
-  const cam=document.getElementById('camada-elementos');
-  cam.style.pointerEvents='none';
+  // canvas fixo em z-index 6, elementos em z-index 7 — coexistem
   cv.style.zIndex='6';
   cv.style.pointerEvents='all';
-  cv.style.cursor='crosshair';
 }
-function modoElem(){
-  const cam=document.getElementById('camada-elementos');
-  cam.style.pointerEvents='all';
-  cv.style.zIndex='3';
-  cv.style.pointerEvents='none';
+
+// lock=false → pode mover elementos (elem-arr têm pointer-events:all por CSS)
+// lock=true  → elementos fixos (pointer-events:none nos elem-arr), só desenha
+function aplicarLock(){
+  document.querySelectorAll('.elem-arr').forEach(el=>{
+    el.style.pointerEvents=locked?'none':'all';
+  });
+  // imagem do cadeado: mesma imagem sempre (é o estado visual que muda por opacity)
+  const img=document.getElementById('lock-img');
+  if(img) img.style.opacity=locked?'1':'0.45';
 }
 function sizing(){
   const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
@@ -388,7 +388,9 @@ function addTexto(){
   const{hdlDel,hdlRes,hdlPlus,hdlMinus}=mkH(d);
   d.appendChild(sp);d.appendChild(hdlDel);d.appendChild(hdlRes);d.appendChild(hdlPlus);d.appendChild(hdlMinus);
   document.getElementById('camada-elementos').appendChild(d);
-  ativaDrag(d,hdlRes,hdlDel);FP('pop-texto');
+  ativaDrag(d,hdlRes,hdlDel);
+  d.style.pointerEvents=locked?'none':'all';
+  FP('pop-texto');
   document.getElementById('inp-txt').value='';document.getElementById('prv-txt').textContent='';
 }
 
@@ -462,6 +464,8 @@ function addElem(url,nome,tipo,ehFundo){
     d.appendChild(hdlPlus);d.appendChild(hdlMinus);
     camEl.appendChild(d);
     ativaDrag(d,hdlRes,hdlDel);
+    // respeita estado do lock
+    d.style.pointerEvents=locked?'none':'all';
   });
 }
 
@@ -517,9 +521,9 @@ function posBarraElem(el){
   be.style.left=left+'px';be.style.top=top+'px';
 }
 function selEl(el){
+  if(locked)return; // locked: não selecciona
   deselAll();
   el.classList.add('sel');
-  modoElem(); // elementos activos, canvas passivo
   const be=document.getElementById('barra-elem');
   be.classList.add('vis');posBarraElem(el);
   document.getElementById('be-plus').onclick=e=>{e.stopPropagation();redimElem(el,1.25);posBarraElem(el);};
@@ -530,7 +534,6 @@ function deselAll(){
   document.querySelectorAll('.elem-arr').forEach(e=>e.classList.remove('sel'));
   eS=null;
   document.getElementById('barra-elem').classList.remove('vis');
-  if(!locked) modoDesenho(); // volta ao modo desenho só se não estiver locked
 }
 function mvG(mx,my){
   if(!eS)return;
@@ -553,9 +556,12 @@ document.addEventListener('mousemove',e=>{if(eS)mvG(e.clientX,e.clientY);});
 document.addEventListener('touchmove',e=>{if(eS)mvG(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
 document.addEventListener('mouseup',()=>{eS=null;resizing=false;});
 document.addEventListener('touchend',()=>{eS=null;resizing=false;});
-document.addEventListener('mousedown',e=>{if(!e.target.closest('.elem-arr')&&!e.target.closest('.pop-ov')&&!e.target.closest('#barra-elem'))deselAll();});
-document.addEventListener('touchstart',e=>{if(!e.target.closest('.elem-arr')&&!e.target.closest('.pop-ov')&&!e.target.closest('#barra-elem'))deselAll();},{passive:true});
-document.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&e.target.tagName!=='INPUT'){const s=document.querySelector('.elem-arr.sel');if(s){s.remove();eS=null;}}});
+// deselecciona ao clicar fora de elementos e popups
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.elem-arr')&&!e.target.closest('.pop-ov')&&!e.target.closest('#barra-elem')&&!e.target.closest('#btn-lock'))
+    deselAll();
+});
+document.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&e.target.tagName!=='INPUT'){const s=document.querySelector('.elem-arr.sel');if(s){s.remove();eS=null;deselAll();}}});
 
 function importar(ev){
   const f=ev.target.files[0];if(!f)return;
@@ -574,7 +580,9 @@ function importar(ev){
   const{hdlDel,hdlRes,hdlPlus,hdlMinus}=mkH(d);
   d.appendChild(m);d.appendChild(hdlDel);d.appendChild(hdlRes);d.appendChild(hdlPlus);d.appendChild(hdlMinus);
   document.getElementById('camada-elementos').appendChild(d);
-  ativaDrag(d,hdlRes,hdlDel);ev.target.value='';
+  ativaDrag(d,hdlRes,hdlDel);
+  d.style.pointerEvents=locked?'none':'all';
+  ev.target.value='';
 }
 
 function gerarCanvas(cb){
@@ -735,13 +743,8 @@ function HT(){tip.classList.remove('v');}
 let locked=false;
 function toggleLock(){
   locked=!locked;
-  document.getElementById('btn-lock').textContent=locked?'🔒':'🔓';
-  if(locked){
-    deselAll();
-    modoDesenho(); // locked = pode desenhar, elementos fixos
-  }else{
-    modoDesenho(); // desbloqueado = também começa em modo desenho, clica num elemento para o mover
-  }
+  deselAll();
+  aplicarLock();
 }
 function irIndice(){window.location.href='indice.html?skip=1';}
 </script>
