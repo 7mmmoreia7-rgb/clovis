@@ -298,6 +298,7 @@ html,body{
 <input type="file" id="fsin" accept="image/*,video/*" style="display:none">
 
 <script>
+<script>
 /* ------------------------------
    CONFIG WORKER / R2
 --------------------------------*/
@@ -320,30 +321,26 @@ const fscont = document.getElementById("fscont");
 const fscls = document.getElementById("fscls");
 const fsdl = document.getElementById("fsdl");
 
-/* cada slot: { url, key } */
+/* ------------------------------
+   DADOS + PERSISTÊNCIA
+--------------------------------*/
 let data = Array(9).fill(null).map(() => ({ url: null, key: null }));
-let activeSlot = null;
 
-/* persistência simples */
 function saveState() {
-  try {
-    localStorage.setItem("galeriaSlots", JSON.stringify(data));
-  } catch (e) {}
+  localStorage.setItem("galeriaSlots", JSON.stringify(data));
 }
 
 function loadState() {
+  const raw = localStorage.getItem("galeriaSlots");
+  if (!raw) return;
   try {
-    const raw = localStorage.getItem("galeriaSlots");
-    if (!raw) return;
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length === 9) {
-      data = parsed;
-    }
-  } catch (e) {}
+    if (Array.isArray(parsed) && parsed.length === 9) data = parsed;
+  } catch {}
 }
 
 /* ------------------------------
-   PLAY
+   PLAY / SKIP
 --------------------------------*/
 play.onclick = () => {
   play.classList.add("gone");
@@ -354,9 +351,6 @@ play.onclick = () => {
   });
 };
 
-/* ------------------------------
-   SKIP
---------------------------------*/
 btnSkip.onclick = () => {
   play.classList.add("gone");
   btnSkip.classList.add("gone");
@@ -365,12 +359,7 @@ btnSkip.onclick = () => {
   goGallery();
 };
 
-/* ------------------------------
-   QUANDO O VÍDEO TERMINA
---------------------------------*/
-vid.onended = () => {
-  goGallery();
-};
+vid.onended = () => goGallery();
 
 /* ------------------------------
    MOSTRAR GALERIA
@@ -414,7 +403,7 @@ function build() {
         </div>
       `;
     } else {
-      if (s.url.match(/\.(mp4|mov|webm|mkv)$/i)) {
+      if (s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i)) {
         d.innerHTML = `<video class="m" src="${s.url}" muted></video>`;
       } else {
         d.innerHTML = `<img class="m" src="${s.url}">`;
@@ -463,17 +452,16 @@ function uploadStorage(file, slot) {
     .then((r) => r.json())
     .then((res) => {
       if (!res.ok || !res.key) throw new Error("Upload falhou");
+
       const key = res.key;
       const url = FILE_URL + encodeURIComponent(key);
+
       data[slot] = { url, key };
       saveState();
       build();
       toast("✓ Guardado!");
     })
-    .catch((err) => {
-      console.error(err);
-      toast("Erro no upload");
-    });
+    .catch(() => toast("Erro no upload"));
 }
 
 /* ------------------------------
@@ -485,7 +473,9 @@ function verSlot(idx) {
 
   fscont.innerHTML = "";
 
-  if (s.url.match(/\.(mp4|mov|webm|mkv)$/i)) {
+  btnIdx.classList.add("gone"); // esconder botão índice
+
+  if (s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i)) {
     const v = document.createElement("video");
     v.src = s.url;
     v.controls = true;
@@ -508,6 +498,7 @@ function verSlot(idx) {
 
 fscls.onclick = () => {
   fsmod.classList.remove("on");
+  btnIdx.classList.remove("gone"); // voltar a mostrar índice
 };
 
 /* ------------------------------
@@ -526,7 +517,7 @@ fsdl.onclick = () => {
 };
 
 /* ------------------------------
-   APAGAR PERMANENTE (via Worker)
+   APAGAR PERMANENTE
 --------------------------------*/
 function apagarSlot(idx) {
   const s = data[idx];
@@ -538,16 +529,13 @@ function apagarSlot(idx) {
     method: "DELETE",
   })
     .then((r) => {
-      if (!r.ok) throw new Error("Erro ao apagar");
+      if (!r.ok) throw new Error();
       data[idx] = { url: null, key: null };
       saveState();
       build();
       toast("✓ Apagado!");
     })
-    .catch((err) => {
-      console.error(err);
-      toast("Erro ao apagar");
-    });
+    .catch(() => toast("Erro ao apagar"));
 }
 
 /* ------------------------------
@@ -563,5 +551,6 @@ btnIdx.onclick = () => {
 loadState();
 build();
 </script>
+
 </body>
 </html>
