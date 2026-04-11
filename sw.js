@@ -2,6 +2,7 @@ const CACHE = 'nem-eu-v1';
 const FILES = [
   '/',
   '/index.html',
+  '/instalacao.html',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png'
@@ -23,4 +24,3 @@ self.addEventListener('fetch', event => {
     fetch(event.request).catch(() => caches.match(event.request))
   );
 });
-
