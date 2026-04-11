@@ -2,13 +2,13 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Instalação - Nem Eu</title>
+  <title>Instalação</title>
 
   <style>
     body {
       margin: 0;
       padding: 0;
-      background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/fundilho.png');
+      background-image: url('fundilho.png');
       background-size: cover;
       background-position: center;
       width: 100vw;
@@ -16,10 +16,12 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow: hidden;
     }
 
+    /* LOGO FULLSCREEN */
     .logo {
-      width: 250px;
+      width: 260px;
       transform-style: preserve-3d;
       filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
       transition: box-shadow 0.2s ease-out;
@@ -39,27 +41,55 @@
     .brilhar {
       box-shadow: 0 0 9px 3px rgba(255,255,255,0.9);
     }
+
+    /* BOTÃO FINAL */
+    #botao-final {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      cursor: pointer;
+      width: 260px;
+      transition: opacity 0.3s ease;
+    }
+
+    #botao-final:hover {
+      content: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mas-se-der-asneira-n-o-fui-eu.png');
+    }
   </style>
 </head>
 
 <body>
 
-  <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/icon-512.png" class="logo" id="logo">
-  <audio id="som-moeda" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/app/comuns/coin.wav"></audio>
+  <!-- LOGO -->
+  <img src="icon-512.png" class="logo" id="logo">
+
+  <!-- SOM -->
+  <audio id="som-moeda" src="coin.wav"></audio>
+
+  <!-- BOTÃO FINAL -->
+  <img id="botao-final"
+       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
 <script>
+  let deferredPrompt = null;
   const som = document.getElementById('som-moeda');
   const logo = document.getElementById('logo');
+  const botaoFinal = document.getElementById('botao-final');
 
-  document.body.addEventListener('click', () => {
-    som.play().then(() => {
-      som.pause();
-      som.currentTime = 0;
-    }).catch(() => {});
+  /* APANHAR EVENTO DE INSTALAÇÃO */
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
 
+  /* INICIAR ANIMAÇÃO AO CARREGAR */
+  window.addEventListener('load', () => {
     logo.classList.add('rodar');
-  }, { once: true });
+  });
 
+  /* 1ª VOLTA */
   logo.addEventListener('animationstart', () => {
     som.volume = 1;
     som.currentTime = 0;
@@ -69,6 +99,7 @@
     setTimeout(() => logo.classList.remove('brilhar'), 200);
   });
 
+  /* 2ª VOLTA */
   logo.addEventListener('animationiteration', () => {
     som.volume = 0.4;
     som.currentTime = 0;
@@ -76,6 +107,28 @@
 
     logo.classList.add('brilhar');
     setTimeout(() => logo.classList.remove('brilhar'), 200);
+  });
+
+  /* QUANDO A ANIMAÇÃO TERMINA → INSTALAR */
+  logo.addEventListener('animationend', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+
+      const escolha = await deferredPrompt.userChoice;
+
+      if (escolha.outcome === 'accepted') {
+        // MOSTRAR BOTÃO FINAL
+        botaoFinal.style.display = 'block';
+        botaoFinal.style.opacity = '1';
+      }
+
+      deferredPrompt = null;
+    }
+  });
+
+  /* BOTÃO FINAL → IR PARA HOME */
+  botaoFinal.addEventListener('click', () => {
+    window.location.href = 'index.html';
   });
 </script>
 
