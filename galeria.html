@@ -321,8 +321,26 @@ const fscls = document.getElementById("fscls");
 const fsdl = document.getElementById("fsdl");
 
 /* cada slot: { url, key } */
-let data = Array(9).fill(null).map(()=>({url:null,key:null}));
+let data = Array(9).fill(null).map(() => ({ url: null, key: null }));
 let activeSlot = null;
+
+/* persistência simples */
+function saveState() {
+  try {
+    localStorage.setItem("galeriaSlots", JSON.stringify(data));
+  } catch (e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem("galeriaSlots");
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length === 9) {
+      data = parsed;
+    }
+  } catch (e) {}
+}
 
 /* ------------------------------
    PLAY
@@ -330,7 +348,7 @@ let activeSlot = null;
 play.onclick = () => {
   play.classList.add("gone");
   btnSkip.classList.add("gone");
-  vid.play().catch(()=>{
+  vid.play().catch(() => {
     vid.muted = true;
     vid.play();
   });
@@ -357,7 +375,7 @@ vid.onended = () => {
 /* ------------------------------
    MOSTRAR GALERIA
 --------------------------------*/
-function goGallery(){
+function goGallery() {
   gbg.classList.add("show");
   slots.classList.add("show");
   btnIdx.classList.add("show");
@@ -367,28 +385,28 @@ function goGallery(){
    TOAST
 --------------------------------*/
 let tt;
-function toast(msg){
+function toast(msg) {
   const t = document.getElementById("toast");
   t.textContent = msg;
   t.classList.add("on");
   clearTimeout(tt);
-  tt = setTimeout(()=>t.classList.remove("on"), 2600);
+  tt = setTimeout(() => t.classList.remove("on"), 2600);
 }
 
 /* ------------------------------
    BUILD DAS SLOTS
 --------------------------------*/
-function build(){
+function build() {
   slots.innerHTML = `
     <div id="vline1"></div>
     <div id="vline2"></div>
   `;
 
-  data.forEach((s,idx)=>{
+  data.forEach((s, idx) => {
     const d = document.createElement("div");
     d.className = "slot";
 
-    if(!s.url){
+    if (!s.url) {
       d.innerHTML = `
         <div class="slot-add" onclick="openImport(${idx})">
           <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5v14m-7-7h14"/></svg>
@@ -396,7 +414,7 @@ function build(){
         </div>
       `;
     } else {
-      if(s.url.match(/\.(mp4|mov|webm|mkv)$/i)){
+      if (s.url.match(/\.(mp4|mov|webm|mkv)$/i)) {
         d.innerHTML = `<video class="m" src="${s.url}" muted></video>`;
       } else {
         d.innerHTML = `<img class="m" src="${s.url}">`;
@@ -417,7 +435,7 @@ function build(){
 /* ------------------------------
    IMPORTAR
 --------------------------------*/
-function openImport(idx){
+function openImport(idx) {
   activeSlot = idx;
   fsin.value = "";
   fsin.click();
@@ -425,14 +443,14 @@ function openImport(idx){
 
 fsin.onchange = () => {
   const f = fsin.files[0];
-  if(!f || activeSlot === null) return;
+  if (!f || activeSlot === null) return;
   uploadStorage(f, activeSlot);
 };
 
 /* ------------------------------
    UPLOAD (via Worker)
 --------------------------------*/
-function uploadStorage(file,slot){
+function uploadStorage(file, slot) {
   toast("A enviar...");
 
   const form = new FormData();
@@ -440,41 +458,48 @@ function uploadStorage(file,slot){
 
   fetch(API_BASE + "/upload", {
     method: "POST",
-    body: form
+    body: form,
   })
-  .then(r => r.json())
-  .then(res => {
-    if(!res.ok || !res.key) throw new Error("Upload falhou");
-    const key = res.key;
-    const url = FILE_URL + encodeURIComponent(key);
-    data[slot] = { url, key };
-    build();
-    toast("✓ Guardado!");
-  })
-  .catch(err => {
-    console.error(err);
-    toast("Erro no upload");
-  });
+    .then((r) => r.json())
+    .then((res) => {
+      if (!res.ok || !res.key) throw new Error("Upload falhou");
+      const key = res.key;
+      const url = FILE_URL + encodeURIComponent(key);
+      data[slot] = { url, key };
+      saveState();
+      build();
+      toast("✓ Guardado!");
+    })
+    .catch((err) => {
+      console.error(err);
+      toast("Erro no upload");
+    });
 }
 
 /* ------------------------------
    FULLSCREEN
 --------------------------------*/
-function verSlot(idx){
+function verSlot(idx) {
   const s = data[idx];
-  if(!s || !s.url) return;
+  if (!s || !s.url) return;
 
   fscont.innerHTML = "";
 
-  if(s.url.match(/\.(mp4|mov|webm|mkv)$/i)){
+  if (s.url.match(/\.(mp4|mov|webm|mkv)$/i)) {
     const v = document.createElement("video");
     v.src = s.url;
     v.controls = true;
     v.autoplay = false;
+    v.style.width = "100%";
+    v.style.height = "100%";
+    v.style.objectFit = "contain";
     fscont.appendChild(v);
-   } else {
+  } else {
     const i = document.createElement("img");
     i.src = s.url;
+    i.style.width = "100%";
+    i.style.height = "100%";
+    i.style.objectFit = "contain";
     fscont.appendChild(i);
   }
 
@@ -486,40 +511,43 @@ fscls.onclick = () => {
 };
 
 /* ------------------------------
-   DOWNLOAD
+   DOWNLOAD (Guardar no dispositivo)
 --------------------------------*/
 fsdl.onclick = () => {
   const el = fscont.querySelector("img,video");
-  if(!el) return;
+  if (!el) return;
 
   const a = document.createElement("a");
   a.href = el.src;
   a.download = "media";
+  document.body.appendChild(a);
   a.click();
+  a.remove();
 };
 
 /* ------------------------------
    APAGAR PERMANENTE (via Worker)
 --------------------------------*/
-function apagarSlot(idx){
+function apagarSlot(idx) {
   const s = data[idx];
-  if(!s || !s.key) return;
+  if (!s || !s.key) return;
 
   toast("A apagar...");
 
   fetch(API_BASE + "/file?key=" + encodeURIComponent(s.key), {
-    method: "DELETE"
+    method: "DELETE",
   })
-  .then(r => {
-    if(!r.ok) throw new Error("Erro ao apagar");
-    data[idx] = { url:null, key:null };
-    build();
-    toast("✓ Apagado!");
-  })
-  .catch(err => {
-    console.error(err);
-    toast("Erro ao apagar");
-  });
+    .then((r) => {
+      if (!r.ok) throw new Error("Erro ao apagar");
+      data[idx] = { url: null, key: null };
+      saveState();
+      build();
+      toast("✓ Apagado!");
+    })
+    .catch((err) => {
+      console.error(err);
+      toast("Erro ao apagar");
+    });
 }
 
 /* ------------------------------
@@ -532,8 +560,8 @@ btnIdx.onclick = () => {
 /* ------------------------------
    INICIAR
 --------------------------------*/
+loadState();
 build();
 </script>
-
 </body>
 </html>
