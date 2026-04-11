@@ -344,6 +344,23 @@ html,body{
   background: rgba(0,0,0,0.2) !important; /* podes pôr transparente */
   border-radius: 8px;
 }
+/* REMOVE COMPLETAMENTE O RETÂNGULO ESCURO DO PLAYER NATIVO */
+#fscont video::-webkit-media-controls-enclosure {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* REMOVE O FUNDO ESCURO POR TRÁS DOS COMANDOS */
+#fscont video::-webkit-media-controls-panel {
+  background: transparent !important;
+}
+
+/* GARANTE QUE O VÍDEO NÃO GANHA FUNDO PRETO */
+#fscont video {
+  background: transparent !important;
+}
 
 </style>
 </head>
