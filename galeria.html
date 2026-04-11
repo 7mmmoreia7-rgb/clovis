@@ -1,32 +1,600 @@
 <!DOCTYPE html>
-<html>
-  <body>
-    <h2>Teste de Upload para o Worker</h2>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Galeria</title>
 
-    <input type="file" id="fileInput" />
-    <button onclick="upload()">Enviar</button>
+<link rel="icon" href="/icon-192.png" />
+<link rel="apple-touch-icon" href="/icon-512.png" />
 
-    <pre id="output"></pre>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Pacifico&display=swap');
 
-    <script>
-      async function upload() {
-        const file = document.getElementById("fileInput").files[0];
-        if (!file) {
-          alert("Escolhe um ficheiro primeiro");
-          return;
-        }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 
-        const form = new FormData();
-        form.append("file", file);
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
+}
 
-        const res = await fetch("https://hidden-hall-2a03.7mmmoreia7.workers.dev/", {
-          method: "POST",
-          body: form
-        });
+#wrap{
+  position:relative;
+  width:100%;
+  height:100%;
+  background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
+}
 
-        const text = await res.text();
-        document.getElementById("output").textContent = text;
+#stage{
+  position:relative;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+/* remover preto atrás do vídeo */
+#vid{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:1;
+  background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
+}
+
+/* PLAY */
+#play{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:10%;
+  cursor:pointer;
+  z-index:1000;
+  transition:opacity .4s;
+  filter:
+    drop-shadow(0 2px 4px rgba(0,0,0,0.35))
+    drop-shadow(0 0 6px rgba(255,255,255,0.25));
+}
+#play.gone{opacity:0;pointer-events:none;}
+
+#gbg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:2;
+  opacity:0;
+  transition:opacity 1.4s ease;
+}
+#gbg.show{opacity:1;}
+
+/* SLOTS */
+#slots{
+  position:absolute;
+  left:9.2%;
+  right:9.5%;
+  top:8.87%;
+  bottom:7.70%;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);
+  z-index:5;
+  opacity:0;
+  transition:opacity 1.4s ease;
+}
+#slots.show{opacity:1;}
+
+.slot{
+  position:relative;
+  overflow:hidden;
+  width:100%;
+  height:100%;
+}
+
+.slot img.m,
+.slot video.m{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* barras horizontais */
+#slots::before,#slots::after{
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  height:3px;
+  background:#7a6245;
+  z-index:6;
+}
+#slots::before{top:calc(100%/3);}
+#slots::after{top:calc(200%/3);}
+
+/* barras verticais — CORRIGIDO */
+#vline1,#vline2{
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:3px;
+  background:#7a6245;
+  z-index:6;
+  pointer-events:none;
+}
+#vline1{left:calc(100%/3 - 1.5px);}
+#vline2{left:calc(200%/3 - 1.5px);}
+
+/* BOTÃO ÍNDICE */
+#btn-idx{
+  position:fixed;
+  bottom:3.5%;
+  right:3.4%;
+  width:8%;
+  cursor:pointer;
+  z-index:900;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .5s;
+  filter:
+    drop-shadow(0 2px 4px rgba(0,0,0,0.35))
+    drop-shadow(0 0 6px rgba(255,255,255,0.25));
+}
+#btn-idx.show{opacity:1;pointer-events:all;}
+
+/* SKIP */
+#btn-skip{
+  position:fixed;
+  bottom:3.5%;
+  right:3.4%;
+  width:8%;
+  cursor:pointer;
+  z-index:800;
+  border:none;
+  background:transparent;
+  padding:0;
+  opacity:1;
+  pointer-events:all;
+  transition:opacity .4s;
+}
+#btn-skip img{
+  width:100%;
+  height:auto;
+  display:block;
+  filter:
+    drop-shadow(0 2px 4px rgba(0,0,0,0.35))
+    drop-shadow(0 0 6px rgba(255,255,255,0.25));
+}
+#btn-skip:hover img{
+  content:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/ok-vai-mesmo.png");
+}
+
+.gone{
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+
+/* IMPORTS — ADICIONADOS */
+.slot-add{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:background .2s;
+}
+.slot-add:hover{background:rgba(0,0,0,.08);}
+.slot-add svg{width:8%;min-width:18px;max-width:44px;opacity:.15;}
+.slot-add span{
+  font-family:sans-serif;
+  font-size:clamp(8px,1.1vw,15px);
+  font-weight:600;
+  margin-top:5px;
+  color:rgba(80,65,50,.3);
+}
+
+.slot-ctrl{
+  position:absolute;bottom:0;left:0;right:0;
+  display:flex;justify-content:center;gap:4px;
+  padding:4px 6px;
+  background:linear-gradient(transparent,rgba(0,0,0,.65));
+  opacity:0;transition:opacity .25s;z-index:5;
+}
+.slot:hover .slot-ctrl{opacity:1;}
+
+.sc{
+  background:rgba(255,255,255,.22);
+  border:none;border-radius:5px;
+  color:#fff;cursor:pointer;padding:4px 8px;
+  font-family:sans-serif;
+  font-size:clamp(8px,.9vw,12px);
+  font-weight:600;
+  display:flex;align-items:center;gap:3px;
+  transition:background .15s;
+}
+.sc:hover{background:rgba(255,255,255,.38);}
+
+/* FULLSCREEN */
+#fsmod{
+  display:none;position:absolute;inset:0;z-index:100;
+  background:url(https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/fundilho.png) center/cover;
+  flex-direction:column;align-items:center;justify-content:center;gap:10px;
+}
+#fsmod.on{display:flex;}
+#fscont{width:92%;height:78%;}
+#fscont img,#fscont video{
+  width:100%;height:100%;object-fit:contain;display:block;border-radius:8px;
+}
+
+#fsbar{display:flex;gap:10px;}
+.fsbtn{
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+  color:#fff;border-radius:8px;padding:8px 18px;
+  font-family:sans-serif;font-size:clamp(11px,1.2vw,15px);font-weight:600;
+  cursor:pointer;transition:background .2s;
+}
+.fsbtn:hover{background:rgba(255,255,255,.32);}
+
+/* TOAST */
+#toast{
+  position:absolute;
+  bottom:3%;
+  left:50%;
+  transform:translateX(-50%) translateY(40px);
+  background:rgba(10,10,10,.92);
+  color:#fff;
+  padding:10px 20px;
+  border-radius:22px;
+  opacity:0;
+  transition:.4s;
+}
+#toast.on{
+  transform:translateX(-50%) translateY(0);
+  opacity:1;
+}
+</style>
+</head>
+
+<body>
+
+<div id="wrap">
+  <div id="stage">
+
+    <video id="vid" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/galeria/galeria.mp4" preload="auto" playsinline></video>
+
+    <img id="play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
+
+    <img id="gbg" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/galeria/galeria.png">
+
+    <div id="slots">
+      <div id="vline1"></div>
+      <div id="vline2"></div>
+    </div>
+
+    <div id="fsmod">
+      <div id="fscont"></div>
+      <div id="fsbar">
+        <button class="fsbtn" id="fscls">✕ Fechar</button>
+        <button class="fsbtn" id="fsdl">💾 Guardar</button>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+  </div>
+</div>
+
+<img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png">
+
+<button id="btn-skip">
+  <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/vai-l-eu-deixo.png">
+</button>
+
+<input type="file" id="fsin" accept="image/*,video/*" style="display:none">
+
+<script>
+/* ------------------------------
+   CONFIGURAÇÕES SUPABASE / R2
+--------------------------------*/
+const SURL = "https://qzjzjzjz.supabase.co";
+const HDR = {
+  "apikey": "public",
+  "Authorization": "Bearer public",
+  "Content-Type": "application/json"
+};
+const HDRD = {
+  "apikey": "public",
+  "Authorization": "Bearer public"
+};
+const STORAGE_URL = "https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/galeria/";
+const STORAGE_UP = "https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/galeria/";
+const SHDR = { "x-upsert": "true" };
+
+/* ------------------------------
+   ELEMENTOS
+--------------------------------*/
+const vid = document.getElementById("vid");
+const play = document.getElementById("play");
+const btnSkip = document.getElementById("btn-skip");
+const gbg = document.getElementById("gbg");
+const slots = document.getElementById("slots");
+const btnIdx = document.getElementById("btn-idx");
+const fsin = document.getElementById("fsin");
+
+const fsmod = document.getElementById("fsmod");
+const fscont = document.getElementById("fscont");
+const fscls = document.getElementById("fscls");
+const fsdl = document.getElementById("fsdl");
+
+let data = Array(9).fill(null).map(()=>({url:null,name:null,id:null,path:null}));
+let activeSlot = null;
+
+/* ------------------------------
+   PLAY
+--------------------------------*/
+play.onclick = () => {
+  play.classList.add("gone");
+  btnSkip.classList.add("gone");
+  vid.play().catch(()=>{
+    vid.muted = true;
+    vid.play();
+  });
+};
+
+/* ------------------------------
+   SKIP
+--------------------------------*/
+btnSkip.onclick = () => {
+  play.classList.add("gone");
+  btnSkip.classList.add("gone");
+  vid.pause();
+  vid.currentTime = vid.duration;
+  goGallery();
+};
+
+/* ------------------------------
+   QUANDO O VÍDEO TERMINA
+--------------------------------*/
+vid.onended = () => {
+  goGallery();
+};
+
+/* ------------------------------
+   MOSTRAR GALERIA
+--------------------------------*/
+function goGallery(){
+  gbg.classList.add("show");
+  slots.classList.add("show");
+  btnIdx.classList.add("show");
+}
+
+/* ------------------------------
+   TOAST
+--------------------------------*/
+let tt;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("on");
+  clearTimeout(tt);
+  tt = setTimeout(()=>t.classList.remove("on"), 2600);
+}
+
+/* ------------------------------
+   BUILD DAS SLOTS
+--------------------------------*/
+function build(){
+  slots.innerHTML = `
+    <div id="vline1"></div>
+    <div id="vline2"></div>
+  `;
+
+  data.forEach((s,idx)=>{
+    const d = document.createElement("div");
+    d.className = "slot";
+
+    if(!s.url){
+      d.innerHTML = `
+        <div class="slot-add" onclick="openImport(${idx})">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5v14m-7-7h14"/></svg>
+          <span>Adicionar</span>
+        </div>
+      `;
+    } else {
+      if(s.url.match(/\.(mp4|mov|webm|mkv)$/i)){
+        d.innerHTML = `<video class="m" src="${s.url}" muted></video>`;
+      } else {
+        d.innerHTML = `<img class="m" src="${s.url}">`;
       }
-    </script>
-  </body>
+
+      d.innerHTML += `
+        <div class="slot-ctrl">
+          <button class="sc" onclick="verSlot(${idx})">👁 Ver</button>
+          <button class="sc" onclick="apagarSlot(${idx})">🗑 Apagar</button>
+        </div>
+      `;
+    }
+
+    slots.appendChild(d);
+  });
+}
+
+/* ------------------------------
+   IMPORTAR
+--------------------------------*/
+function openImport(idx){
+  activeSlot = idx;
+  fsin.value = "";
+  fsin.click();
+}
+
+fsin.onchange = () => {
+  const f = fsin.files[0];
+  if(!f || activeSlot === null) return;
+  uploadStorage(f, activeSlot);
+};
+
+/* ------------------------------
+   UPLOAD (IMAGEM + VÍDEO)
+--------------------------------*/
+function uploadStorage(file,slot){
+  const ext = file.name.split(".").pop().toLowerCase();
+  const isVideo = ["mp4","mov","webm","mkv"].includes(ext);
+  const path = "media_"+slot+"_"+Date.now()+"."+ext;
+
+  toast("A enviar...");
+
+  if(isVideo){
+    fetch(STORAGE_UP+path,{
+      method:"POST",
+      headers:SHDR,
+      body:file
+    })
+    .then(()=>{
+      const url = STORAGE_URL+path;
+      data[slot] = {url:url,name:file.name,id:null,path:path};
+      build();
+      return fetch(SURL+"/rest/v1/galeria",{
+        method:"POST",
+        headers:HDR,
+        body:JSON.stringify({imagem:url,path:path})
+      });
+    })
+    .then(r=>r.json())
+    .then(rows=>{
+      if(rows && rows[0]) data[slot].id = rows[0].id;
+      build();
+      toast("✓ Guardado!");
+    });
+  }
+
+  else {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        canvas.getContext("2d").drawImage(img,0,0);
+
+        canvas.toBlob(blob=>{
+          fetch(STORAGE_UP+path,{
+            method:"POST",
+            headers:Object.assign({"Content-Type":"image/png"},SHDR),
+            body:blob
+          })
+          .then(()=>{
+            const url = STORAGE_URL+path;
+            data[slot] = {url:url,name:file.name,id:null,path:path};
+            build();
+            return fetch(SURL+"/rest/v1/galeria",{
+              method:"POST",
+              headers:HDR,
+              body:JSON.stringify({imagem:url,path:path})
+            });
+          })
+          .then(r=>r.json())
+          .then(rows=>{
+            if(rows && rows[0]) data[slot].id = rows[0].id;
+            build();
+            toast("✓ Guardado!");
+          });
+        },"image/png");
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+/* ------------------------------
+   FULLSCREEN
+--------------------------------*/
+function verSlot(idx){
+  const s = data[idx];
+  if(!s || !s.url) return;
+
+  fscont.innerHTML = "";
+
+  if(s.url.match(/\.(mp4|mov|webm|mkv)$/i)){
+    const v = document.createElement("video");
+    v.src = s.url;
+    v.controls = true;
+    v.autoplay = false;
+    fscont.appendChild(v);
+   } else {
+    const i = document.createElement("img");
+    i.src = s.url;
+    fscont.appendChild(i);
+  }
+
+  fsmod.classList.add("on");
+}
+
+fscls.onclick = () => {
+  fsmod.classList.remove("on");
+};
+
+/* ------------------------------
+   DOWNLOAD
+--------------------------------*/
+fsdl.onclick = () => {
+  const el = fscont.querySelector("img,video");
+  if(!el) return;
+
+  const a = document.createElement("a");
+  a.href = el.src;
+  a.download = "media";
+  a.click();
+};
+
+/* ------------------------------
+   APAGAR PERMANENTE
+--------------------------------*/
+function apagarSlot(idx){
+  const s = data[idx];
+  if(!s || !s.id) return;
+
+  toast("A apagar...");
+
+  const delStorage = s.path
+    ? fetch(STORAGE_UP+s.path,{method:"DELETE",headers:SHDR})
+    : Promise.resolve();
+
+  delStorage
+  .then(()=>{
+    return fetch(SURL+"/rest/v1/galeria?id=eq."+s.id,{
+      method:"DELETE",
+      headers:HDRD
+    });
+  })
+  .then(()=>{
+    data[idx] = {url:null,name:null,id:null,path:null};
+    build();
+    toast("✓ Apagado!");
+  })
+  .catch(()=>{
+    toast("Erro ao apagar");
+  });
+}
+
+/* ------------------------------
+   BOTÃO ÍNDICE
+--------------------------------*/
+btnIdx.onclick = () => {
+  window.location.href = "indice.html?skip=1";
+};
+
+/* ------------------------------
+   INICIAR
+--------------------------------*/
+build();
+</script>
+</body>
 </html>
