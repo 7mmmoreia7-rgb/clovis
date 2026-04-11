@@ -299,21 +299,10 @@ html,body{
 
 <script>
 /* ------------------------------
-   CONFIGURAÇÕES SUPABASE / R2
+   CONFIG WORKER / R2
 --------------------------------*/
-const SURL = "https://qzjzjzjz.supabase.co";
-const HDR = {
-  "apikey": "public",
-  "Authorization": "Bearer public",
-  "Content-Type": "application/json"
-};
-const HDRD = {
-  "apikey": "public",
-  "Authorization": "Bearer public"
-};
-const STORAGE_URL = "https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/galeria/";
-const STORAGE_UP = "https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/galeria/";
-const SHDR = { "x-upsert": "true" };
+const API_BASE = "https://hidden-hall-2a03.7mmmoreia7.workers.dev";
+const FILE_URL = API_BASE + "/file?key=";
 
 /* ------------------------------
    ELEMENTOS
@@ -331,7 +320,8 @@ const fscont = document.getElementById("fscont");
 const fscls = document.getElementById("fscls");
 const fsdl = document.getElementById("fsdl");
 
-let data = Array(9).fill(null).map(()=>({url:null,name:null,id:null,path:null}));
+/* cada slot: { url, key } */
+let data = Array(9).fill(null).map(()=>({url:null,key:null}));
 let activeSlot = null;
 
 /* ------------------------------
@@ -440,77 +430,31 @@ fsin.onchange = () => {
 };
 
 /* ------------------------------
-   UPLOAD (IMAGEM + VÍDEO)
+   UPLOAD (via Worker)
 --------------------------------*/
 function uploadStorage(file,slot){
-  const ext = file.name.split(".").pop().toLowerCase();
-  const isVideo = ["mp4","mov","webm","mkv"].includes(ext);
-  const path = "media_"+slot+"_"+Date.now()+"."+ext;
-
   toast("A enviar...");
 
-  if(isVideo){
-    fetch(STORAGE_UP+path,{
-      method:"POST",
-      headers:SHDR,
-      body:file
-    })
-    .then(()=>{
-      const url = STORAGE_URL+path;
-      data[slot] = {url:url,name:file.name,id:null,path:path};
-      build();
-      return fetch(SURL+"/rest/v1/galeria",{
-        method:"POST",
-        headers:HDR,
-        body:JSON.stringify({imagem:url,path:path})
-      });
-    })
-    .then(r=>r.json())
-    .then(rows=>{
-      if(rows && rows[0]) data[slot].id = rows[0].id;
-      build();
-      toast("✓ Guardado!");
-    });
-  }
+  const form = new FormData();
+  form.append("file", file);
 
-  else {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        canvas.getContext("2d").drawImage(img,0,0);
-
-        canvas.toBlob(blob=>{
-          fetch(STORAGE_UP+path,{
-            method:"POST",
-            headers:Object.assign({"Content-Type":"image/png"},SHDR),
-            body:blob
-          })
-          .then(()=>{
-            const url = STORAGE_URL+path;
-            data[slot] = {url:url,name:file.name,id:null,path:path};
-            build();
-            return fetch(SURL+"/rest/v1/galeria",{
-              method:"POST",
-              headers:HDR,
-              body:JSON.stringify({imagem:url,path:path})
-            });
-          })
-          .then(r=>r.json())
-          .then(rows=>{
-            if(rows && rows[0]) data[slot].id = rows[0].id;
-            build();
-            toast("✓ Guardado!");
-          });
-        },"image/png");
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
+  fetch(API_BASE + "/upload", {
+    method: "POST",
+    body: form
+  })
+  .then(r => r.json())
+  .then(res => {
+    if(!res.ok || !res.key) throw new Error("Upload falhou");
+    const key = res.key;
+    const url = FILE_URL + encodeURIComponent(key);
+    data[slot] = { url, key };
+    build();
+    toast("✓ Guardado!");
+  })
+  .catch(err => {
+    console.error(err);
+    toast("Erro no upload");
+  });
 }
 
 /* ------------------------------
@@ -555,31 +499,25 @@ fsdl.onclick = () => {
 };
 
 /* ------------------------------
-   APAGAR PERMANENTE
+   APAGAR PERMANENTE (via Worker)
 --------------------------------*/
 function apagarSlot(idx){
   const s = data[idx];
-  if(!s || !s.id) return;
+  if(!s || !s.key) return;
 
   toast("A apagar...");
 
-  const delStorage = s.path
-    ? fetch(STORAGE_UP+s.path,{method:"DELETE",headers:SHDR})
-    : Promise.resolve();
-
-  delStorage
-  .then(()=>{
-    return fetch(SURL+"/rest/v1/galeria?id=eq."+s.id,{
-      method:"DELETE",
-      headers:HDRD
-    });
+  fetch(API_BASE + "/file?key=" + encodeURIComponent(s.key), {
+    method: "DELETE"
   })
-  .then(()=>{
-    data[idx] = {url:null,name:null,id:null,path:null};
+  .then(r => {
+    if(!r.ok) throw new Error("Erro ao apagar");
+    data[idx] = { url:null, key:null };
     build();
     toast("✓ Apagado!");
   })
-  .catch(()=>{
+  .catch(err => {
+    console.error(err);
     toast("Erro ao apagar");
   });
 }
@@ -596,5 +534,6 @@ btnIdx.onclick = () => {
 --------------------------------*/
 build();
 </script>
+
 </body>
 </html>
