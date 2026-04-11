@@ -257,6 +257,20 @@ html,body{
   transform:translateX(-50%) translateY(0);
   opacity:1;
 }
+  #fscont video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+#fsbar {
+  z-index: 9999;
+}
+
+#btn-idx.gone {
+  display: none !important;
+}
+
 </style>
 </head>
 
@@ -471,10 +485,11 @@ function verSlot(idx) {
   if (!s || !s.url) return;
 
   fscont.innerHTML = "";
+  btnIdx.classList.add("gone");
 
-  btnIdx.classList.add("gone"); // esconder botão índice
+  const isVideo = s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i);
 
-  if (s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i)) {
+  if (isVideo) {
     const v = document.createElement("video");
     v.src = s.url;
     v.controls = true;
@@ -495,6 +510,7 @@ function verSlot(idx) {
   fsmod.classList.add("on");
 }
 
+
 fscls.onclick = () => {
   fsmod.classList.remove("on");
   btnIdx.classList.remove("gone"); // voltar a mostrar índice
@@ -514,6 +530,7 @@ fsdl.onclick = () => {
   a.click();
   a.remove();
 };
+
 
 /* ------------------------------
    APAGAR PERMANENTE
