@@ -8,7 +8,7 @@
     body {
       margin: 0;
       padding: 0;
-      background-image: url('fundilho.png');
+      background-image: url('https://4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/fundilho.png');
       background-size: cover;
       background-position: center;
       width: 100vw;
@@ -19,7 +19,6 @@
       overflow: hidden;
     }
 
-    /* LOGO FULLSCREEN */
     .logo {
       width: 260px;
       transform-style: preserve-3d;
@@ -42,7 +41,6 @@
       box-shadow: 0 0 9px 3px rgba(255,255,255,0.9);
     }
 
-    /* BOTÃO FINAL */
     #botao-final {
       position: absolute;
       bottom: 40px;
@@ -55,7 +53,7 @@
     }
 
     #botao-final:hover {
-      content: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mas-se-der-asneira-n-o-fui-eu.png');
+      content: url('https://4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mas-se-der-asneira-n-o-fui-eu.png');
     }
   </style>
 </head>
@@ -63,14 +61,14 @@
 <body>
 
   <!-- LOGO -->
-  <img src="icon-512.png" class="logo" id="logo">
+  <img src="https://4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/icon-512.png" class="logo" id="logo">
 
   <!-- SOM -->
-  <audio id="som-moeda" src="coin.wav"></audio>
+  <audio id="som-moeda" src="https://4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/coin.wav"></audio>
 
   <!-- BOTÃO FINAL -->
   <img id="botao-final"
-       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
+       src="https://4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
 <script>
   let deferredPrompt = null;
@@ -78,18 +76,15 @@
   const logo = document.getElementById('logo');
   const botaoFinal = document.getElementById('botao-final');
 
-  /* APANHAR EVENTO DE INSTALAÇÃO */
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
   });
 
-  /* INICIAR ANIMAÇÃO AO CARREGAR */
   window.addEventListener('load', () => {
     logo.classList.add('rodar');
   });
 
-  /* 1ª VOLTA */
   logo.addEventListener('animationstart', () => {
     som.volume = 1;
     som.currentTime = 0;
@@ -99,7 +94,6 @@
     setTimeout(() => logo.classList.remove('brilhar'), 200);
   });
 
-  /* 2ª VOLTA */
   logo.addEventListener('animationiteration', () => {
     som.volume = 0.4;
     som.currentTime = 0;
@@ -109,7 +103,6 @@
     setTimeout(() => logo.classList.remove('brilhar'), 200);
   });
 
-  /* QUANDO A ANIMAÇÃO TERMINA → INSTALAR */
   logo.addEventListener('animationend', async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -117,7 +110,6 @@
       const escolha = await deferredPrompt.userChoice;
 
       if (escolha.outcome === 'accepted') {
-        // MOSTRAR BOTÃO FINAL
         botaoFinal.style.display = 'block';
         botaoFinal.style.opacity = '1';
       }
@@ -126,7 +118,6 @@
     }
   });
 
-  /* BOTÃO FINAL → IR PARA HOME */
   botaoFinal.addEventListener('click', () => {
     window.location.href = 'index.html';
   });
