@@ -76,37 +76,39 @@
   const logo = document.getElementById('logo');
   const botaoFinal = document.getElementById('botao-final');
 
+  // Apanhar evento de instalação
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
   });
 
+  // Iniciar animação
   window.addEventListener('load', () => {
     logo.classList.add('rodar');
   });
 
+  // 1ª volta
   logo.addEventListener('animationstart', () => {
     som.volume = 1;
     som.currentTime = 0;
-    som.play();
-
+    som.play().catch(()=>{});
     logo.classList.add('brilhar');
     setTimeout(() => logo.classList.remove('brilhar'), 200);
   });
 
+  // 2ª volta
   logo.addEventListener('animationiteration', () => {
     som.volume = 0.4;
     som.currentTime = 0;
-    som.play();
-
+    som.play().catch(()=>{});
     logo.classList.add('brilhar');
     setTimeout(() => logo.classList.remove('brilhar'), 200);
   });
 
+  // Quando termina → instalar
   logo.addEventListener('animationend', async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
-
       const escolha = await deferredPrompt.userChoice;
 
       if (escolha.outcome === 'accepted') {
@@ -118,9 +120,17 @@
     }
   });
 
+  // Botão final → home
   botaoFinal.addEventListener('click', () => {
     window.location.href = 'index.html';
   });
+</script>
+
+<!-- REGISTO DO SERVICE WORKER (OBRIGATÓRIO) -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
 </script>
 
 </body>
