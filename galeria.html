@@ -229,10 +229,11 @@ html,body{
 /* FULLSCREEN — CORRIGIDO */
 #fscont {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 60px); /* espaço para os botões */
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 #fscont img,
@@ -246,30 +247,34 @@ html,body{
 
 /* Barra de botões */
 #fsbar {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  justify-content: center;
   gap: 12px;
-  margin-top: 10px;
+  z-index: 9999;
 }
 
-/* Botões mais pequenos e proporcionais */
+/* Botões mais pequenos (reduz ~3–4 cm visualmente) */
 .fsbtn {
   background: rgba(255,255,255,.18);
   border: 1px solid rgba(255,255,255,.3);
   color: #fff;
   border-radius: 8px;
-  padding: 6px 14px;
+  padding: 6px 12px; /* ← diminuir aqui reduz o tamanho */
   font-family: sans-serif;
-  font-size: clamp(10px, 1vw, 14px);
+  font-size: clamp(10px, 0.9vw, 13px); /* ← reduz ainda mais */
   font-weight: 600;
   cursor: pointer;
   transition: background .2s;
-  transform: scale(0.85);
+  transform: scale(0.80); /* ← isto reduz ~3–4 cm visualmente */
 }
 
 .fsbtn:hover {
   background: rgba(255,255,255,.32);
 }
+
 
 
 /* TOAST */
