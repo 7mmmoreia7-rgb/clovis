@@ -215,13 +215,13 @@ const CDN='https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/';
 const a=(p,fs)=>fs.map(f=>({url:CDN+p+'/'+f,tipo:f.match(/\.(mp4|webm)$/i)?'video':'img'}));
 
 const ANIMAIS=[
-  ...a('animais',['b1.png','b2.png','b3.png','b4.png','b5.jpg','b6.png','b7.png','b10.png','b11.png','b12.png','b13.png','b14.png','b15.png','b16.png','b17.png','b18.png','b19.png','b20.png','b21.png','b22.png','b23.png','b24.png','b25.png','b26.png']),
-  ...a('animais1',['b8.png','b7.png','b9.png','doninha.png','thumb(26).png','doninha.gif','elefante.gif','galinha.gif','gato.gif','golfinho.gif','lama.gif','panda.gif','peixe.gif','pombos.gif','rato.gif','unicórnio.gif'])
+  ...a('animais',['b1.png','b2.png','b3.png','b4.png','b5.jpg','b6.png','b7.png','b10.png','b11.png','b12.png','b13.png','b14.png','b15.png','b16.png','b17.png','b19.png','b21.png','b22.png','b23.png','b24.png','b25.png','b26.png']),
+  ...a('animais1',['b8.png','b9.png','doninha.png','elefante.gif','galinha.gif','gato.gif','golfinho.gif','lama.gif','panda.gif','peixe.gif','pombos.gif','rato.gif'])
 ];
-const GAROTOS=a('garotos',['111.png','112.png','113.png','114.png','115.png','116.png','29.png','30.png','bonecaA.png','bonecaB.png','ca.png','go.png','ela.gif','pocoyo(2).gif','pocoyo.gif']);
-const NATUREZA=[...a('natureza',['a.png','b.png','c.png','d.png','e.png','f.png','g.png','h.png','i.png','j.png','k.png','l.png','m.png','arco.png','arvore.png','cogumelo.png','cora.png','coram.png','corl.png','fj.png','n1.png','n2.png','n10.png','n12.png']),...a('natureza1',['n4.png','n7.png','n8.png','n9.png','neve.png','nuv.png','sol.png','trov.png','o.png','p.png','q.png','r.png','s.png','u.png','v.png','w.png','x.png','z.png'])];
+const GAROTOS=a('garotos',['111.png','112.png','113.png','114.png','115.png','116.png','29.png','30.png','bonecaA.png','bonecaB.png','ca.png','go.png','ela.gif','pocoyo.gif']);
+const NATUREZA=[...a('natureza',['a.png','b.png','c.png','d.png','e.png','f.png','g.png','h.png','i.png','j.png','k.png','l.png','m.png','arco.png','arvore.png','cogumelo.png','cora.png','coram.png','corl.png','n1.png','n2.png','n10.png','n12.png']),...a('natureza1',['n4.png','n7.png','n8.png','n9.png','neve.png','nuv.png','trov.png','p.png','q.png','r.png','s.png','u.png','v.png','w.png','x.png','z.png'])];
 const CASAS=a('casas',['c1.png','c2.png','c3.png','c4.png','c5.png','c6.png','c7.png','c8.png','c9.png','c10.png','c11.png','c12.png','c13.png','c14.png','c15.png']);
-const TRECOS=a('trecos',['love.gif','t1.png','t2.png','t3.png','t4.png','t5.jpg','t6.png','t7.png','t8.png']);
+const TRECOS=a('trecos',['love.gif','t1.png','t2.png','t3.png','t4.png','t5.jpg','t7.png','t8.png']);
 const BRILHOS=a('brilhos',['bolas.gif','estrela.gif','foguete.gif','g1.gif','g2.gif','luzinhas.gif']);
 const FUNDOS=a('fundos',['castelo.jpg','flores.jpg','ceu.mp4','floresta.mp4','gliter.mp4','mar.mp4']);
 const CENARIOS=[{nome:'☀️ Dia',g:'#87CEEB',g2:'#E0F7FA'},{nome:'🌊 Mar',g:'#006994',g2:'#00CED1'},{nome:'🌅 Pôr do Sol',g:'#FF6B35',g2:'#FFD700'},{nome:'🌿 Natureza',g:'#228B22',g2:'#90EE90'},{nome:'🌙 Noite',g:'#0D1B2A',g2:'#1B2A4A'},{nome:'🌸 Primavera',g:'#FFB7C5',g2:'#FFF0F5'},{nome:'❄️ Neve',g:'#E8F4FD',g2:'#FFFFFF'},{nome:'🔥 Fogo',g:'#8B0000',g2:'#FF4500'},{nome:'🏖️ Praia',g:'#F4D03F',g2:'#85C1E9'},{nome:'🌌 Galáxia',g:'#0B0C10',g2:'#45A29E'}];
@@ -565,8 +565,32 @@ document.addEventListener('keydown',e=>{
 /* ══════════════════════════════════════════════════════
    GUARDAR
 ══════════════════════════════════════════════════════ */
+
+// Carrega uma imagem sem taint CORS: tenta crossOrigin, fallback blob via fetch
+function carregarImagem(src){
+  return new Promise(res=>{
+    // Tentativa 1: crossOrigin anonymous (funciona se R2 tiver CORS configurado)
+    const img1=new Image();
+    img1.crossOrigin='anonymous';
+    img1.onload=()=>res(img1);
+    img1.onerror=()=>{
+      // Tentativa 2: fetch → blob URL (contorna CORS do canvas)
+      fetch(src)
+        .then(r=>r.blob())
+        .then(blob=>{
+          const burl=URL.createObjectURL(blob);
+          const img2=new Image();
+          img2.onload=()=>{URL.revokeObjectURL(burl);res(img2);};
+          img2.onerror=()=>res(null);
+          img2.src=burl;
+        })
+        .catch(()=>res(null));
+    };
+    img1.src=src;
+  });
+}
+
 function gerarCanvas(cb){
-  // dimensões lógicas (sem DPR) — é o que vemos no ecrã
   const r=cv.getBoundingClientRect();
   const W=r.width, H=r.height;
   const dpr=window.devicePixelRatio||1;
@@ -581,7 +605,7 @@ function gerarCanvas(cb){
   const fc=document.getElementById('fundo-cor');
   if(fc.style.display!=='none'&&fc.width>0){
     c.drawImage(fc,0,0,W,H);
-  } else {
+  }else{
     c.fillStyle='#cfc0a0';
     c.fillRect(0,0,W,H);
   }
@@ -589,47 +613,33 @@ function gerarCanvas(cb){
   // 2. fundo imagem ou vídeo
   const fm=document.querySelector('#camada-fundos img:not([id])');
   const fv=document.querySelector('#camada-fundos video');
+
   const p1=fm
-    ? new Promise(res=>{
-        const i=new Image();i.crossOrigin='anonymous';
-        i.onload=()=>{c.drawImage(i,0,0,W,H);res();};
-        i.onerror=res;
-        i.src=fm.src;
-      })
+    ? carregarImagem(fm.src).then(img=>{if(img)c.drawImage(img,0,0,W,H);})
     : fv
       ? new Promise(res=>{try{c.drawImage(fv,0,0,W,H);}catch(e){}res();})
       : Promise.resolve();
 
   p1.then(()=>{
     // 3. traços do canvas de desenho
-    // O cv interno tem cv.width/cv.height em pixels físicos (com DPR)
-    // Desenhamos com as dimensões lógicas W×H
     try{
-      c.drawImage(cv, 0, 0, cv.width, cv.height, 0, 0, W, H);
-    }catch(e){console.warn('canvas draw:',e);}
+      c.drawImage(cv,0,0,cv.width,cv.height,0,0,W,H);
+    }catch(e){console.warn('draw canvas:',e);}
 
-    // 4. elementos (imagens, texto)
+    // 4. elementos
     const cr=document.getElementById('camada-elementos').getBoundingClientRect();
-    const promises=Array.from(document.querySelectorAll('#camada-elementos .elem-arr')).map(el=>{
+    const elems=Array.from(document.querySelectorAll('#camada-elementos .elem-arr'));
+
+    const promises=elems.map(el=>{
       const er=el.getBoundingClientRect();
       const x=er.left-cr.left, y=er.top-cr.top, w=er.width, h=er.height;
       const im=el.querySelector('img');
-      // texto: primeiro div com fontSize
-      const allDivs=el.querySelectorAll('div');
       let txDiv=null;
-      allDivs.forEach(dv=>{if(dv.style.fontSize)txDiv=dv;});
+      el.querySelectorAll('div').forEach(dv=>{if(dv.style.fontSize)txDiv=dv;});
 
       if(im){
-        return new Promise(res=>{
-          const i=new Image();
-          i.crossOrigin='anonymous';
-          i.onload=()=>{c.drawImage(i,x,y,w,h);res();};
-          i.onerror=()=>{
-            // fallback sem crossOrigin
-            try{c.drawImage(im,x,y,w,h);}catch(e){}
-            res();
-          };
-          i.src=im.src;
+        return carregarImagem(im.src).then(img=>{
+          if(img)c.drawImage(img,x,y,w,h);
         });
       }
       if(txDiv){
