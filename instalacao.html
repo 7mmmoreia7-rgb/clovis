@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Instalação</title>
 
-  <!-- MANIFEST -->
   <link rel="manifest" href="/manifest.json">
 
   <style>
@@ -20,14 +19,16 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
+      flex-direction: column;
+      font-family: sans-serif;
     }
 
     .logo {
       width: 260px;
       transform-style: preserve-3d;
       filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
-      transition: box-shadow 0.2s ease-out;
       border-radius: 50%;
+      display: none;
     }
 
     .rodar {
@@ -40,23 +41,29 @@
       100% { transform: rotateY(360deg) scale(1); }
     }
 
-    .brilhar {
-      box-shadow: 0 0 9px 3px rgba(255,255,255,0.9);
+    #play {
+      width: 260px;
+      cursor: pointer;
+      transition: 0.3s;
     }
 
-    #botao-final {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
+    #play:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 10px #fff);
+    }
+
+    #frase-final {
+      margin-top: 30px;
+      color: white;
+      font-size: 22px;
       display: none;
       cursor: pointer;
-      width: 260px;
-      transition: opacity 0.3s ease;
+      transition: 0.3s;
     }
 
-    #botao-final:hover {
-      content: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mas-se-der-asneira-n-o-fui-eu.png');
+    #frase-final:hover {
+      color: #ffea00;
+      text-shadow: 0 0 10px #fff;
     }
   </style>
 </head>
@@ -69,67 +76,74 @@
   <!-- SOM -->
   <audio id="som-moeda" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/coin.wav"></audio>
 
-  <!-- BOTÃO FINAL -->
-  <img id="botao-final"
-       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
+  <!-- BOTÃO PLAY -->
+  <img id="play"
+       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
+
+  <!-- FRASE FINAL -->
+  <div id="frase-final">Abrir a aplicação</div>
 
 <script>
   let deferredPrompt = null;
   const som = document.getElementById('som-moeda');
   const logo = document.getElementById('logo');
-  const botaoFinal = document.getElementById('botao-final');
+  const play = document.getElementById('play');
+  const frase = document.getElementById('frase-final');
 
-  // Apanhar evento de instalação
+  // Guardar evento de instalação
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
   });
 
-  // Iniciar animação
-  window.addEventListener('load', () => {
+  // Clicar no PLAY → arranca tudo
+  play.addEventListener('click', () => {
+    // som
+    som.currentTime = 0;
+    som.play().catch(()=>{});
+
+    // esconder play
+    play.style.display = 'none';
+
+    // mostrar logo + animação
+    logo.style.display = 'block';
     logo.classList.add('rodar');
   });
 
-  // 1ª volta
+  // Som durante a animação
   logo.addEventListener('animationstart', () => {
     som.volume = 1;
     som.currentTime = 0;
     som.play().catch(()=>{});
-    logo.classList.add('brilhar');
-    setTimeout(() => logo.classList.remove('brilhar'), 200);
   });
 
-  // 2ª volta
   logo.addEventListener('animationiteration', () => {
     som.volume = 0.4;
     som.currentTime = 0;
     som.play().catch(()=>{});
-    logo.classList.add('brilhar');
-    setTimeout(() => logo.classList.remove('brilhar'), 200);
   });
 
-  // Quando termina → instalar
+  // Quando a animação termina → instalar
   logo.addEventListener('animationend', async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const escolha = await deferredPrompt.userChoice;
 
       if (escolha.outcome === 'accepted') {
-        botaoFinal.style.display = 'block';
-        botaoFinal.style.opacity = '1';
+        frase.style.display = 'block';
       }
 
       deferredPrompt = null;
     }
   });
 
-  // Botão final → home
-  botaoFinal.addEventListener('click', () => {
+  // Clicar na frase → abrir home
+  frase.addEventListener('click', () => {
     window.location.href = 'index.html';
   });
 </script>
 
-<!-- REGISTO DO SERVICE WORKER -->
+<!-- SERVICE WORKER -->
 <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
