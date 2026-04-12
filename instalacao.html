@@ -19,7 +19,7 @@
       font-family: sans-serif;
     }
 
-    /* PLAY igual ao resto da app */
+    /* PLAY */
     #btn-play {
       position: fixed;
       top: 50%; left: 50%;
@@ -31,7 +31,7 @@
       filter: drop-shadow(0 0 8px rgba(0,0,0,0.4));
     }
 
-    /* LOGO MAIOR — SEM BORDER-RADIUS */
+    /* LOGO — sem cortes */
     #logo {
       position: fixed;
       top: 50%; left: 50%;
@@ -51,18 +51,18 @@
       100% { transform: translate(-50%, -50%) rotateY(360deg) scale(1); }
     }
 
-    /* BOTÃO INSTALAR (CENTRO) */
-    #btn-instalar {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 260px;
-      display: none;
-      cursor: pointer;
-      z-index: 15;
+    /* BRILHO FINAL */
+    .flash {
+      animation: flash 0.4s ease-out forwards;
     }
 
-    /* BOTÃO FINAL (HOME) */
+    @keyframes flash {
+      0%   { filter: brightness(1); }
+      50%  { filter: brightness(3); }
+      100% { filter: brightness(1); opacity: 0; }
+    }
+
+    /* BOTÃO FINAL */
     #btn-final {
       position: fixed;
       bottom: 40px;
@@ -93,10 +93,6 @@
   <!-- SOM -->
   <audio id="som-moeda" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/coin.wav"></audio>
 
-  <!-- BOTÃO INSTALAR -->
-  <img id="btn-instalar"
-       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
-
   <!-- BOTÃO FINAL -->
   <img id="btn-final"
        src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
@@ -107,7 +103,6 @@
   const play = document.getElementById('btn-play');
   const logo = document.getElementById('logo');
   const som = document.getElementById('som-moeda');
-  const btnInstalar = document.getElementById('btn-instalar');
   const btnFinal = document.getElementById('btn-final');
 
   window.addEventListener('beforeinstallprompt', (e) => {
@@ -115,51 +110,51 @@
     deferredPrompt = e;
   });
 
-  // PLAY → som + logo + animação
+  /* PLAY → delay → animação */
   play.onclick = function () {
     play.style.opacity = '0';
     setTimeout(() => play.style.display = 'none', 300);
 
-    som.currentTime = 0;
-    som.play().catch(()=>{});
+    setTimeout(() => {
+      som.currentTime = 0;
+      som.play().catch(()=>{});
 
-    logo.style.display = 'block';
-    logo.classList.add('rodar');
+      logo.style.display = 'block';
+      logo.classList.add('rodar');
+    }, 500); // <-- pequeno espaço antes da animação
   };
 
-  // Som durante animação
+  /* Som durante animação */
   logo.addEventListener('animationiteration', () => {
     som.volume = 0.4;
     som.currentTime = 0;
     som.play().catch(()=>{});
   });
 
-  // Quando animação termina → mostrar botão de instalação
+  /* Fim da animação → brilho → logo vira botão de instalação */
   logo.addEventListener('animationend', () => {
-    btnInstalar.style.display = 'block';
+    logo.classList.add('flash');
+
+    logo.onclick = async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const escolha = await deferredPrompt.userChoice;
+
+        if (escolha.outcome === 'accepted') {
+          btnFinal.style.display = 'block';
+        }
+
+        deferredPrompt = null;
+      }
+    };
   });
 
-  // Botão instalar → prompt + botão final
-  btnInstalar.onclick = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const escolha = await deferredPrompt.userChoice;
-
-      if (escolha.outcome === 'accepted') {
-        btnInstalar.style.display = 'none';
-        btnFinal.style.display = 'block';
-      }
-
-      deferredPrompt = null;
-    }
-  };
-
-  // Botão final → home
+  /* Botão final → home */
   btnFinal.onclick = () => {
     window.location.href = 'index.html';
   };
 
-  // SW
+  /* SW */
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
