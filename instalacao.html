@@ -51,7 +51,7 @@
       100% { transform: translate(-50%, -50%) rotateY(360deg) scale(1); }
     }
 
-    /* BRILHO FINAL */
+    /* BRILHO FINAL — sem apagar o logo */
     .flash {
       animation: flash 0.4s ease-out forwards;
     }
@@ -59,7 +59,7 @@
     @keyframes flash {
       0%   { filter: brightness(1); }
       50%  { filter: brightness(3); }
-      100% { filter: brightness(1); opacity: 0; }
+      100% { filter: brightness(1); }
     }
 
     /* BOTÃO FINAL */
@@ -121,7 +121,7 @@
 
       logo.style.display = 'block';
       logo.classList.add('rodar');
-    }, 500); // <-- pequeno espaço antes da animação
+    }, 500); // pequeno espaço antes da animação
   };
 
   /* Som durante animação */
