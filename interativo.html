@@ -22,10 +22,11 @@ button:focus,button:active,button:hover{outline:none !important;box-shadow:none 
 #bg-isto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
 #meu-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1;}
 #btn-play{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:10%;border:none;background:transparent;cursor:pointer;z-index:10;padding:0;box-shadow:none !important;}
-#btn-play img{width:100%;height:auto;display:block;filter:drop-shadow(0 0 14px rgba(0,0,0,.55));}
+#btn-play img{width:100%;height:auto;display:block;filter:drop-shadow(0 0 12px rgba(0,0,0,.55));}
 
 /* skip button - mesma posição que o btn-idx */
-#btn-skip{position:fixed;bottom:3.5%;right:3.4%;width:8%;height:auto;cursor:pointer;z-index:200;border:none;background:transparent;padding:0;box-shadow:none !important;}
+#btn-skip{position:fixed;bottom:3.5%;right:3.4%;width:6%;height:auto;cursor:pointer;z-index:200;border:none;background:transparent;padding:0;box-shadow:none !important;transition:transform .12s ease;}
+#btn-skip:hover{transform:scale(1.05);}
 #btn-skip img{width:100%;height:auto;display:block;}
 
 #overlay-fade{position:absolute;inset:0;z-index:150;background:#fff;opacity:0;pointer-events:none;transition:opacity .6s ease;}
@@ -36,7 +37,7 @@ button:focus,button:active,button:hover{outline:none !important;box-shadow:none 
 #camada-fundos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;z-index:2;overflow:hidden;pointer-events:none;}
 #camada-fundos video,#camada-fundos img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
 #fundo-cor{position:absolute;inset:0;width:100%;height:100%;}
-#meu-canvas{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;background:transparent;cursor:crosshair;z-index:3;touch-action:none;}
+#meu-canvas{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;background:transparent;cursor:crosshair;z-index:6;touch-action:none;}
 /* camada de elementos sempre visível, pointer-events só nos .elem-arr */
 #camada-elementos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;z-index:7;pointer-events:none;overflow:hidden;}
 #barra-botoes{position:absolute;top:0;left:0;width:100%;height:13.5%;z-index:10;pointer-events:none;}
@@ -127,10 +128,7 @@ button:focus,button:active,button:hover{outline:none !important;box-shadow:none 
   <video id="meu-video" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/voador.mp4" playsinline preload="auto"></video>
   <button id="btn-play" onclick="iniciarVideo()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" alt="Play"></button>
   <!-- SKIP: mesma posição que btn-idx, salta o vídeo -->
-  <button id="btn-skip"
-          onmouseenter="this.firstElementChild.src='https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/r-pido-antes-que-eu-mude-de-id-12-04-2026.png'"
-          onmouseleave="this.firstElementChild.src='https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skipa-l-12-04-2026.png'"
-          onclick="fazTransicao()">
+  <button id="btn-skip" onclick="fazTransicao()">
     <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skipa-l-12-04-2026.png" alt="Skip">
   </button>
 </div>
@@ -154,9 +152,7 @@ button:focus,button:active,button:hover{outline:none !important;box-shadow:none 
     <button id="btn-guardar"  onclick="AP('pop-export')"                            onmouseenter="TT(event,'Guardar')"   onmouseleave="HT()"></button>
     <button id="btn-importar" onclick="document.getElementById('inp-img').click()" onmouseenter="TT(event,'Importar')"  onmouseleave="HT()"></button>
   </div>
-  <button id="btn-lock" onclick="toggleLock()">
-    <img id="lock-img" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/aloquete.png" alt="lock">
-  </button>
+  <button id="btn-lock" onclick="toggleLock()"><img id="lock-img" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/aloquete.png" alt="lock"></button>
   <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" onclick="irIndice()" style="cursor:pointer;">
 </div>
 
@@ -331,12 +327,11 @@ const cv=document.getElementById('meu-canvas'),cx=cv.getContext('2d');
 function initCanvas(){
   sizing();
   window.addEventListener('resize',sizing);
-  // canvas recebe sempre eventos de desenho; o lock só afeta os elementos
-  cv.addEventListener('mousedown',e=>{ini(e.offsetX,e.offsetY);});
+  cv.addEventListener('mousedown',e=>{if(locked)return;ini(e.offsetX,e.offsetY);});
   cv.addEventListener('mousemove',e=>cont(e.offsetX,e.offsetY));
   cv.addEventListener('mouseup',fim);
   cv.addEventListener('mouseleave',fim);
-  cv.addEventListener('touchstart',e=>{e.preventDefault();const p=tPos(e.touches[0]);ini(p.x,p.y);},{passive:false});
+  cv.addEventListener('touchstart',e=>{if(locked)return;e.preventDefault();const p=tPos(e.touches[0]);ini(p.x,p.y);},{passive:false});
   cv.addEventListener('touchmove',e=>{e.preventDefault();const p=tPos(e.touches[0]);cont(p.x,p.y);},{passive:false});
   cv.addEventListener('touchend',fim);
   cv.style.zIndex='6';
@@ -344,20 +339,14 @@ function initCanvas(){
 }
 
 // lock=false → pode mover elementos
-// lock=true  → elementos fixos (pointer-events:none nos elem-arr), mas continua a desenhar
-let locked=false;
-
+// lock=true  → elementos fixos, desenha por cima (canvas sobe)
 function aplicarLock(){
   document.querySelectorAll('.elem-arr').forEach(el=>{
     el.style.pointerEvents=locked?'none':'all';
   });
   const img=document.getElementById('lock-img');
-  if(img){
-    img.src = locked
-      ? 'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/aloquete.png'
-      : 'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/lock%20aberto.png';
-    img.style.opacity=1;
-  }
+  if(img) img.style.opacity=locked?'1':'0.45';
+  if(cv) cv.style.zIndex=locked?'8':'6';
 }
 function sizing(){
   const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
@@ -599,46 +588,30 @@ function gerarCanvas(cb){
   const c=tmp.getContext('2d');c.scale(dpr,dpr);
   const W=r.width,H=r.height;
 
+  // 1. fundo de cor
   const fc=document.getElementById('fundo-cor');
   if(fc.style.display!=='none'){try{c.drawImage(fc,0,0,W,H);}catch(e){c.fillStyle='#cfc0a0';c.fillRect(0,0,W,H);}}
   else{c.fillStyle='#cfc0a0';c.fillRect(0,0,W,H);}
 
-  const fm=document.querySelector('#camada-fundos img:not([id])');
-  const fv=document.querySelector('#camada-fundos video');
-  const p1=fm?new Promise(res=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>{c.drawImage(i,0,0,W,H);res();};i.onerror=res;i.src=fm.src+'?v=1';}):
-             fv?new Promise(res=>{try{c.drawImage(fv,0,0,W,H);}catch(e){}res();}):
-             Promise.resolve();
+  // 2. canvas de desenho
+  try{c.drawImage(cv,0,0,W,H);}catch(e){}
 
-  p1.then(()=>{
-    try{c.drawImage(cv,0,0,W,H);}catch(e){}
-
-    const cr=document.getElementById('camada-elementos').getBoundingClientRect();
-    const p2=Array.from(document.querySelectorAll('#camada-elementos .elem-arr')).map(el=>{
-      const er=el.getBoundingClientRect();
-      const x=er.left-cr.left,y=er.top-cr.top,w=er.width,h=er.height;
-      const im=el.querySelector('img');
-      const tx=el.querySelector('.txt-elem');
-      if(im){
-        return new Promise(res=>{
-          const i=new Image();i.crossOrigin='anonymous';
-          i.onload=()=>{c.drawImage(i,x,y,w,h);res();};
-          i.onerror=()=>{
-            try{c.drawImage(im,x,y,w,h);}catch(e){}res();
-          };
-          i.src=im.src;
-        });
-      }
-      if(tx){
-        const fs=parseFloat(getComputedStyle(tx).fontSize)||32;
-        c.save();c.font=fs+'px '+tx.style.fontFamily;
-        c.fillStyle=tx.style.color||'#000';
-        c.fillText(tx.textContent,x,y+fs);c.restore();
-      }
-      return Promise.resolve();
-    });
-
-    Promise.all(p2).then(()=>cb(tmp));
+  // 3. elementos (apenas texto para evitar taint)
+  const cr=document.getElementById('camada-elementos').getBoundingClientRect();
+  const p2=Array.from(document.querySelectorAll('#camada-elementos .elem-arr')).map(el=>{
+    const er=el.getBoundingClientRect();
+    const x=er.left-cr.left,y=er.top-cr.top;
+    const tx=el.querySelector('.txt-elem');
+    if(tx){
+      const fs=parseFloat(getComputedStyle(tx).fontSize)||32;
+      c.save();c.font=fs+'px '+(tx.style.fontFamily||'sans-serif');
+      c.fillStyle=tx.style.color||'#000';
+      c.fillText(tx.textContent,x,y+fs);c.restore();
+    }
+    return Promise.resolve();
   });
+
+  Promise.all(p2).then(()=>cb(tmp));
 }
 function expDispositivo(){
   gerarCanvas(t=>{
@@ -742,12 +715,34 @@ const tip=document.getElementById('tip');
 function TT(e,t){tip.textContent=t;tip.style.left=(e.clientX+10)+'px';tip.style.top=(e.clientY+26)+'px';tip.classList.add('v');}
 function HT(){tip.classList.remove('v');}
 
+let locked=false;
 function toggleLock(){
   locked=!locked;
   deselAll();
   aplicarLock();
+  const img=document.getElementById('lock-img');
+  if(img){
+    img.src=locked
+      ?'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/lock%20aberto.png'
+      :'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/aloquete.png';
+    img.style.opacity=locked?'1':'0.45';
+  }
 }
 function irIndice(){window.location.href='indice.html?skip=1';}
+
+// skip hover imagens
+(function(){
+  const btn=document.getElementById('btn-skip');
+  if(!btn)return;
+  const img=btn.querySelector('img');
+  const normal='https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skipa-l-12-04-2026.png';
+  const hover='https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/r-pido-antes-que-eu-mude-de-id-12-04-2026.png';
+  img.src=normal;
+  btn.addEventListener('mouseenter',()=>{img.src=hover;});
+  btn.addEventListener('mouseleave',()=>{img.src=normal;});
+  btn.addEventListener('touchstart',()=>{img.src=hover;},{passive:true});
+  btn.addEventListener('touchend',()=>{img.src=normal;},{passive:true});
+})();
 </script>
 </body>
 </html>
