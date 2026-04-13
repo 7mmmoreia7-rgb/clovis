@@ -7,66 +7,73 @@
 
   <link rel="icon" href="/icon-192.png" />
   <link rel="apple-touch-icon" href="/icon-512.png" />
-<link rel="manifest" href="/manifest.json">
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-  }
-</script>
+  <link rel="manifest" href="/manifest.json">
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
+
   <style>
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-    html, body { 
-      width:100%; 
-      height:100%; 
-      overflow:hidden; 
-      background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") 
-      center/cover no-repeat;
+    html, body {
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
     }
 
-    #myVideo { 
-      position:fixed; 
-      top:0; left:0; 
-      width:100%; 
-      height:100%; 
-      object-fit:cover; 
+    #myVideo {
+      position:fixed;
+      top:0; left:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
       z-index:1;
     }
 
-    #btn-play { 
-      position:fixed; 
-      top:50%; left:50%; 
-      transform:translate(-50%,-50%); 
-      width:10%; 
-      cursor:pointer; 
-      z-index:10; 
-      transition:opacity .3s; 
+    /* PLAY */
+    #btn-play {
+      position:fixed;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      width:10%;
+      cursor:pointer;
+      z-index:10;
+      transition:opacity .3s;
     }
 
-    #btn-idx { 
-      position:fixed; 
-      bottom:3.5%; right:3.4%; 
-      width:8%; 
-      cursor:pointer; 
-      z-index:9999; 
-      opacity:0; 
-      pointer-events:none; 
-      transition:opacity .5s; 
+    /* SKIP */
+    #btn-skip-home {
+      position:fixed;
+      bottom:3.5%;
+      right:3.4%;
+      width:6%;
+      z-index:10;
+      cursor:pointer;
+      transition:transform .2s ease, opacity .3s;
     }
-    #btn-skip-home{
-  position:fixed;
-  bottom:3.5%;
-  right:3.4%;
-  width:6%;
-  z-index:9999;
-  cursor:pointer;
-  transition:transform .2s ease;
-}
 
-#btn-skip-home:hover{
-  content:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/clika2.png");
-  transform:scale(1.15);
-}
+    #btn-skip-home:hover img {
+      content:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/clika2.png");
+      transform:scale(1.25);
+    }
+
+    /* ÍNDICE */
+    #btn-idx {
+      position:fixed;
+      bottom:3.5%;
+      right:3.4%;
+      width:8%;
+      cursor:pointer;
+      z-index:9999;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .5s;
+    }
   </style>
 </head>
 
@@ -76,44 +83,66 @@
     <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/home/home.mp4" type="video/mp4">
   </video>
 
-  <img id="btn-play" 
-       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" 
+  <!-- PLAY -->
+  <img id="btn-play"
+       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png"
        alt="Play" />
-<img id="btn-skip-home"
-     src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/clika1.png"
-     alt="Skip Home">
-  <img id="btn-idx" 
-       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" 
+
+  <!-- SKIP -->
+  <img id="btn-skip-home"
+       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/clika1.png"
+       alt="Skip Home" />
+
+  <!-- ÍNDICE -->
+  <img id="btn-idx"
+       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png"
        alt="Índice" />
 
- <script>
-const play = document.getElementById('btn-play');
-const vid  = document.getElementById('myVideo');
-const idx  = document.getElementById('btn-idx');
-const skip = document.getElementById('btn-skip-home');
+  <script>
+    const play = document.getElementById('btn-play');
+    const skip = document.getElementById('btn-skip-home');
+    const vid  = document.getElementById('myVideo');
+    const idx  = document.getElementById('btn-idx');
 
-play.onclick = function () {
-  play.style.opacity = '0';
-  play.style.pointerEvents = 'none';
-  vid.play().catch(function(){ 
-    vid.muted = true; 
-    vid.play(); 
-  });
-};
+    function hideStartButtons() {
+      play.style.opacity = '0';
+      play.style.pointerEvents = 'none';
 
-vid.onended = function () {
-  idx.style.opacity = '1';
-  idx.style.pointerEvents = 'all';
-};
+      skip.style.opacity = '0';
+      skip.style.pointerEvents = 'none';
+    }
 
-idx.onclick = function () {
-  window.location.href = 'indice.html?skip=1';
-};
+    /* PLAY */
+    play.onclick = function () {
+      hideStartButtons();
+      vid.play().catch(function(){
+        vid.muted = true;
+        vid.play();
+      });
+    };
 
-skip.onclick = function () {
-  vid.currentTime = vid.duration;
-};
-</script>
+    /* SKIP */
+    skip.onclick = function () {
+      hideStartButtons();
+
+      vid.pause();
+      vid.currentTime = vid.duration;
+
+      // ativa lógica de fim
+      vid.dispatchEvent(new Event('ended'));
+    };
+
+    /* FIM DO VÍDEO */
+    vid.onended = function () {
+      idx.style.opacity = '1';
+      idx.style.pointerEvents = 'all';
+    };
+
+    /* ÍNDICE */
+    idx.onclick = function () {
+      window.location.href = 'indice.html?skip=1';
+    };
+  </script>
 
 </body>
 </html>
