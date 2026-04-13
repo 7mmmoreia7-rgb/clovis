@@ -1,22 +1,12 @@
-**PARTE 1 - HEAD**
-
-HTML
-
-```
 <!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
   <title>Instalação</title>
+
   <link rel="manifest" href="/manifest.json">
-```
 
-**PARTE 2 - ESTILOS (CSS)**
-
-HTML
-
-```
-<style>
+  <style>
     body {
       margin: 0;
       padding: 0;
@@ -28,6 +18,8 @@ HTML
       overflow: hidden;
       font-family: sans-serif;
     }
+
+    /* PLAY */
     #btn-play {
       position: fixed;
       top: 50%; left: 50%;
@@ -38,6 +30,8 @@ HTML
       transition: opacity .3s;
       filter: drop-shadow(0 0 8px rgba(0,0,0,0.4));
     }
+
+    /* LOGO — sem cortes */
     #logo {
       position: fixed;
       top: 50%; left: 50%;
@@ -46,22 +40,29 @@ HTML
       display: none;
       filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
     }
+
     .rodar {
       animation: rodar 1.2s ease-out 2 forwards;
     }
+
     @keyframes rodar {
-      0% { transform: translate(-50%, -50%) rotateY(0deg) scale(1); }
-      40% { transform: translate(-50%, -50%) rotateY(180deg) scale(0.9); }
+      0%   { transform: translate(-50%, -50%) rotateY(0deg) scale(1); }
+      40%  { transform: translate(-50%, -50%) rotateY(180deg) scale(0.9); }
       100% { transform: translate(-50%, -50%) rotateY(360deg) scale(1); }
     }
+
+    /* BRILHO FINAL — sem apagar o logo */
     .flash {
       animation: flash 0.4s ease-out forwards;
     }
+
     @keyframes flash {
-      0% { filter: brightness(1); }
-      50% { filter: brightness(3); }
+      0%   { filter: brightness(1); }
+      50%  { filter: brightness(3); }
       100% { filter: brightness(1); }
     }
+
+    /* BOTÃO FINAL */
     #btn-final {
       position: fixed;
       bottom: 40px;
@@ -73,19 +74,15 @@ HTML
       transition: .3s;
       z-index: 15;
     }
+
     #btn-final:hover {
       content: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mas-se-der-asneira-n-o-fui-eu.png');
     }
   </style>
 </head>
-```
 
-**PARTE 3 - BODY (HTML)**
-
-HTML
-
-```
 <body>
+
   <!-- PLAY -->
   <img id="btn-play"
        src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
@@ -99,14 +96,10 @@ HTML
   <!-- BOTÃO FINAL -->
   <img id="btn-final"
        src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
-```
-
-**PARTE 4 - JAVASCRIPT**
-
-HTML
 
 <script>
   let deferredPrompt = null;
+
   const play = document.getElementById('btn-play');
   const logo = document.getElementById('logo');
   const som = document.getElementById('som-moeda');
@@ -121,12 +114,14 @@ HTML
   play.onclick = function () {
     play.style.opacity = '0';
     setTimeout(() => play.style.display = 'none', 300);
+
     setTimeout(() => {
       som.currentTime = 0;
       som.play().catch(()=>{});
+
       logo.style.display = 'block';
       logo.classList.add('rodar');
-    }, 500);
+    }, 500); // pequeno espaço antes da animação
   };
 
   /* Som durante animação */
@@ -139,13 +134,16 @@ HTML
   /* Fim da animação → brilho → logo vira botão de instalação */
   logo.addEventListener('animationend', () => {
     logo.classList.add('flash');
+
     logo.onclick = async () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const escolha = await deferredPrompt.userChoice;
+
         if (escolha.outcome === 'accepted') {
           btnFinal.style.display = 'block';
         }
+
         deferredPrompt = null;
       }
     };
@@ -156,10 +154,11 @@ HTML
     window.location.href = 'index.html';
   };
 
-  /* Service Worker */
+  /* SW */
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
 </script>
+
 </body>
 </html>
