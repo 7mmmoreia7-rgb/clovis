@@ -8,125 +8,39 @@
     body {
       margin: 0;
       padding: 0;
-      background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/fundilho.png');
-      background-size: cover;
-      background-position: center;
+      background: #000;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
       font-family: sans-serif;
     }
     #btn-play {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 10%;
+      width: 15%;
       cursor: pointer;
-      z-index: 10;
-      transition: opacity .3s;
-      filter: drop-shadow(0 0 8px rgba(0,0,0,0.4));
-    }
-    #logo {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 400px;
-      display: none;
-      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
-    }
-    .rodar {
-      animation: rodar 1.2s ease-out 2 forwards;
-    }
-    @keyframes rodar {
-      0% { transform: translate(-50%, -50%) rotateY(0deg) scale(1); }
-      40% { transform: translate(-50%, -50%) rotateY(180deg) scale(0.9); }
-      100% { transform: translate(-50%, -50%) rotateY(360deg) scale(1); }
-    }
-    .flash {
-      animation: flash 0.4s ease-out forwards;
-    }
-    @keyframes flash {
-      0% { filter: brightness(1); }
-      50% { filter: brightness(3); }
-      100% { filter: brightness(1); }
-    }
-    #btn-final {
-      position: fixed;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 260px;
-      display: none;
-      cursor: pointer;
-      transition: .3s;
-      z-index: 15;
     }
   </style>
 </head>
 <body>
 
   <img id="btn-play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
-  <img id="logo" src="/icon-512.png">
-  <audio id="som-moeda" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/coin.wav"></audio>
-  <img id="btn-final" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
 <script>
-  // ==================== MODO FORÇADO PARA TESTE ====================
-  // Apaga sempre a marca para forçar a instalação aparecer
+  // === TESTE FORÇADO - APAGA DEPOIS ===
   localStorage.removeItem('appInstalled');
 
-  let deferredPrompt = null;
-  const play = document.getElementById('btn-play');
-  const logo = document.getElementById('logo');
-  const som = document.getElementById('som-moeda');
-  const btnFinal = document.getElementById('btn-final');
+  // Se já foi instalado, vai direto para home
+  if (localStorage.getItem('appInstalled') === 'true') {
+    window.location.href = 'index.html';
+  }
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-  });
-
-  play.onclick = function () {
-    play.style.opacity = '0';
-    setTimeout(() => play.style.display = 'none', 300);
-    setTimeout(() => {
-      som.currentTime = 0;
-      som.play().catch(()=>{});
-      logo.style.display = 'block';
-      logo.classList.add('rodar');
-    }, 500);
-  };
-
-  logo.addEventListener('animationiteration', () => {
-    som.volume = 0.4;
-    som.currentTime = 0;
-    som.play().catch(()=>{});
-  });
-
-  logo.addEventListener('animationend', () => {
-    logo.classList.add('flash');
-    logo.onclick = async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const escolha = await deferredPrompt.userChoice;
-        
-        if (escolha.outcome === 'accepted') {
-          localStorage.setItem('appInstalled', 'true');
-          btnFinal.style.display = 'block';
-        }
-        deferredPrompt = null;
-      }
-    };
-  });
-
-  btnFinal.onclick = () => {
+  document.getElementById('btn-play').onclick = function() {
     localStorage.setItem('appInstalled', 'true');
     window.location.href = 'index.html';
   };
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-  }
 </script>
 </body>
 </html>
