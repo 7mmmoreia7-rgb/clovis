@@ -98,9 +98,12 @@
        src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
 <script>
-  // ==================== VERIFICAÇÃO DE INSTALAÇÃO ====================
-  // Se o utilizador já instalou antes, vai direto para a home
-  if (localStorage.getItem('appInstalled') === 'true') {
+  // ==================== CONTROLO DE INSTALAÇÃO ====================
+
+  // Verifica se já passou pela instalação
+  const jaInstalado = localStorage.getItem('appInstalled');
+
+  if (jaInstalado === 'true') {
     window.location.href = 'index.html';
   }
 
@@ -115,35 +118,37 @@
     deferredPrompt = e;
   });
 
-  /* PLAY → delay → animação */
+  // Clique no Play
   play.onclick = function () {
     play.style.opacity = '0';
     setTimeout(() => play.style.display = 'none', 300);
+
     setTimeout(() => {
       som.currentTime = 0;
-      som.play().catch(()=>{});
+      som.play().catch(() => {});
       logo.style.display = 'block';
       logo.classList.add('rodar');
     }, 500);
   };
 
-  /* Som durante animação */
+  // Som na animação
   logo.addEventListener('animationiteration', () => {
     som.volume = 0.4;
     som.currentTime = 0;
-    som.play().catch(()=>{});
+    som.play().catch(() => {});
   });
 
-  /* Fim da animação → brilho → logo vira botão de instalação */
+  // Fim da animação
   logo.addEventListener('animationend', () => {
     logo.classList.add('flash');
+
     logo.onclick = async () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const escolha = await deferredPrompt.userChoice;
-        
+
         if (escolha.outcome === 'accepted') {
-          localStorage.setItem('appInstalled', 'true');   // ← Marca como instalado
+          localStorage.setItem('appInstalled', 'true');
           btnFinal.style.display = 'block';
         }
         deferredPrompt = null;
@@ -151,15 +156,15 @@
     };
   });
 
-  /* Botão final → home */
+  // Botão final
   btnFinal.onclick = () => {
-    localStorage.setItem('appInstalled', 'true');   // ← Marca como instalado
+    localStorage.setItem('appInstalled', 'true');
     window.location.href = 'index.html';
   };
 
-  /* SW */
+  // Service Worker
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 </script>
 </body>
