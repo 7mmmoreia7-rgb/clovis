@@ -71,10 +71,9 @@
   <img id="btn-final" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
 <script>
-  // Se já foi instalado, vai direto para a home
-  if (localStorage.getItem('appInstalled') === 'true') {
-    window.location.href = 'index.html';
-  }
+  // ==================== MODO FORÇADO PARA TESTE ====================
+  // Apaga sempre a marca para forçar a instalação aparecer
+  localStorage.removeItem('appInstalled');
 
   let deferredPrompt = null;
   const play = document.getElementById('btn-play');
@@ -110,6 +109,7 @@
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const escolha = await deferredPrompt.userChoice;
+        
         if (escolha.outcome === 'accepted') {
           localStorage.setItem('appInstalled', 'true');
           btnFinal.style.display = 'block';
