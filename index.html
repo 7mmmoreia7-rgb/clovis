@@ -1,162 +1,156 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Regras</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Regras</title>
 
-  <link rel="icon" href="/icon-192.png" />
-  <link rel="apple-touch-icon" href="/icon-512.png" />
-  <link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png" />
+<link rel="apple-touch-icon" href="/icon-512.png" />
+<link rel="manifest" href="/manifest.json">
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js');
-    }
-  </script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>
 
-  <style>
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
-    html, body {
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
-    }
-
-    #myVideo {
-      position:fixed;
-      top:0; left:0;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      z-index:1;
-    }
-
-    /* PLAY */
-    #btn-play {
-      position:fixed;
-      top:50%;
-      left:50%;
-      transform:translate(-50%,-50%);
-      width:10%;
-      cursor:pointer;
-      z-index:10;
-      transition:opacity .3s;
-    }
-
-    /* SKIP */
-    #btn-skip-home {
-      position:fixed;
-      bottom:3.5%;
-      right:3.4%;
-      width:6%;
-      z-index:10;
-      cursor:pointer;
-      transition:transform .2s ease, opacity .3s;
-    }
-
-    #btn-skip-home:hover img {
-      content:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/clika2.png");
-      transform:scale(1.25);
-    }
-
-    /* ÍNDICE */
-    #btn-idx {
-      position:fixed;
-      bottom:3.5%;
-      right:3.4%;
-      width:8%;
-      cursor:pointer;
-      z-index:9999;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .5s;
-    }
-    #btn-skip-home{
-  transition: transform .2s ease;
+<style>
+*, *::before, *::after {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-#btn-skip-home img{
+html, body {
   width:100%;
-  height:auto;
-  display:block;
+  height:100%;
+  overflow:hidden;
+  background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
 }
 
-#btn-skip-home:hover img{
+/* VIDEO */
+#myVideo {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:1;
+}
+
+/* PLAY */
+#btn-play {
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:10%;
+  cursor:pointer;
+  z-index:10;
+  transition:opacity .3s;
+}
+
+/* SKIP */
+#btn-skip-home {
+  position:fixed;
+  bottom:3.5%;
+  right:3.4%;
+  width:6%;
+  z-index:10;
+  cursor:pointer;
+  transition:transform .2s ease;
+}
+
+#btn-skip-home:hover {
   content:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/clika2.png");
   transform:scale(1.25);
 }
-  </style>
+
+/* ÍNDICE */
+#btn-idx {
+  position:fixed;
+  bottom:3.5%;
+  right:3.4%;
+  width:8%;
+  cursor:pointer;
+  z-index:9999;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .5s;
+}
+</style>
 </head>
 
 <body>
 
-  <video id="myVideo" playsinline>
-    <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/home/home.mp4" type="video/mp4">
-  </video>
+<video id="myVideo" playsinline>
+  <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/home/home.mp4" type="video/mp4">
+</video>
 
-  <!-- PLAY -->
-  <img id="btn-play"
-       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png"
-       alt="Play" />
+<!-- PLAY -->
+<img id="btn-play"
+     src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png"
+     alt="Play" />
 
-  <!-- SKIP -->
-  <img id="btn-skip-home"
-       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/clika1.png"
-       alt="Skip Home" />
+<!-- SKIP -->
+<img id="btn-skip-home"
+     src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/clika1.png"
+     alt="Skip Home" />
 
-  <!-- ÍNDICE -->
-  <img id="btn-idx"
-       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png"
-       alt="Índice" />
+<!-- ÍNDICE -->
+<img id="btn-idx"
+     src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png"
+     alt="Índice" />
 
-  <script>
-    const play = document.getElementById('btn-play');
-    const skip = document.getElementById('btn-skip-home');
-    const vid  = document.getElementById('myVideo');
-    const idx  = document.getElementById('btn-idx');
+<script>
 
-    function hideStartButtons() {
-      play.style.opacity = '0';
-      play.style.pointerEvents = 'none';
+const play = document.getElementById('btn-play');
+const skip = document.getElementById('btn-skip-home');
+const vid  = document.getElementById('myVideo');
+const idx  = document.getElementById('btn-idx');
 
-      skip.style.opacity = '0';
-      skip.style.pointerEvents = 'none';
-    }
+function hideStartButtons() {
+  play.style.opacity = '0';
+  play.style.pointerEvents = 'none';
 
-    /* PLAY */
-    play.onclick = function () {
-      hideStartButtons();
-      vid.play().catch(function(){
-        vid.muted = true;
-        vid.play();
-      });
-    };
+  skip.style.opacity = '0';
+  skip.style.pointerEvents = 'none';
+}
 
-    /* SKIP */
-    skip.onclick = function () {
-      hideStartButtons();
+/* PLAY */
+play.onclick = function () {
+  hideStartButtons();
 
-      vid.pause();
-      vid.currentTime = vid.duration;
+  vid.play().catch(function(){
+    vid.muted = true;
+    vid.play();
+  });
+};
 
-      // ativa lógica de fim
-      vid.dispatchEvent(new Event('ended'));
-    };
+/* SKIP */
+skip.onclick = function () {
+  hideStartButtons();
 
-    /* FIM DO VÍDEO */
-    vid.onended = function () {
-      idx.style.opacity = '1';
-      idx.style.pointerEvents = 'all';
-    };
+  vid.pause();
+  vid.currentTime = vid.duration;
 
-    /* ÍNDICE */
-    idx.onclick = function () {
-      window.location.href = 'indice.html?skip=1';
-    };
-  </script>
+  vid.dispatchEvent(new Event('ended'));
+};
+
+/* FIM DO VÍDEO */
+vid.onended = function () {
+  idx.style.opacity = '1';
+  idx.style.pointerEvents = 'all';
+};
+
+/* ÍNDICE */
+idx.onclick = function () {
+  window.location.href = 'indice.html?skip=1';
+};
+
+</script>
 
 </body>
 </html>
