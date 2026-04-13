@@ -1,44 +1,165 @@
+**PARTE 1 - HEAD**
+
+HTML
+
+```
 <!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
   <title>Instalação</title>
   <link rel="manifest" href="/manifest.json">
-  <style>
+```
+
+**PARTE 2 - ESTILOS (CSS)**
+
+HTML
+
+```
+<style>
     body {
       margin: 0;
       padding: 0;
-      background: #000;
+      background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/fundilho.png');
+      background-size: cover;
+      background-position: center;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-family: sans-serif;
     }
     #btn-play {
-      width: 15%;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10%;
       cursor: pointer;
+      z-index: 10;
+      transition: opacity .3s;
+      filter: drop-shadow(0 0 8px rgba(0,0,0,0.4));
+    }
+    #logo {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      display: none;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
+    }
+    .rodar {
+      animation: rodar 1.2s ease-out 2 forwards;
+    }
+    @keyframes rodar {
+      0% { transform: translate(-50%, -50%) rotateY(0deg) scale(1); }
+      40% { transform: translate(-50%, -50%) rotateY(180deg) scale(0.9); }
+      100% { transform: translate(-50%, -50%) rotateY(360deg) scale(1); }
+    }
+    .flash {
+      animation: flash 0.4s ease-out forwards;
+    }
+    @keyframes flash {
+      0% { filter: brightness(1); }
+      50% { filter: brightness(3); }
+      100% { filter: brightness(1); }
+    }
+    #btn-final {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      display: none;
+      cursor: pointer;
+      transition: .3s;
+      z-index: 15;
+    }
+    #btn-final:hover {
+      content: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mas-se-der-asneira-n-o-fui-eu.png');
     }
   </style>
 </head>
-<body>
+```
 
-  <img id="btn-play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
+**PARTE 3 - BODY (HTML)**
+
+HTML
+
+```
+<body>
+  <!-- PLAY -->
+  <img id="btn-play"
+       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
+
+  <!-- LOGO -->
+  <img id="logo" src="/icon-512.png">
+
+  <!-- SOM -->
+  <audio id="som-moeda" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/coin.wav"></audio>
+
+  <!-- BOTÃO FINAL -->
+  <img id="btn-final"
+       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
+```
+
+**PARTE 4 - JAVASCRIPT**
+
+HTML
 
 <script>
-  // Se já foi instalado antes, vai direto para a home
-  if (localStorage.getItem('appInstalled') === 'true') {
-    window.location.href = 'index.html';
-  }
+  let deferredPrompt = null;
+  const play = document.getElementById('btn-play');
+  const logo = document.getElementById('logo');
+  const som = document.getElementById('som-moeda');
+  const btnFinal = document.getElementById('btn-final');
 
-  // Clique no play
-  document.getElementById('btn-play').onclick = function () {
-    // Marca como instalado
-    localStorage.setItem('appInstalled', 'true');
-    // Vai para a home
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  /* PLAY → delay → animação */
+  play.onclick = function () {
+    play.style.opacity = '0';
+    setTimeout(() => play.style.display = 'none', 300);
+    setTimeout(() => {
+      som.currentTime = 0;
+      som.play().catch(()=>{});
+      logo.style.display = 'block';
+      logo.classList.add('rodar');
+    }, 500);
+  };
+
+  /* Som durante animação */
+  logo.addEventListener('animationiteration', () => {
+    som.volume = 0.4;
+    som.currentTime = 0;
+    som.play().catch(()=>{});
+  });
+
+  /* Fim da animação → brilho → logo vira botão de instalação */
+  logo.addEventListener('animationend', () => {
+    logo.classList.add('flash');
+    logo.onclick = async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const escolha = await deferredPrompt.userChoice;
+        if (escolha.outcome === 'accepted') {
+          btnFinal.style.display = 'block';
+        }
+        deferredPrompt = null;
+      }
+    };
+  });
+
+  /* Botão final → home */
+  btnFinal.onclick = () => {
     window.location.href = 'index.html';
   };
+
+  /* Service Worker */
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
 </script>
 </body>
 </html>
