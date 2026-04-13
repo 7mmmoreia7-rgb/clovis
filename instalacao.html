@@ -15,8 +15,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-family: sans-serif;
     }
     #btn-play {
       width: 15%;
@@ -29,16 +27,16 @@
   <img id="btn-play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 
 <script>
-  // === TESTE FORÇADO - APAGA DEPOIS ===
-  localStorage.removeItem('appInstalled');
-
-  // Se já foi instalado, vai direto para home
+  // Se já foi instalado antes, vai direto para a home
   if (localStorage.getItem('appInstalled') === 'true') {
     window.location.href = 'index.html';
   }
 
-  document.getElementById('btn-play').onclick = function() {
+  // Clique no play
+  document.getElementById('btn-play').onclick = function () {
+    // Marca como instalado
     localStorage.setItem('appInstalled', 'true');
+    // Vai para a home
     window.location.href = 'index.html';
   };
 </script>
