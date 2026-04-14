@@ -20,6 +20,11 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  const url = event.request.url;
+
+  // só cache do teu site
+  if (!url.startsWith(self.location.origin)) return;
+
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );
