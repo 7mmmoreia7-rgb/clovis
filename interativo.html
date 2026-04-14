@@ -653,9 +653,10 @@ function gerarCanvas(cb){
       el.querySelectorAll('div').forEach(dv=>{if(dv.style.fontSize)txDiv=dv;});
 
       if(im){
-        return carregarImagem(im.src).then(img=>{
-          if(img)c.drawImage(img,x,y,w,h);
-        });
+      return carregarImagem(im.getAttribute('src')).then(img=>{
+  if (img) c.drawImage(img, x, y, w, h);
+         return;
+});
       }
       if(txDiv){
         const fs=parseFloat(getComputedStyle(txDiv).fontSize)||32;
