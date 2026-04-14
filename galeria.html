@@ -435,12 +435,17 @@ function saveState() {
 }
 
 function loadState() {
-  const raw = localStorage.getItem("galeriaSlots");
+  const raw = localStorage.getItem("galeria");
   if (!raw) return;
+
   try {
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length === 9) data = parsed;
-  } catch {}
+    if (Array.isArray(parsed)) {
+      data = parsed;
+    }
+  } catch (e) {
+    console.error("Erro ao carregar galeria:", e);
+  }
 }
 
 /* ------------------------------
