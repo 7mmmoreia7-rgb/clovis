@@ -140,17 +140,22 @@ window.addEventListener('beforeinstallprompt', (e) => {
     logo.classList.add('flash');
 
     logo.onclick = async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const escolha = await deferredPrompt.userChoice;
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const escolha = await deferredPrompt.userChoice;
 
-        if (escolha.outcome === 'accepted') {
-          btnFinal.style.display = 'block';
-        }
+    if (escolha.outcome === 'accepted') {
+      localStorage.setItem("app_instalada", "true");
+      btnFinal.style.display = 'block';
+    }
 
-        deferredPrompt = null;
-      }
-    };
+    deferredPrompt = null;
+
+  } else {
+    // fallback: se não houver install, segue na mesma
+    btnFinal.style.display = 'block';
+  }
+};
   });
 
   /* Botão final → home */
