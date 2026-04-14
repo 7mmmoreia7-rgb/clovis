@@ -431,7 +431,7 @@ const fsdl = document.getElementById("fsdl");
 let data = Array(9).fill(null).map(() => ({ url: null, key: null }));
 
 function saveState() {
-  localStorage.setItem("galeriaSlots", JSON.stringify(data));
+ localStorage.setItem("galeria", JSON.stringify(data));
 }
 
 function loadState() {
