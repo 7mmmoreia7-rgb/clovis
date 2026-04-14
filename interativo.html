@@ -593,24 +593,20 @@ document.addEventListener('keydown',e=>{
 // Carrega uma imagem sem taint CORS: tenta crossOrigin, fallback blob via fetch
 function carregarImagem(src){
   return new Promise(res=>{
-    // Tentativa 1: crossOrigin anonymous (funciona se R2 tiver CORS configurado)
-    const img1=new Image();
-    img1.crossOrigin='anonymous';
-    img1.onload=()=>res(img1);
-    img1.onerror=()=>{
-      // Tentativa 2: fetch → blob URL (contorna CORS do canvas)
-      fetch(src)
-        .then(r=>r.blob())
-        .then(blob=>{
-          const burl=URL.createObjectURL(blob);
-          const img2=new Image();
-          img2.onload=()=>{URL.revokeObjectURL(burl);res(img2);};
-          img2.onerror=()=>res(null);
-          img2.src=burl;
-        })
-        .catch(()=>res(null));
-    };
-    img1.src=src;
+    const img = new Image();
+
+    // 🔥 MUITO IMPORTANTE
+    img.crossOrigin = 'anonymous';
+
+    img.onload = ()=>res(img);
+    img.onerror = ()=>res(null);
+
+    // 🔥 SE vier do R2 → passa pelo Worker
+    if(src.includes('r2.dev')){
+      img.src = API_BASE + "/proxy?url=" + encodeURIComponent(src);
+    } else {
+      img.src = src;
+    }
   });
 }
 
