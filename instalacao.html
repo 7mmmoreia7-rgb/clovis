@@ -2,131 +2,50 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Instalação</title>
-  <link rel="manifest" href="/manifest.json">
+  <title>Teste Instalação</title>
   <style>
     body {
       margin: 0;
       padding: 0;
-      background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/fundilho.png');
-      background-size: cover;
-      background-position: center;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
+      background: #000;
+      color: white;
       font-family: sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      text-align: center;
     }
-    #btn-play {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 10%;
+    button {
+      padding: 20px 40px;
+      font-size: 20px;
+      background: #0066ff;
+      color: white;
+      border: none;
+      border-radius: 12px;
       cursor: pointer;
-      z-index: 10;
-      transition: opacity .3s;
-      filter: drop-shadow(0 0 8px rgba(0,0,0,0.4));
-    }
-    #logo {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 400px;
-      display: none;
-      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
-    }
-    .rodar {
-      animation: rodar 1.2s ease-out 2 forwards;
-    }
-    @keyframes rodar {
-      0% { transform: translate(-50%, -50%) rotateY(0deg) scale(1); }
-      40% { transform: translate(-50%, -50%) rotateY(180deg) scale(0.9); }
-      100% { transform: translate(-50%, -50%) rotateY(360deg) scale(1); }
-    }
-    .flash {
-      animation: flash 0.4s ease-out forwards;
-    }
-    @keyframes flash {
-      0% { filter: brightness(1); }
-      50% { filter: brightness(3); }
-      100% { filter: brightness(1); }
-    }
-    #btn-final {
-      position: fixed;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 260px;
-      display: none;
-      cursor: pointer;
-      transition: .3s;
-      z-index: 15;
     }
   </style>
 </head>
 <body>
 
-  <img id="btn-play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
-  <img id="logo" src="/icon-512.png">
-  <audio id="som-moeda" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/coin.wav"></audio>
-  <img id="btn-final" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
+  <h1>TESTE - Página de Instalação</h1>
+  <p>Se estás a ver esta página, a instalação está a funcionar.</p>
+  <button onclick="irParaHome()">Ir para Home</button>
 
 <script>
-  // Se já foi instalada antes, vai direto para a home
-  if (localStorage.getItem('appInstalled') === 'true') {
-    window.location.href = 'index.html';
-  }
+  // Força mostrar sempre durante o teste
+  localStorage.removeItem('appInstalled');
 
-  let deferredPrompt = null;
-  const play = document.getElementById('btn-play');
-  const logo = document.getElementById('logo');
-  const som = document.getElementById('som-moeda');
-  const btnFinal = document.getElementById('btn-final');
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-  });
-
-  play.onclick = function () {
-    play.style.opacity = '0';
-    setTimeout(() => play.style.display = 'none', 300);
-    setTimeout(() => {
-      som.currentTime = 0;
-      som.play().catch(() => {});
-      logo.style.display = 'block';
-      logo.classList.add('rodar');
-    }, 500);
-  };
-
-  logo.addEventListener('animationiteration', () => {
-    som.volume = 0.4;
-    som.currentTime = 0;
-    som.play().catch(() => {});
-  });
-
-  logo.addEventListener('animationend', () => {
-    logo.classList.add('flash');
-    logo.onclick = async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const escolha = await deferredPrompt.userChoice;
-        if (escolha.outcome === 'accepted') {
-          localStorage.setItem('appInstalled', 'true');
-          btnFinal.style.display = 'block';
-        }
-        deferredPrompt = null;
-      }
-    };
-  });
-
-  btnFinal.onclick = () => {
+  function irParaHome() {
     localStorage.setItem('appInstalled', 'true');
     window.location.href = 'index.html';
-  };
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
   }
+
+  // Se já estiver marcado como instalada, vai direto (mas agora estamos a forçar o contrário)
+  console.log("Página de instalação carregada");
 </script>
 </body>
 </html>
