@@ -563,7 +563,7 @@ function uploadStorage(file, slot) {
       if (!res.ok || !res.key) throw new Error("Upload falhou");
 
       const key = res.key;
-      const url = FILE_URL + encodeURIComponent(key);
+      const url = API_BASE + "/file?key=" + encodeURIComponent(key);
 
       data[slot] = { url, key };
       saveState();
