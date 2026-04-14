@@ -594,21 +594,16 @@ document.addEventListener('keydown',e=>{
 function carregarImagem(src){
   return new Promise(res=>{
     const img = new Image();
-
-    // 🔥 MUITO IMPORTANTE
     img.crossOrigin = 'anonymous';
 
     img.onload = ()=>res(img);
     img.onerror = ()=>res(null);
 
-    // 🔥 SE vier do R2 → passa pelo Worker
-    if(src.includes('r2.dev')){
-      img.src = API_BASE + "/proxy?url=" + encodeURIComponent(src);
-    } else {
-      img.src = src;
-    }
+    // 🔥 FORÇAR SEMPRE proxy (não só r2.dev)
+    img.src = API_BASE + "/proxy?url=" + encodeURIComponent(src);
   });
 }
+
 
 function gerarCanvas(cb){
   const r=cv.getBoundingClientRect();
