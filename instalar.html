@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Instalar</title>
+  <style>
+    body { 
+      margin:0; padding:0; background:#000; color:white; 
+      height:100vh; display:flex; align-items:center; justify-content:center; 
+      flex-direction:column; gap:40px; font-family:sans-serif; 
+    }
+    button { 
+      padding:20px 50px; font-size:22px; background:#0066ff; 
+      border:none; border-radius:12px; color:white; cursor:pointer; 
+    }
+  </style>
+</head>
+<body>
+  <h1>Instalação da App</h1>
+  <p>Primeira vez?</p>
+  <button onclick="instalar()">Instalar Agora</button>
+
+<script>
+  // Força mostrar a instalação (para teste)
+  localStorage.removeItem('appInstalled');
+
+  function instalar() {
+    localStorage.setItem('appInstalled', 'true');
+    window.location.href = 'index.html';
+  }
+</script>
+</body>
+</html>
