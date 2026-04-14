@@ -630,7 +630,7 @@ function gerarCanvas(cb){
   const fv=document.querySelector('#camada-fundos video');
 
   const p1=fm
-    ? carregarImagem(fm.src).then(img=>{if(img)c.drawImage(img,0,0,W,H);})
+    ? carregarImagem(fm.getAttribute('src')).then(img=>{if(img)c.drawImage(img,0,0,W,H);})
     : fv
       ? new Promise(res=>{try{c.drawImage(fv,0,0,W,H);}catch(e){}res();})
       : Promise.resolve();
