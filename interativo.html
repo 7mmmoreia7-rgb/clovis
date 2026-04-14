@@ -713,7 +713,7 @@ function expGaleria(){
 .then(data=>{
   if(!data.ok) throw new Error('Upload falhou');
 
-  const url = 'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/' + data.key;
+  const url = API_BASE + "/file?key=" + encodeURIComponent(data.key);
 
   // 🧠 ir buscar galeria atual
   let galeria = JSON.parse(localStorage.getItem('galeria') || '[]');
