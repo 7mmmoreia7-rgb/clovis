@@ -99,7 +99,11 @@
 
 <script>
   let deferredPrompt = null;
-
+window.addEventListener('beforeinstallprompt', (e) => {
+  console.log("🔥 INSTALL DISPONÍVEL");
+  e.preventDefault();
+  deferredPrompt = e;
+});
   const play = document.getElementById('btn-play');
   const logo = document.getElementById('logo');
   const som = document.getElementById('som-moeda');
