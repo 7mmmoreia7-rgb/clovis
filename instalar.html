@@ -2,94 +2,20 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Instalação</title>
-  <link rel="manifest" href="/manifest.json">
+  <title>Teste</title>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/fundilho.png');
-      background-size: cover;
-      background-position: center;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-    }
-    #btn-play {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 12%;
-      cursor: pointer;
-      z-index: 10;
-      transition: opacity 0.4s;
-    }
-    #logo {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 380px;
-      display: none;
-      cursor: pointer;
-    }
-    #btn-final {
-      position: fixed;
-      bottom: 12%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 280px;
-      display: none;
-      cursor: pointer;
-      z-index: 15;
-    }
-    #btn-final:hover {
-      filter: brightness(1.2);
-    }
+    body { margin:0; padding:0; background:#000; color:white; height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:30px; font-family:sans-serif; }
+    button { padding:25px 60px; font-size:24px; background:#0066ff; border:none; border-radius:15px; color:white; cursor:pointer; }
   </style>
 </head>
 <body>
-
-  <img id="btn-play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
-  <img id="logo" src="/icon-512.png">
-  <img id="btn-final" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
+  <h1>TESTE FINAL</h1>
+  <p>Se estás a ver isto, a página carregou.</p>
+  <button onclick="alert('Botão funciona! Vamos para a home.') ; window.location.href='index.html'">Ir para Home</button>
 
 <script>
-  // Limpa para teste
+  console.log("Página de instalação carregada com sucesso");
   localStorage.removeItem('appInstalled');
-
-  const play = document.getElementById('btn-play');
-  const logo = document.getElementById('logo');
-  const btnFinal = document.getElementById('btn-final');
-
-  // Clique no Play
-  play.onclick = function () {
-    play.style.opacity = '0';
-    setTimeout(() => {
-      play.style.display = 'none';
-      logo.style.display = 'block';
-    }, 400);
-  };
-
-  // Clique no Logo (depois da animação)
-  logo.onclick = function () {
-    localStorage.setItem('appInstalled', 'true');
-    window.location.href = 'index.html';
-  };
-
-  // Clique no botão final
-  btnFinal.onclick = function () {
-    localStorage.setItem('appInstalled', 'true');
-    window.location.href = 'index.html';
-  };
-
-  // Mostra o botão final automaticamente após a animação
-  setTimeout(() => {
-    if (logo.style.display === 'block') {
-      btnFinal.style.display = 'block';
-    }
-  }, 2800);
 </script>
 </body>
 </html>
