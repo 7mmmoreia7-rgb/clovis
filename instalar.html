@@ -71,10 +71,9 @@
   <img id="btn-final" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
 <script>
-  // Se já foi instalada, vai direto para a home
-  if (localStorage.getItem('appInstalled') === 'true') {
-    window.location.href = 'index.html';
-  }
+ <script>
+  // Força mostrar sempre durante o teste
+  localStorage.removeItem('appInstalled');
 
   let deferredPrompt = null;
   const play = document.getElementById('btn-play');
@@ -92,30 +91,30 @@
     setTimeout(() => play.style.display = 'none', 300);
     setTimeout(() => {
       som.currentTime = 0;
-      som.play().catch(()=>{});
+      som.play().catch(() => {});
       logo.style.display = 'block';
       logo.classList.add('rodar');
     }, 500);
   };
 
-  logo.addEventListener('animationiteration', () => {
-    som.volume = 0.4;
-    som.currentTime = 0;
-    som.play().catch(()=>{});
-  });
-
   logo.addEventListener('animationend', () => {
     logo.classList.add('flash');
+    // Mostra o botão final automaticamente depois da animação
+    btnFinal.style.display = 'block';
+    
+    // Clique no logo também instala
     logo.onclick = async () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const escolha = await deferredPrompt.userChoice;
         if (escolha.outcome === 'accepted') {
           localStorage.setItem('appInstalled', 'true');
-          btnFinal.style.display = 'block';
         }
         deferredPrompt = null;
+      } else {
+        localStorage.setItem('appInstalled', 'true');
       }
+      window.location.href = 'index.html';
     };
   });
 
@@ -127,6 +126,9 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
