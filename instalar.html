@@ -23,7 +23,7 @@
       width: 12%;
       cursor: pointer;
       z-index: 10;
-      transition: all 0.3s;
+      transition: opacity 0.4s;
     }
     #logo {
       position: fixed;
@@ -44,6 +44,9 @@
       cursor: pointer;
       z-index: 15;
     }
+    #btn-final:hover {
+      filter: brightness(1.2);
+    }
   </style>
 </head>
 <body>
@@ -53,13 +56,14 @@
   <img id="btn-final" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
 <script>
-  // Limpa marca antiga para teste
+  // Limpa para teste
   localStorage.removeItem('appInstalled');
 
   const play = document.getElementById('btn-play');
   const logo = document.getElementById('logo');
   const btnFinal = document.getElementById('btn-final');
 
+  // Clique no Play
   play.onclick = function () {
     play.style.opacity = '0';
     setTimeout(() => {
@@ -68,22 +72,24 @@
     }, 400);
   };
 
+  // Clique no Logo (depois da animação)
   logo.onclick = function () {
     localStorage.setItem('appInstalled', 'true');
     window.location.href = 'index.html';
   };
 
+  // Clique no botão final
   btnFinal.onclick = function () {
     localStorage.setItem('appInstalled', 'true');
     window.location.href = 'index.html';
   };
 
-  // Mostra o botão final automaticamente após alguns segundos (para teste)
+  // Mostra o botão final automaticamente após a animação
   setTimeout(() => {
     if (logo.style.display === 'block') {
       btnFinal.style.display = 'block';
     }
-  }, 2500);
+  }, 2800);
 </script>
 </body>
 </html>
