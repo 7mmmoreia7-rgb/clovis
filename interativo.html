@@ -590,16 +590,13 @@ document.addEventListener('keydown',e=>{
    GUARDAR
 ══════════════════════════════════════════════════════ */
 
-// Carrega uma imagem sem taint CORS: tenta crossOrigin, fallback blob via fetch
 function carregarImagem(src){
   return new Promise(res=>{
     const img = new Image();
-    img.crossOrigin = 'anonymous';
 
     img.onload = ()=>res(img);
     img.onerror = ()=>res(null);
 
-    // 🔥 FORÇAR SEMPRE proxy (não só r2.dev)
     img.src = API_BASE + "/proxy?url=" + encodeURIComponent(src);
   });
 }
