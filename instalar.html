@@ -23,6 +23,7 @@
       width: 12%;
       cursor: pointer;
       z-index: 10;
+      transition: all 0.3s;
     }
     #logo {
       position: fixed;
@@ -31,13 +32,14 @@
       transform: translate(-50%, -50%);
       width: 380px;
       display: none;
+      cursor: pointer;
     }
     #btn-final {
       position: fixed;
-      bottom: 15%;
+      bottom: 12%;
       left: 50%;
       transform: translateX(-50%);
-      width: 260px;
+      width: 280px;
       display: none;
       cursor: pointer;
       z-index: 15;
@@ -51,7 +53,7 @@
   <img id="btn-final" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
 <script>
-  // Apaga marca antiga para forçar teste
+  // Limpa marca antiga para teste
   localStorage.removeItem('appInstalled');
 
   const play = document.getElementById('btn-play');
@@ -75,6 +77,13 @@
     localStorage.setItem('appInstalled', 'true');
     window.location.href = 'index.html';
   };
+
+  // Mostra o botão final automaticamente após alguns segundos (para teste)
+  setTimeout(() => {
+    if (logo.style.display === 'block') {
+      btnFinal.style.display = 'block';
+    }
+  }, 2500);
 </script>
 </body>
 </html>
