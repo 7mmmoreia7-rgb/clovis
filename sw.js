@@ -20,6 +20,9 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Ignora pedidos externos (R2, workers, fonts, etc) — deixa o browser tratar
+  if (!event.request.url.startsWith(self.location.origin)) return;
+
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );
