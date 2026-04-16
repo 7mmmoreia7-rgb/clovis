@@ -21,9 +21,33 @@ html,body{width:100%;height:100%;overflow:hidden;background:url("https://pub-4f2
 #meu-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1;}
 #btn-play{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:10%;z-index:10;padding:0;}
 #btn-play img{width:100%;height:auto;display:block;}
-#btn-skip{position:fixed;bottom:3.5%;right:3.4%;width:8%;z-index:200;padding:0;}
-#btn-skip img{width:100%;height:auto;display:block;}
+#btn-skip{
+  position:fixed;
+  bottom:3.5%;
+  right:3.4%;
+  width:6%;
+  z-index:200;
+  padding:0;
+}
 
+#btn-skip img{
+  width:100%;
+  height:auto;
+  display:block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35))
+          drop-shadow(0 0 6px rgba(255,255,255,0.25));
+  transition: transform .2s ease;
+}
+
+#btn-skip:hover img{
+  content:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skipa1.png");
+  transform: scale(1.30);
+}
+
+.gone{
+  opacity:0 !important;
+  pointer-events:none !important;
+}
 /* FADE */
 #overlay-fade{position:absolute;inset:0;z-index:150;background:#fff;opacity:0;pointer-events:none;transition:opacity .6s ease;}
 #overlay-fade.ativo{opacity:1;pointer-events:all;}
@@ -131,7 +155,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:url("https://pub-4f2
   <img id="bg-isto" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png" alt="">
   <video id="meu-video" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/voador.mp4" playsinline preload="auto"></video>
   <button id="btn-play" onclick="iniciarVideo()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" alt="Play"></button>
-  <button id="btn-skip" onclick="fazTransicao()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skip.png" alt="Skip"></button>
+  <button id="btn-skip" onclick="fazTransicao()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skipa.png" alt="Skip"></button>
 </div>
 <div id="overlay-fade"></div>
 
@@ -566,19 +590,20 @@ document.addEventListener('keydown',e=>{
    GUARDAR
 ══════════════════════════════════════════════════════ */
 
-const WORKER='https://hidden-hall-2a03.7mmmoreia7.workers.dev';
-
-// Carrega imagem via Worker proxy — sem CORS issues
+// Carrega uma imagem sem taint CORS: tenta crossOrigin, fallback blob via fetch
 function carregarImagem(src){
   return new Promise(res=>{
-    const proxySrc=WORKER+'/proxy?url='+encodeURIComponent(src);
-    const img=new Image();
-    img.crossOrigin='anonymous';
-    img.onload=()=>res(img);
-    img.onerror=()=>res(null);
-    img.src=proxySrc;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    img.onload = ()=>res(img);
+    img.onerror = ()=>res(null);
+
+    // 🔥 FORÇAR SEMPRE proxy (não só r2.dev)
+    img.src = API_BASE + "/proxy?url=" + encodeURIComponent(src);
   });
 }
+
 
 function gerarCanvas(cb){
   const r=cv.getBoundingClientRect();
@@ -605,7 +630,7 @@ function gerarCanvas(cb){
   const fv=document.querySelector('#camada-fundos video');
 
   const p1=fm
-    ? carregarImagem(fm.src).then(img=>{if(img)c.drawImage(img,0,0,W,H);})
+    ? carregarImagem(fm.getAttribute('src')).then(img=>{if(img)c.drawImage(img,0,0,W,H);})
     : fv
       ? new Promise(res=>{try{c.drawImage(fv,0,0,W,H);}catch(e){}res();})
       : Promise.resolve();
@@ -628,9 +653,10 @@ function gerarCanvas(cb){
       el.querySelectorAll('div').forEach(dv=>{if(dv.style.fontSize)txDiv=dv;});
 
       if(im){
-        return carregarImagem(im.src).then(img=>{
-          if(img)c.drawImage(img,x,y,w,h);
-        });
+      return carregarImagem(im.getAttribute('src')).then(img=>{
+  if (img) c.drawImage(img, x, y, w, h);
+         return;
+});
       }
       if(txDiv){
         const fs=parseFloat(getComputedStyle(txDiv).fontSize)||32;
@@ -676,12 +702,25 @@ function expGaleria(){
           body:fd
         })
         .then(r=>{if(!r.ok)throw new Error('Upload erro '+r.status);return r.json();})
-        .then(data=>{
-          if(!data.ok)throw new Error('Upload falhou');
-          const urlPublica='https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/'+data.key;
-          console.log('Enviado para galeria:',urlPublica);
-          alert('Enviado para a Galeria! ✅');
-        })
+.then(data=>{
+  if(!data.ok) throw new Error('Upload falhou');
+
+const url = 'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/' + data.key;
+
+  // 🧠 ir buscar galeria atual
+  let galeria = JSON.parse(localStorage.getItem('galeria') || '[]');
+
+  // ➕ adicionar novo desenho no início
+  galeria.unshift({
+    key: data.key,
+    url: url
+  });
+
+  localStorage.setItem('galeria', JSON.stringify(galeria));
+
+  console.log('Enviado para galeria:', data.key);
+  alert('Enviado para a Galeria! ✅');
+})
         .catch(e=>{console.error(e);alert('Erro ao enviar: '+e.message);});
       },'image/jpeg',0.92);
     }catch(e){alert('Erro ao exportar: '+e.message);}
@@ -740,16 +779,6 @@ const tip=document.getElementById('tip');
 function TT(e,t){tip.textContent=t;tip.style.left=(e.clientX+10)+'px';tip.style.top=(e.clientY+26)+'px';tip.classList.add('v');}
 function HT(){tip.classList.remove('v');}
 function irIndice(){window.location.href='indice.html?skip=1';}
-
-// Desactiva service workers que interceptam pedidos externos e causam erros CORS
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(regs=>{
-    regs.forEach(reg=>{
-      // Só desactiva se o sw não for o nosso (ou desactiva todos para este contexto)
-      reg.unregister().then(ok=>{if(ok)console.log('SW removido:',reg.scope);});
-    });
-  });
-}
 </script>
 </body>
 </html>
