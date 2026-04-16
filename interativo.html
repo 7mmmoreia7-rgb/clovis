@@ -229,7 +229,9 @@ html,body{
 </div>
 
 <script>
-  function px(url){
+const API_BASE = "https://hidden-hall-2a03.7mmmoreira7.workers.dev";   // ← PRIMEIRO DE TUDO
+
+function px(url){
   return API_BASE + "/proxy?url=" + encodeURIComponent(url);
 }
 
@@ -619,9 +621,6 @@ document.addEventListener('keydown',e=>{
 /* ══════════════════════════════════════════════════════
    CORREÇÕES EXPORTAÇÃO + CORS
 ════════════════════════════════════════════════════════ */
-
-const API_BASE = window.API_BASE || "https://hidden-hall-2a03.7mmmoreia7.workers.dev"; // <-- AJUSTA PARA O TEU PROXY
-
 // Carrega imagem SEM taint CORS (sempre via proxy)
 function carregarImagem(src){
   return new Promise(res=>{
