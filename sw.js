@@ -40,18 +40,26 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // 1. IGNORAR WORKER: Se for para o teu worker do Cloudflare, deixa passar direto (Rede)
-  // Isso evita que o Service Worker "suje" a resposta com cache e bloqueie o Canvas.
-  if (url.hostname.includes('workers.dev')) {
+  // 1. IGNORAR tudo o que possa contaminar o canvas
+  if (
+    url.hostname.includes('workers.dev') ||   // Cloudflare Worker
+    url.pathname.startsWith('/proxy') ||      // Proxy de imagens
+    url.pathname.endsWith('.jpg') ||
+    url.pathname.endsWith('.jpeg') ||
+    url.pathname.endsWith('.png') ||
+    url.pathname.endsWith('.webp') ||
+    url.pathname.endsWith('.gif') ||
+    url.pathname.endsWith('.mp4') ||
+    url.pathname.endsWith('.webm')
+  ) {
+    // Deixa ir direto à rede SEM cache
     return;
   }
 
-  // 2. ESTRATÉGIA: Tenta Rede primeiro, se falhar vai à Cache
-  // Isso garante que a versão mais nova da app seja sempre carregada se houver internet.
+  // 2. Rede primeiro, cache depois
   event.respondWith(
     fetch(event.request)
-      .catch(() => {
-        return caches.match(event.request);
-      })
+      .catch(() => caches.match(event.request))
   );
 });
+
