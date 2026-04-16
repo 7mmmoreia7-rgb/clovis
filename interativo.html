@@ -11,7 +11,12 @@
 *{margin:0;padding:0;box-sizing:border-box;outline:none!important;-webkit-tap-highlight-color:transparent!important;-webkit-touch-callout:none;}
 button{-webkit-appearance:none;appearance:none;border:none;background:transparent;cursor:pointer;box-shadow:none!important;}
 button:focus,button:active{outline:none!important;box-shadow:none!important;}
-html,body{width:100%;height:100%;overflow:hidden;background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;}
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:none;
+}
 #app{position:relative;width:100%;height:100%;}
 
 /* VÍDEO */
@@ -152,15 +157,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:url("https://pub-4f2
 </div>
 
 <div id="ecra-video">
-  <img id="bg-isto" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png" alt="">
+  <img id="bg-isto" data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png" alt="">
   <video id="meu-video" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/voador.mp4" playsinline preload="auto"></video>
-  <button id="btn-play" onclick="iniciarVideo()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" alt="Play"></button>
-  <button id="btn-skip" onclick="fazTransicao()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skipa.png" alt="Skip"></button>
+  <button id="btn-play" onclick="iniciarVideo()"><img data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" alt="Play"></button>
+  <button id="btn-skip" onclick="fazTransicao()"><img data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skipa.png" alt="Skip"></button>
 </div>
 <div id="overlay-fade"></div>
 
 <div id="ecra-quadro">
-  <img id="fundo-design" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/interativo1.png" alt="">
+  <img id="fundo-design" data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/interativo1.png" alt="">
   <div id="camada-fundos">
     <canvas id="fundo-cor" style="display:none;position:absolute;inset:0;width:100%;height:100%;"></canvas>
   </div>
@@ -177,9 +182,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:url("https://pub-4f2
     <button id="btn-importar" onclick="document.getElementById('inp-img').click()" onmouseenter="TT(event,'Importar')"  onmouseleave="HT()"></button>
   </div>
   <button id="btn-lock" onclick="toggleLock()">
-    <img id="lock-img" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/aloquete.png" alt="lock">
+    <img id="lock-img" data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/aloquete.png" alt="lock">
   </button>
-  <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" onclick="irIndice()" style="cursor:pointer;">
+  <img id="btn-idx" data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" onclick="irIndice()" style="cursor:pointer;">
 </div>
 
 <div class="pop-bg" id="pop-bg" onclick="FPTodos()"></div>
@@ -224,15 +229,25 @@ html,body{width:100%;height:100%;overflow:hidden;background:url("https://pub-4f2
 </div>
 
 <script>
-/* ══════════════════════════════════════════════════════
-   SUPABASE
-══════════════════════════════════════════════════════ */
-const SURL='https://itqzgxotbzsuwevjpnoi.supabase.co';
-const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cXpneG90YnpzdXdldmpwbm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDU4NTgsImV4cCI6MjA4NzI4MTg1OH0.nS4RuwfULc9uHGh_u93vLZ7uRsLnKl7NULrb2Yesw9k';
-const SURL_GAL=SURL+'/storage/v1/object/public/galeria/';
-const SURL_UP =SURL+'/storage/v1/object/galeria/';
+  function px(url){
+  return API_BASE + "/proxy?url=" + encodeURIComponent(url);
+}
 
-/* ══════════════════════════════════════════════════════
+window.addEventListener("DOMContentLoaded", ()=>{
+
+  // Converter todas as imagens do HTML
+  document.querySelectorAll("img[data-src]").forEach(img=>{
+    img.src = px(img.dataset.src);
+  });
+
+});
+  // Repor o fundo do body via proxy
+document.body.style.backgroundImage =
+  `url(${px("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png")})`;
+document.body.style.backgroundSize = "cover";
+document.body.style.backgroundPosition = "center";
+
+  /* ══════════════════════════════════════════════════════
    ASSETS
 ══════════════════════════════════════════════════════ */
 const CDN='https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/';
@@ -252,6 +267,22 @@ const CENARIOS=[{nome:'☀️ Dia',g:'#87CEEB',g2:'#E0F7FA'},{nome:'🌊 Mar',g:
 const CORES=['#000000','#FFFFFF','#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#C77DFF','#FF9A3C','#FF6BB5','#00C9A7','#E63946','#F4A261','#2A9D8F','#264653','#A8DADC','#EF476F','#06D6A0','#118AB2','#FFB703','#FB8500','#9B2226','#EE9B00','#94D2BD','#0A9396','#E9D8A6','#6d4c41','#78909c','#37474f'];
 const FONTES=[{nome:'Nunito',css:"'Nunito',sans-serif",prev:'Texto divertido Aa'},{nome:'Pacifico',css:"'Pacifico',cursive",prev:'Texto cursivo Aa'},{nome:'Georgia',css:'Georgia,serif',prev:'Texto clássico Aa'},{nome:'Impact',css:'Impact,sans-serif',prev:'IMPACTO FORTE'},{nome:'Courier New',css:"'Courier New',monospace",prev:'Máquina escrever'},{nome:'Arial Black',css:"'Arial Black',sans-serif",prev:'Texto pesado Aa'}];
 const PINCEIS=[{nome:'Fino 1px',tipo:'round',px:1},{nome:'Normal 4px',tipo:'round',px:4},{nome:'Médio 10px',tipo:'round',px:10},{nome:'Grosso 20px',tipo:'round',px:20},{nome:'Quadrado 8px',tipo:'square',px:8},{nome:'Marcador 16px',tipo:'square',px:16}];
+function proxifyList(lista){
+  return lista.map(item=>{
+    if(item.tipo === 'img'){
+      item.url = px(item.url);
+    }
+    return item;
+  });
+}
+
+ANIMAIS = proxifyList(ANIMAIS);
+GAROTOS = proxifyList(GAROTOS);
+NATUREZA = proxifyList(NATUREZA);
+CASAS = proxifyList(CASAS);
+TRECOS = proxifyList(TRECOS);
+BRILHOS = proxifyList(BRILHOS);
+FUNDOS = proxifyList(FUNDOS);
 
 /* ══════════════════════════════════════════════════════
    ESTADO
