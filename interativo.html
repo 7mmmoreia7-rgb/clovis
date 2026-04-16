@@ -590,195 +590,152 @@ document.addEventListener('keydown',e=>{
    GUARDAR
 ══════════════════════════════════════════════════════ */
 
-// Carrega uma imagem sem taint CORS: tenta crossOrigin, fallback blob via fetch
-function carregarImagem(src){
-  return new Promise(res=>{
+/* ══════════════════════════════════════════════════════
+   CONSTANTES E CONFIGURAÇÃO
+══════════════════════════════════════════════════════ */
+const API_BASE = 'https://hidden-hall-2a03.7mmmoreia7.workers.dev';
+
+// Carrega imagem via Proxy para evitar "Canvas Tainted"
+function carregarImagem(src) {
+  return new Promise(res => {
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    img.crossOrigin = 'anonymous'; 
+    
+    img.onload = () => res(img);
+    img.onerror = () => res(null);
 
-    img.onload = ()=>res(img);
-    img.onerror = ()=>res(null);
-
-    // 🔥 FORÇAR SEMPRE proxy (não só r2.dev)
-    img.src = API_BASE + "/proxy?url=" + encodeURIComponent(src);
+    // Se for blob local, usa direto. Se for externo, usa o proxy do worker.
+    if (src.startsWith('blob:')) {
+      img.src = src;
+    } else {
+      img.src = API_BASE + "/proxy?url=" + encodeURIComponent(src);
+    }
   });
 }
 
+function colocar(d) {
+  const camEl = document.getElementById('camada-elementos');
+  camEl.appendChild(d);
+  aplicarMovel(d);
+  
+  d.addEventListener('pointerdown', e => {
+    if (locked) return;
+    e.stopPropagation();
+    selEl(d);
+    
+    let rect = d.getBoundingClientRect();
+    let shiftX = e.clientX - rect.left;
+    let shiftY = e.clientY - rect.top;
 
-function gerarCanvas(cb){
-  const r=cv.getBoundingClientRect();
-  const W=r.width, H=r.height;
-  const dpr=window.devicePixelRatio||1;
+    function moveAt(clientX, clientY) {
+      const pRect = camEl.getBoundingClientRect();
+      d.style.left = (clientX - pRect.left - shiftX) + 'px';
+      d.style.top = (clientY - pRect.top - shiftY) + 'px';
+      posBarraElem(d);
+    }
 
-  const tmp=document.createElement('canvas');
-  tmp.width=Math.round(W*dpr);
-  tmp.height=Math.round(H*dpr);
-  const c=tmp.getContext('2d');
-  c.scale(dpr,dpr);
+    const onMove = ev => moveAt(ev.clientX, ev.clientY);
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', () => {
+      document.removeEventListener('pointermove', onMove);
+    }, { once: true });
+  });
+}
 
-  // 1. fundo de cor / cenário
-  const fc=document.getElementById('fundo-cor');
-  if(fc.style.display!=='none'&&fc.width>0){
-    c.drawImage(fc,0,0,W,H);
-  }else{
-    c.fillStyle='#cfc0a0';
-    c.fillRect(0,0,W,H);
+function redim(d, f) {
+  let w = d.offsetWidth;
+  let newW = w * f;
+  d.style.width = newW + 'px';
+  const img = d.querySelector('img, video');
+  if (img && img.tagName === 'IMG' && img.naturalWidth) {
+    d.style.height = (newW * img.naturalHeight / img.naturalWidth) + 'px';
+  } else {
+    d.style.height = (d.offsetHeight * f) + 'px';
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   GERAR E EXPORTAR
+══════════════════════════════════════════════════════ */
+function gerarCanvas(cb) {
+  const r = cv.getBoundingClientRect();
+  const W = r.width, H = r.height;
+  const dpr = window.devicePixelRatio || 1;
+
+  const tmp = document.createElement('canvas');
+  tmp.width = W * dpr; tmp.height = H * dpr;
+  const c = tmp.getContext('2d');
+  c.scale(dpr, dpr);
+
+  // 1. Fundo
+  const fc = document.getElementById('fundo-cor');
+  if (fc.style.display !== 'none') {
+    c.drawImage(fc, 0, 0, W, H);
+  } else {
+    c.fillStyle = '#cfc0a0'; c.fillRect(0, 0, W, H);
   }
 
-  // 2. fundo imagem ou vídeo
-  const fm=document.querySelector('#camada-fundos img:not([id])');
-  const fv=document.querySelector('#camada-fundos video');
+  // 2. Traços e Elementos (Sequencial para garantir ordem)
+  const fm = document.querySelector('#camada-fundos img:not([id])');
+  const pFundo = fm ? carregarImagem(fm.src) : Promise.resolve(null);
 
-  const p1=fm
-    ? carregarImagem(fm.getAttribute('src')).then(img=>{if(img)c.drawImage(img,0,0,W,H);})
-    : fv
-      ? new Promise(res=>{try{c.drawImage(fv,0,0,W,H);}catch(e){}res();})
-      : Promise.resolve();
+  pFundo.then(imgFundo => {
+    if (imgFundo) c.drawImage(imgFundo, 0, 0, W, H);
+    
+    // Desenha o que está no canvas de pintura
+    c.drawImage(cv, 0, 0, cv.width/dpr, cv.height/dpr, 0, 0, W, H);
 
-  p1.then(()=>{
-    // 3. traços do canvas de desenho
-    try{
-      c.drawImage(cv,0,0,cv.width,cv.height,0,0,W,H);
-    }catch(e){console.warn('draw canvas:',e);}
+    const elems = Array.from(document.querySelectorAll('#camada-elementos .elem-arr'));
+    const pElems = elems.map(el => {
+      const er = el.getBoundingClientRect();
+      const cr = document.getElementById('camada-elementos').getBoundingClientRect();
+      const x = er.left - cr.left, y = er.top - cr.top, w = er.width, h = er.height;
+      
+      const img = el.querySelector('img');
+      const txt = el.querySelector('div[style*="font-size"]');
 
-    // 4. elementos
-    const cr=document.getElementById('camada-elementos').getBoundingClientRect();
-    const elems=Array.from(document.querySelectorAll('#camada-elementos .elem-arr'));
-
-    const promises=elems.map(el=>{
-      const er=el.getBoundingClientRect();
-      const x=er.left-cr.left, y=er.top-cr.top, w=er.width, h=er.height;
-      const im=el.querySelector('img');
-      let txDiv=null;
-      el.querySelectorAll('div').forEach(dv=>{if(dv.style.fontSize)txDiv=dv;});
-
-      if(im){
-      return carregarImagem(im.getAttribute('src')).then(img=>{
-  if (img) c.drawImage(img, x, y, w, h);
-         return;
-});
-      }
-      if(txDiv){
-        const fs=parseFloat(getComputedStyle(txDiv).fontSize)||32;
+      if (img) return carregarImagem(img.src).then(i => { if(i) c.drawImage(i, x, y, w, h); });
+      if (txt) {
+        const fs = parseFloat(getComputedStyle(txt).fontSize);
         c.save();
-        c.font=`${fs}px ${txDiv.style.fontFamily||'sans-serif'}`;
-        c.fillStyle=txDiv.style.color||'#000';
-        c.fillText(txDiv.textContent,x,y+fs);
+        c.font = `${fs}px ${txt.style.fontFamily || 'sans-serif'}`;
+        c.fillStyle = txt.style.color || '#000';
+        c.fillText(txt.textContent, x, y + fs);
         c.restore();
       }
       return Promise.resolve();
     });
 
-    Promise.all(promises).then(()=>cb(tmp));
+    Promise.all(pElems).then(() => cb(tmp));
   });
 }
 
-function expDispositivo(){
-  gerarCanvas(t=>{
+function expDispositivo() {
+  gerarCanvas(t => {
+    const a = document.createElement('a');
+    a.download = 'meu-desenho.png';
+    a.href = t.toDataURL('image/png');
+    a.click();
     FP('pop-export');
-    try{
-      const a=document.createElement('a');
-      a.download='clube-desenho.png';
-      a.href=t.toDataURL('image/png');
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(()=>document.body.removeChild(a),200);
-    }catch(e){
-      alert('Erro ao guardar: '+e.message+'\n(Imagens externas podem bloquear a exportação)');
-    }
   });
 }
 
-function expGaleria(){
-  gerarCanvas(t=>{
-    FP('pop-export');
-    try{
-      t.toBlob(blob=>{
-        if(!blob){alert('Erro ao gerar imagem');return;}
-        const fd=new FormData();
-        fd.append('file', blob, 'desenho_'+Date.now()+'.jpg');
-        fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload',{
-          method:'POST',
-          body:fd
-        })
-        .then(r=>{if(!r.ok)throw new Error('Upload erro '+r.status);return r.json();})
-.then(data=>{
-  if(!data.ok) throw new Error('Upload falhou');
-
-const url = 'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/' + data.key;
-
-  // 🧠 ir buscar galeria atual
-  let galeria = JSON.parse(localStorage.getItem('galeria') || '[]');
-
-  // ➕ adicionar novo desenho no início
-  galeria.unshift({
-    key: data.key,
-    url: url
-  });
-
-  localStorage.setItem('galeria', JSON.stringify(galeria));
-
-  console.log('Enviado para galeria:', data.key);
-  alert('Enviado para a Galeria! ✅');
-})
-        .catch(e=>{console.error(e);alert('Erro ao enviar: '+e.message);});
-      },'image/jpeg',0.92);
-    }catch(e){alert('Erro ao exportar: '+e.message);}
+function expGaleria() {
+  gerarCanvas(t => {
+    t.toBlob(blob => {
+      const fd = new FormData();
+      fd.append('file', blob, `desenho_${Date.now()}.jpg`);
+      fetch(`${API_BASE}/upload`, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(data => {
+          if (data.ok) {
+            let gal = JSON.parse(localStorage.getItem('galeria') || '[]');
+            gal.unshift({ key: data.key, url: `https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/${data.key}` });
+            localStorage.setItem('galeria', JSON.stringify(gal));
+            alert('Guardado na Galeria! ✅');
+          }
+          FP('pop-export');
+        }).catch(e => alert('Erro: ' + e.message));
+    }, 'image/jpeg', 0.9);
   });
 }
-
-/* ══════════════════════════════════════════════════════
-   POPULAR POPUPS
-══════════════════════════════════════════════════════ */
-function popularPopups(){
-  PINCEIS.forEach(p=>{
-    const b=document.createElement('button');b.className='btn-pb';
-    b.innerHTML='<div class="prev-ln" style="height:'+Math.min(p.px,14)+'px"></div>'+p.nome;
-    b.onclick=()=>{grossura=p.px;tipoCap=p.tipo==='square'?'square':'round';ferramenta='pincel';cv.style.cursor='crosshair';document.getElementById('sl-gross').value=p.px;document.getElementById('lbl-gross').textContent=p.px+'px';document.querySelectorAll('#g-pinceis .btn-pb').forEach(x=>x.classList.remove('a'));b.classList.add('a');};
-    document.getElementById('g-pinceis').appendChild(b);
-  });
-  CORES.forEach(c=>{const d=document.createElement('div');d.className='bl-cor';d.style.background=c;d.dataset.c=c;if(c==='#FFFFFF')d.style.border='3px solid #ddd';d.onclick=()=>setCor(c);document.getElementById('g-cores').appendChild(d);});
-  FONTES.forEach(f=>{
-    const d=document.createElement('div');d.className='item-f';
-    d.innerHTML='<span class="pf" style="font-family:'+f.css+'">'+f.prev+'</span><span class="nf">'+f.nome+'</span>';
-    d.onclick=()=>{fonte=f.css;document.querySelectorAll('.item-f').forEach(x=>x.classList.remove('a'));d.classList.add('a');prvTxt();};
-    document.getElementById('g-fontes').appendChild(d);
-  });
-  document.getElementById('inp-txt').addEventListener('input',prvTxt);
-
-  function mkCard(cnt,item,isFundo){
-    const card=document.createElement('div');card.className='card-el';
-    if(item.tipo==='video'){const v=document.createElement('video');v.src=item.url;v.autoplay=true;v.loop=true;v.muted=true;v.playsinline=true;v.style.cssText='max-width:75%;max-height:72%;object-fit:cover;border-radius:6px;';card.appendChild(v);}
-    else{const im=document.createElement('img');im.src=item.url;im.alt='';card.appendChild(im);}
-    card.onclick=()=>addElem(item.url,'',item.tipo,isFundo);cnt.appendChild(card);
-  }
-  ANIMAIS.forEach( e=>mkCard(document.getElementById('tab-animais'), e,false));
-  GAROTOS.forEach( e=>mkCard(document.getElementById('tab-garotos'), e,false));
-  NATUREZA.forEach(e=>mkCard(document.getElementById('tab-natureza'),e,false));
-  CASAS.forEach(   e=>mkCard(document.getElementById('tab-casas'),   e,false));
-  TRECOS.forEach(  e=>mkCard(document.getElementById('tab-trecos'),  e,false));
-  BRILHOS.forEach( e=>mkCard(document.getElementById('tab-brilhos'), e,false));
-  FUNDOS.forEach(  e=>mkCard(document.getElementById('tab-fundos'),  e,true));
-  const gc=document.getElementById('g-fundos-cor');
-  CENARIOS.forEach(c=>{const card=document.createElement('div');card.className='card-fundo-cor';card.style.background='linear-gradient(to bottom,'+c.g+','+c.g2+')';card.textContent=c.nome;card.onclick=()=>aplicarCenario(c.g,c.g2);gc.appendChild(card);});
-}
-
-/* ══════════════════════════════════════════════════════
-   UI
-══════════════════════════════════════════════════════ */
-function showTab(n,btn){
-  ['animais','garotos','natureza','casas','trecos','brilhos','fundos','fundos-cor'].forEach(t=>{
-    document.getElementById('tab-'+t).style.display=t===n?(t==='fundos-cor'?'block':'grid'):'none';
-  });
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('a'));btn.classList.add('a');
-}
-function AP(id){document.querySelectorAll('.pop-ov').forEach(p=>{p.classList.remove('open');p.style.display='none';});const el=document.getElementById(id);el.style.display='block';requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));document.getElementById('pop-bg').classList.add('open');}
-function FP(id){const el=document.getElementById(id);el.classList.remove('open');setTimeout(()=>el.style.display='none',220);document.getElementById('pop-bg').classList.remove('open');}
-function FPTodos(){document.querySelectorAll('.pop-ov').forEach(p=>{p.classList.remove('open');setTimeout(()=>p.style.display='none',220);});document.getElementById('pop-bg').classList.remove('open');}
-const tip=document.getElementById('tip');
-function TT(e,t){tip.textContent=t;tip.style.left=(e.clientX+10)+'px';tip.style.top=(e.clientY+26)+'px';tip.classList.add('v');}
-function HT(){tip.classList.remove('v');}
-function irIndice(){window.location.href='indice.html?skip=1';}
-</script>
-</body>
-</html>
