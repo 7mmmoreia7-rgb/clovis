@@ -4,18 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Interativo</title>
+<link rel="icon" href="/icon-192.png" />
 <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    html,body{width:100%;height:100%;overflow:hidden;background:#000;}
-    
-    #video-container{position:fixed;inset:0;z-index:10;}
-    #meu-video{width:100%;height:100%;object-fit:cover;}
-    #btn-play{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:12%;z-index:20;cursor:pointer;}
-    
-    #canvas-container{position:fixed;inset:0;z-index:5;display:none;background:#f8f0e0;}
-    #meu-canvas{width:100%;height:100%;background:transparent;cursor:crosshair;}
-    
-    #btn-idx{position:fixed;bottom:5%;right:5%;width:8%;z-index:30;cursor:pointer;}
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Pacifico&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;}
+
+#video-container{position:fixed;inset:0;z-index:10;}
+#meu-video{width:100%;height:100%;object-fit:cover;}
+#btn-play{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:12%;z-index:20;cursor:pointer;}
+#btn-skip{position:fixed;bottom:5%;right:5%;width:8%;z-index:20;cursor:pointer;}
+
+#canvas-container{position:fixed;inset:0;z-index:5;display:none;background:#f8f0e0;}
+#meu-canvas{width:100%;height:100%;background:transparent;cursor:crosshair;}
+
+#btn-idx{position:fixed;bottom:5%;right:5%;width:8%;z-index:30;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -23,6 +26,7 @@
 <div id="video-container">
   <video id="meu-video" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/voador.mp4" playsinline preload="auto"></video>
   <img id="btn-play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" onclick="iniciarVideo()">
+  <img id="btn-skip" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skip.png" onclick="fazTransicao()">
 </div>
 
 <div id="canvas-container">
@@ -61,8 +65,16 @@ canvas.addEventListener('mousemove', e => { if(drawing){ ctx.lineTo(e.offsetX, e
 canvas.addEventListener('mouseup', () => drawing = false);
 canvas.addEventListener('mouseleave', () => drawing = false);
 
+canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; const r = canvas.getBoundingClientRect(); ctx.beginPath(); ctx.moveTo(e.touches[0].clientX - r.left, e.touches[0].clientY - r.top); });
+canvas.addEventListener('touchmove', e => { e.preventDefault(); if(drawing){ const r = canvas.getBoundingClientRect(); ctx.lineTo(e.touches[0].clientX - r.left, e.touches[0].clientY - r.top); ctx.stroke(); }});
+canvas.addEventListener('touchend', () => drawing = false);
+
 function irIndice(){
   window.location.href = 'indice.html?skip=1';
+}
+
+function fazTransicao(){
+  iniciarVideo();
 }
 </script>
 </body>
