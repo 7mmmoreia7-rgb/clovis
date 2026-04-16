@@ -12,7 +12,7 @@
     #meu-video{width:100%;height:100%;object-fit:cover;}
     #btn-play{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:12%;z-index:20;cursor:pointer;}
     
-    #canvas-container{position:fixed;inset:0;z-index:5;display:none;background:#fff;}
+    #canvas-container{position:fixed;inset:0;z-index:5;display:none;background:#f8f0e0;}
     #meu-canvas{width:100%;height:100%;background:transparent;cursor:crosshair;}
     
     #btn-idx{position:fixed;bottom:5%;right:5%;width:8%;z-index:30;cursor:pointer;}
@@ -41,7 +41,6 @@ function iniciarVideo(){
   videoContainer.style.display = 'none';
   canvasContainer.style.display = 'block';
   resizeCanvas();
-  video.pause();
 }
 
 function resizeCanvas(){
@@ -57,32 +56,10 @@ window.addEventListener('resize', resizeCanvas);
 
 let drawing = false;
 
-canvas.addEventListener('mousedown', startDrawing);
-canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('mouseup', stopDrawing);
-canvas.addEventListener('mouseleave', stopDrawing);
-
-canvas.addEventListener('touchstart', e => { e.preventDefault(); startDrawing(e.touches[0]); });
-canvas.addEventListener('touchmove', e => { e.preventDefault(); draw(e.touches[0]); });
-canvas.addEventListener('touchend', stopDrawing);
-
-function startDrawing(e){
-  drawing = true;
-  const rect = canvas.getBoundingClientRect();
-  ctx.beginPath();
-  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-}
-
-function draw(e){
-  if(!drawing) return;
-  const rect = canvas.getBoundingClientRect();
-  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-  ctx.stroke();
-}
-
-function stopDrawing(){
-  drawing = false;
-}
+canvas.addEventListener('mousedown', e => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+canvas.addEventListener('mousemove', e => { if(drawing){ ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); }});
+canvas.addEventListener('mouseup', () => drawing = false);
+canvas.addEventListener('mouseleave', () => drawing = false);
 
 function irIndice(){
   window.location.href = 'indice.html?skip=1';
