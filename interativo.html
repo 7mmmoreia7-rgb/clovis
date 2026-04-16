@@ -585,87 +585,132 @@ document.addEventListener('keydown',e=>{
     const s=eS;if(s){s.remove();deselAll();}
   }
 });
-
+<script>
 /* ══════════════════════════════════════════════════════
-   GUARDAR
-══════════════════════════════════════════════════════ */
+   CORREÇÕES EXPORTAÇÃO + CORS
+════════════════════════════════════════════════════════ */
 
-// Carrega uma imagem sem taint CORS: tenta crossOrigin, fallback blob via fetch
+const API_BASE = window.API_BASE || "https://teu-backend.com"; // <-- AJUSTA PARA O TEU PROXY
+
+// Carrega imagem SEM taint CORS (sempre via proxy)
 function carregarImagem(src){
   return new Promise(res=>{
+    if(!src){
+      console.warn("carregarImagem: src vazio");
+      return res(null);
+    }
+
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    img.crossOrigin = "anonymous";
 
     img.onload = ()=>res(img);
-    img.onerror = ()=>res(null);
+    img.onerror = (e)=>{
+      console.error("Erro ao carregar imagem:", src, e);
+      res(null);
+    };
 
-    // 🔥 FORÇAR SEMPRE proxy (não só r2.dev)
+    // 🔥 FORÇAR SEMPRE PROXY
     img.src = API_BASE + "/proxy?url=" + encodeURIComponent(src);
   });
 }
 
-
 function gerarCanvas(cb){
-  const r=cv.getBoundingClientRect();
-  const W=r.width, H=r.height;
-  const dpr=window.devicePixelRatio||1;
+  const r = cv.getBoundingClientRect();
+  const W = r.width, H = r.height;
+  const dpr = window.devicePixelRatio || 1;
 
-  const tmp=document.createElement('canvas');
-  tmp.width=Math.round(W*dpr);
-  tmp.height=Math.round(H*dpr);
-  const c=tmp.getContext('2d');
-  c.scale(dpr,dpr);
+  const tmp = document.createElement("canvas");
+  tmp.width = Math.round(W * dpr);
+  tmp.height = Math.round(H * dpr);
 
-  // 1. fundo de cor / cenário
-  const fc=document.getElementById('fundo-cor');
-  if(fc.style.display!=='none'&&fc.width>0){
-    c.drawImage(fc,0,0,W,H);
-  }else{
-    c.fillStyle='#cfc0a0';
-    c.fillRect(0,0,W,H);
+  const c = tmp.getContext("2d");
+  c.scale(dpr, dpr);
+
+  /* 1. Fundo cor */
+  const fc = document.getElementById("fundo-cor");
+  try{
+    if(fc && fc.style.display !== "none" && fc.width > 0){
+      c.drawImage(fc, 0, 0, W, H);
+    }else{
+      c.fillStyle = "#cfc0a0";
+      c.fillRect(0, 0, W, H);
+    }
+  }catch(e){
+    console.error("Erro fundo-cor:", e);
+    c.fillStyle = "#cfc0a0";
+    c.fillRect(0, 0, W, H);
   }
 
-  // 2. fundo imagem ou vídeo
-  const fm=document.querySelector('#camada-fundos img:not([id])');
-  const fv=document.querySelector('#camada-fundos video');
+  /* 2. Fundo imagem ou vídeo */
+  const fm = document.querySelector("#camada-fundos img:not([id])");
+  const fv = document.querySelector("#camada-fundos video");
 
-  const p1=fm
-    ? carregarImagem(fm.getAttribute('src')).then(img=>{if(img)c.drawImage(img,0,0,W,H);})
+  const p1 = fm
+    ? carregarImagem(fm.src).then(img=>{
+        if(img){
+          try{ c.drawImage(img, 0, 0, W, H); }
+          catch(e){ console.error("Erro fundo-imagem:", e); }
+        }
+      })
     : fv
-      ? new Promise(res=>{try{c.drawImage(fv,0,0,W,H);}catch(e){}res();})
+      ? new Promise(res=>{
+          try{ c.drawImage(fv, 0, 0, W, H); }
+          catch(e){ console.error("Erro fundo-vídeo:", e); }
+          res();
+        })
       : Promise.resolve();
 
   p1.then(()=>{
-    // 3. traços do canvas de desenho
+
+    /* 3. Canvas de desenho */
     try{
-      c.drawImage(cv,0,0,cv.width,cv.height,0,0,W,H);
-    }catch(e){console.warn('draw canvas:',e);}
+      c.drawImage(cv, 0, 0, cv.width, cv.height, 0, 0, W, H);
+    }catch(e){
+      console.error("Erro ao desenhar canvas principal:", e);
+    }
 
-    // 4. elementos
-    const cr=document.getElementById('camada-elementos').getBoundingClientRect();
-    const elems=Array.from(document.querySelectorAll('#camada-elementos .elem-arr'));
+    /* 4. Elementos */
+    const camada = document.getElementById("camada-elementos");
+    const cr = camada.getBoundingClientRect();
+    const elems = [...document.querySelectorAll("#camada-elementos .elem-arr")];
 
-    const promises=elems.map(el=>{
-      const er=el.getBoundingClientRect();
-      const x=er.left-cr.left, y=er.top-cr.top, w=er.width, h=er.height;
-      const im=el.querySelector('img');
-      let txDiv=null;
-      el.querySelectorAll('div').forEach(dv=>{if(dv.style.fontSize)txDiv=dv;});
+    const promises = elems.map(el=>{
+      const er = el.getBoundingClientRect();
+      const x = er.left - cr.left;
+      const y = er.top - cr.top;
+      const w = er.width;
+      const h = er.height;
+
+      const im = el.querySelector("img");
+      let txDiv = null;
+
+      el.querySelectorAll("div").forEach(dv=>{
+        if(dv.style.fontSize) txDiv = dv;
+      });
 
       if(im){
-      return carregarImagem(im.getAttribute('src')).then(img=>{
-  if (img) c.drawImage(img, x, y, w, h);
-         return;
-});
+        return carregarImagem(im.src).then(img=>{
+          if(img){
+            try{ c.drawImage(img, x, y, w, h); }
+            catch(e){ console.error("Erro elemento imagem:", e); }
+          }
+        });
       }
+
       if(txDiv){
-        const fs=parseFloat(getComputedStyle(txDiv).fontSize)||32;
-        c.save();
-        c.font=`${fs}px ${txDiv.style.fontFamily||'sans-serif'}`;
-        c.fillStyle=txDiv.style.color||'#000';
-        c.fillText(txDiv.textContent,x,y+fs);
-        c.restore();
+        try{
+          const fs = parseFloat(getComputedStyle(txDiv).fontSize) || 32;
+          c.save();
+          c.font = `${fs}px ${txDiv.style.fontFamily || "sans-serif"}`;
+          c.fillStyle = txDiv.style.color || "#000";
+          c.textBaseline = "top";
+          c.fillText(txDiv.textContent, x, y);
+          c.restore();
+        }catch(e){
+          console.error("Erro elemento texto:", e);
+        }
       }
+
       return Promise.resolve();
     });
 
@@ -675,55 +720,68 @@ function gerarCanvas(cb){
 
 function expDispositivo(){
   gerarCanvas(t=>{
-    FP('pop-export');
+    FP("pop-export");
+
+    let dataUrl;
     try{
-      const a=document.createElement('a');
-      a.download='clube-desenho.png';
-      a.href=t.toDataURL('image/png');
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(()=>document.body.removeChild(a),200);
+      dataUrl = t.toDataURL("image/png");
     }catch(e){
-      alert('Erro ao guardar: '+e.message+'\n(Imagens externas podem bloquear a exportação)');
+      console.error("toDataURL falhou (CORS):", e);
+      alert("Erro ao gerar imagem (CORS). Verifica o proxy.");
+      return;
     }
+
+    const a = document.createElement("a");
+    a.download = "clube-desenho.png";
+    a.href = dataUrl;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>a.remove(), 200);
   });
 }
 
 function expGaleria(){
   gerarCanvas(t=>{
-    FP('pop-export');
-    try{
-      t.toBlob(blob=>{
-        if(!blob){alert('Erro ao gerar imagem');return;}
-        const fd=new FormData();
-        fd.append('file', blob, 'desenho_'+Date.now()+'.jpg');
-        fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload',{
-          method:'POST',
-          body:fd
-        })
-        .then(r=>{if(!r.ok)throw new Error('Upload erro '+r.status);return r.json();})
-.then(data=>{
-  if(!data.ok) throw new Error('Upload falhou');
+    FP("pop-export");
 
-const url = 'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/' + data.key;
+    t.toBlob(blob=>{
+      if(!blob){
+        alert("Erro ao gerar imagem");
+        return;
+      }
 
-  // 🧠 ir buscar galeria atual
-  let galeria = JSON.parse(localStorage.getItem('galeria') || '[]');
+      const fd = new FormData();
+      fd.append("file", blob, "desenho_" + Date.now() + ".jpg");
 
-  // ➕ adicionar novo desenho no início
-  galeria.unshift({
-    key: data.key,
-    url: url
-  });
+      fetch("https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload",{
+        method:"POST",
+        body:fd
+      })
+      .then(r=>{
+        if(!r.ok) throw new Error("Upload erro " + r.status);
+        return r.json();
+      })
+      .then(data=>{
+        if(!data.ok || !data.key)
+          throw new Error("Resposta inesperada do servidor");
 
-  localStorage.setItem('galeria', JSON.stringify(galeria));
+        const url = "https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/" + data.key;
 
-  console.log('Enviado para galeria:', data.key);
-  alert('Enviado para a Galeria! ✅');
-})
-        .catch(e=>{console.error(e);alert('Erro ao enviar: '+e.message);});
-      },'image/jpeg',0.92);
-    }catch(e){alert('Erro ao exportar: '+e.message);}
+        let galeria = JSON.parse(localStorage.getItem("galeria") || "[]");
+        if(!Array.isArray(galeria)) galeria = [];
+
+        galeria.unshift({ key:data.key, url });
+
+        localStorage.setItem("galeria", JSON.stringify(galeria));
+
+        alert("Enviado para a Galeria! ✅");
+      })
+      .catch(e=>{
+        console.error("Erro upload:", e);
+        alert("Erro ao enviar: " + e.message);
+      });
+
+    }, "image/jpeg", 0.92);
   });
 }
 
