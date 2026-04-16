@@ -9,43 +9,30 @@
         * { margin:0; padding:0; box-sizing:border-box; outline:none!important; -webkit-tap-highlight-color:transparent!important; }
         html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:'Nunito', sans-serif; }
         #app { position:relative; width:100%; height:100%; }
-        
         #ecra-video { position:absolute; inset:0; z-index:100; transition:opacity 1s ease; }
         #ecra-video.oculto { opacity:0; pointer-events:none; }
         #meu-video { width:100%; height:100%; object-fit:cover; }
         #btn-play { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:120px; z-index:110; border:none; background:none; cursor:pointer; }
         #btn-play img { width:100%; filter: drop-shadow(0 0 15px rgba(255,255,255,0.5)); }
-
         #ecra-quadro { position:absolute; inset:0; display:none; z-index:5; }
         #ecra-quadro.visivel { display:block; }
         #fundo-design { width:100%; height:100%; object-fit:fill; }
-        
-        #meu-canvas { position:absolute; left:9.5%; top:14.7%; width:80.8%; height:70.5%; z-index:6; touch-action:none; cursor:crosshair; }
+        #meu-canvas { position:absolute; left:9.5%; top:14.7%; width:80.8%; height:70.5%; z-index:6; touch-action:none; }
         #camada-elementos { position:absolute; left:9.5%; top:14.7%; width:80.8%; height:70.5%; z-index:5; overflow:hidden; pointer-events:none; }
-        #camada-fundos { position:absolute; left:9.5%; top:14.7%; width:80.8%; height:70.5%; z-index:1; overflow:hidden; }
-        #fundo-cor { position:absolute; left:9.5%; top:14.7%; width:80.8%; height:70.5%; z-index:0; }
-
         .elem-arr { position:absolute; cursor:grab; pointer-events:all; display:flex; align-items:center; justify-content:center; }
         .elem-arr img { width:100%; height:100%; object-fit:contain; pointer-events:none; }
-        .elem-arr.movel { pointer-events:all; z-index:10; }
-
         .pop-ov { position:fixed; bottom:110px; left:50%; transform:translateX(-50%) scale(0.9); width:90%; max-width:600px; background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); border-radius:20px; padding:20px; display:none; opacity:0; transition:0.3s; z-index:200; box-shadow:0 10px 30px rgba(0,0,0,0.3); }
         .pop-ov.open { display:block; opacity:1; transform:translateX(-50%) scale(1); }
-        
         #barra-elem { position:fixed; background:#fff; border-radius:30px; padding:5px 15px; display:none; gap:10px; z-index:300; box-shadow:0 5px 15px rgba(0,0,0,0.2); align-items:center; }
         #barra-elem.vis { display:flex; }
         .btn-be { background:#f0f0f0; border:none; width:35px; height:35px; border-radius:50%; cursor:pointer; font-weight:bold; }
-        .btn-be.del { background:#ffebee; color:#f44336; }
-
         #overlay-fade { position:absolute; inset:0; z-index:150; background:#fff; opacity:0; pointer-events:none; transition:opacity .6s; }
         #overlay-fade.ativo { opacity:1; }
-        
         .grid-it { display:grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap:10px; max-height:300px; overflow-y:auto; padding:10px; }
         .card-el { background:#fff; border:2px solid #eee; border-radius:10px; padding:5px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
         .card-el img { max-width:100%; max-height:60px; }
-
         .controles-fixos { position:fixed; bottom:20px; width:100%; display:flex; justify-content:center; gap:15px; z-index:500; }
-        .btn-acao { padding:12px 20px; border-radius:25px; border:none; color:#fff; font-weight:bold; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.2); }
+        .btn-acao { padding:12px 20px; border-radius:25px; border:none; color:#fff; font-weight:bold; cursor:pointer; }
     </style>
 </head>
 <body>
@@ -56,24 +43,18 @@
     </div>
     <div id="overlay-fade"></div>
     <div id="ecra-quadro">
-        <canvas id="fundo-cor"></canvas>
-        <div id="camada-fundos"></div>
         <img id="fundo-design" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/interativo1.png">
         <canvas id="meu-canvas"></canvas>
         <div id="camada-elementos"></div>
-
         <div id="barra-elem">
             <button class="btn-be" id="be-plus">+</button>
             <button class="btn-be" id="be-minus">-</button>
-            <button class="btn-be del" id="be-del">✕</button>
+            <button class="btn-be" id="be-del" style="color:red">✕</button>
         </div>
-
         <div id="pop-elementos" class="pop-ov">
-            <h3>Escolha um elemento:</h3>
             <div id="grid-geral" class="grid-it"></div>
-            <button onclick="FP('pop-elementos')" style="margin-top:10px; width:100%; padding:10px; border:none; background:#ccc; border-radius:10px;">Fechar</button>
+            <button onclick="FP('pop-elementos')" style="margin-top:10px; width:100%; padding:10px;">Fechar</button>
         </div>
-        
         <div class="controles-fixos">
             <button class="btn-acao" style="background:#4D96FF;" onclick="AP('pop-elementos')">ADICIONAR</button>
             <button class="btn-acao" style="background:#6BCB77;" onclick="expDispositivo()">GUARDAR</button>
@@ -81,94 +62,41 @@
         </div>
     </div>
 </div>
-
 <script>
 const API_BASE = 'https://hidden-hall-2a03.7mmmoreia7.workers.dev';
 const CDN = 'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/';
 const a = (p, fs) => fs.map(f => ({ url: CDN + p + '/' + f }));
 
-/* COLA ESTE BLOCO DENTRO DA TAG <script> PARA RECUPERAR TODAS AS IMAGENS */
+const ANIMAIS = [...a('animais', ['b1.png','b2.png','b3.png','b4.png','b5.jpg','b6.png','b7.png','b10.png','b11.png','b12.png','b13.png','b14.png','b15.png','b16.png','b17.png','b19.png','b21.png','b22.png','b23.png','b24.png','b25.png','b26.png']), ...a('animais1', ['b8.png','b9.png','doninha.png','elefante.gif','galinha.gif','gato.gif','golfinho.gif','lama.gif','panda.gif','peixe.gif','pombos.gif','rato.gif'])];
+const GAROTOS = a('garotos', ['111.png','112.png','113.png','114.png','115.png','116.png','29.png','30.png','bonecaA.png','bonecaB.png','ca.png','go.png','ela.gif','pocoyo.gif']);
+const NATUREZA = [...a('natureza', ['a.png','b.png','c.png','d.png','e.png','f.png','g.png','h.png','i.png','j.png','k.png','l.png','m.png','arco.png','arvore.png','cogumelo.png','cora.png','coram.png','corl.png','n1.png','n2.png','n10.png','n12.png']), ...a('natureza1', ['n4.png','n7.png','n8.png','n9.png','neve.png','nuv.png','trov.png','p.png','q.png','r.png','s.png','u.png','v.png','w.png','x.png','z.png'])];
+const CASAS = a('casas', ['c1.png','c2.png','c3.png','c4.png','c5.png','c6.png','c7.png','c8.png','c9.png','c10.png','c11.png','c12.png','c13.png','c14.png','c15.png']);
+const TRECOS = a('trecos', ['love.gif','t1.png','t2.png','t3.png','t4.png','t5.jpg','t7.png','t8.png']);
+const BRILHOS = a('brilhos', ['bolas.gif','estrela.gif','foguete.gif','g1.gif','g2.gif','luzinhas.gif']);
+const ASSETS_GERAL = [...ANIMAIS, ...GAROTOS, ...NATUREZA, ...CASAS, ...TRECOS, ...BRILHOS];
 
-const ANIMAIS = [
-    ...a('animais', ['b1.png', 'b2.png', 'b3.png', 'b4.png', 'b5.jpg', 'b6.png', 'b7.png', 'b10.png', 'b11.png', 'b12.png', 'b13.png', 'b14.png', 'b15.png', 'b16.png', 'b17.png', 'b19.png', 'b21.png', 'b22.png', 'b23.png', 'b24.png', 'b25.png', 'b26.png']),
-    ...a('animais1', ['b8.png', 'b9.png', 'doninha.png', 'elefante.gif', 'galinha.gif', 'gato.gif', 'golfinho.gif', 'lama.gif', 'panda.gif', 'peixe.gif', 'pombos.gif', 'rato.gif'])
-];
-
-const GAROTOS = a('garotos', ['111.png', '112.png', '113.png', '114.png', '115.png', '116.png', '29.png', '30.png', 'bonecaA.png', 'bonecaB.png', 'ca.png', 'go.png', 'ela.gif', 'pocoyo.gif']);
-
-const NATUREZA = [
-    ...a('natureza', ['a.png', 'b.png', 'c.png', 'd.png', 'e.png', 'f.png', 'g.png', 'h.png', 'i.png', 'j.png', 'k.png', 'l.png', 'm.png', 'arco.png', 'arvore.png', 'cogumelo.png', 'cora.png', 'coram.png', 'corl.png', 'n1.png', 'n2.png', 'n10.png', 'n12.png']),
-    ...a('natureza1', ['n4.png', 'n7.png', 'n8.png', 'n9.png', 'neve.png', 'nuv.png', 'trov.png', 'p.png', 'q.png', 'r.png', 's.png', 'u.png', 'v.png', 'w.png', 'x.png', 'z.png'])
-];
-
-const CASAS = a('casas', ['c1.png', 'c2.png', 'c3.png', 'c4.png', 'c5.png', 'c6.png', 'c7.png', 'c8.png', 'c9.png', 'c10.png', 'c11.png', 'c12.png', 'c13.png', 'c14.png', 'c15.png']);
-
-const TRECOS = a('trecos', ['love.gif', 't1.png', 't2.png', 't3.png', 't4.png', 't5.jpg', 't7.png', 't8.png']);
-
-const BRILHOS = a('brilhos', ['bolas.gif', 'estrela.gif', 'foguete.gif', 'g1.gif', 'g2.gif', 'luzinhas.gif']);
-
-const FUNDOS = a('fundos', ['castelo.jpg', 'flores.jpg', 'ceu.mp4', 'floresta.mp4', 'gliter.mp4', 'mar.mp4']);
-
-const CENARIOS = [
-    { nome: '☀️ Dia', g: '#87CEEB', g2: '#E0F7FA' },
-    { nome: '🌊 Mar', g: '#006994', g2: '#00CED1' },
-    { nome: '🌅 Pôr do Sol', g: '#FF6B35', g2: '#FFD700' },
-    { nome: '🌿 Natureza', g: '#228B22', g2: '#90EE90' },
-    { nome: '🌙 Noite', g: '#0D1B2A', g2: '#1B2A4A' },
-    { nome: '🌸 Primavera', g: '#FFB7C5', g2: '#FFF0F5' },
-    { nome: '❄️ Neve', g: '#E8F4FD', g2: '#FFFFFF' },
-    { nome: '🔥 Fogo', g: '#8B0000', g2: '#FF4500' },
-    { nome: '🏖️ Praia', g: '#F4D03F', g2: '#85C1E9' },
-    { nome: '🌌 Galáxia', g: '#0B0C10', g2: '#45A29E' }
-];
-
-const CORES = ['#000000', '#FFFFFF', '#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#C77DFF', '#FF9A3C', '#FF6BB5', '#00C9A7', '#E63946', '#F4A261', '#2A9D8F', '#264653', '#A8DADC', '#EF476F', '#06D6A0', '#118AB2', '#FFB703', '#FB8500', '#9B2226', '#EE9B00', '#94D2BD', '#0A9396', '#E9D8A6', '#6d4c41', '#78909c', '#37474f'];
-
-const FONTES = [
-    { nome: 'Nunito', css: "'Nunito',sans-serif", prev: 'Texto Aa' },
-    { nome: 'Pacifico', css: "'Pacifico',cursive", prev: 'Texto Aa' },
-    { nome: 'Georgia', css: 'Georgia,serif', prev: 'Texto Aa' },
-    { nome: 'Impact', css: 'Impact,sans-serif', prev: 'IMPACTO Aa' }
-];
-
-const PINCEIS = [
-    { nome: 'Fino 1px', tipo: 'round', px: 1 },
-    { nome: 'Normal 4px', tipo: 'round', px: 4 },
-    { nome: 'Médio 10px', tipo: 'round', px: 10 },
-    { nome: 'Grosso 20px', tipo: 'round', px: 20 },
-    { nome: 'Quadrado 8px', tipo: 'square', px: 8 }
-];
-  /* ══════════════════════════════════════════════════════
-   PARTE B: MOTOR DA APLICAÇÃO (VÍDEO, DESENHO E EXPORTAÇÃO)
-══════════════════════════════════════════════════════ */
-
-// 1. Controle de Início (Vídeo e Transição)
+let ferramenta='pincel', cor='#000000', grossura=4, desenhar=false, hist=[], eS=null, locked=false;
+    // --- FUNÇÕES DE MOTOR ---
 function iniciarVideo() {
     const v = document.getElementById('meu-video');
     const btn = document.getElementById('btn-play');
     if (btn) btn.style.display = 'none';
-    
     v.play().catch(() => fazTransicao());
     v.onended = fazTransicao;
 }
 
-let trOk = false;
 function fazTransicao() {
-    if (trOk) return; 
-    trOk = true;
     const fade = document.getElementById('overlay-fade');
     fade.classList.add('ativo');
-    
     setTimeout(() => {
         document.getElementById('ecra-video').classList.add('oculto');
         document.getElementById('ecra-quadro').classList.add('visivel');
-        initCanvas(); 
+        initCanvas();
         popularPopups();
         setTimeout(() => fade.classList.remove('ativo'), 200);
     }, 600);
 }
 
-// 2. Sistema de Pintura (Canvas)
 const cv = document.getElementById('meu-canvas');
 const cx = cv.getContext('2d');
 
@@ -185,10 +113,8 @@ function initCanvas() {
         desenhar = true;
         cx.beginPath();
         cx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-        
-        cx.globalCompositeOperation = ferramenta === 'borracha' ? 'destination-out' : 'source-over';
         cx.strokeStyle = cor;
-        cx.lineWidth = ferramenta === 'borracha' ? 30 : grossura;
+        cx.lineWidth = grossura;
         cx.lineCap = 'round';
     });
 
@@ -207,11 +133,10 @@ function initCanvas() {
     });
 }
 
-// 3. Gestão de Elementos (Mover e Editar)
 function popularPopups() {
     const grid = document.getElementById('grid-geral');
     grid.innerHTML = '';
-    ASSETS.forEach(item => {
+    ASSETS_GERAL.forEach(item => {
         const div = document.createElement('div');
         div.className = 'card-el';
         div.innerHTML = `<img src="${item.url}">`;
@@ -222,8 +147,8 @@ function popularPopups() {
 
 function addElem(url) {
     const d = document.createElement('div');
-    d.className = 'elem-arr movel';
-    d.style.left = '50px'; d.style.top = '50px'; d.style.width = '120px';
+    d.className = 'elem-arr';
+    d.style.left = '50px'; d.style.top = '50px'; d.style.width = '100px';
     const im = document.createElement('img');
     im.src = url;
     d.appendChild(im);
@@ -233,7 +158,7 @@ function addElem(url) {
 }
 
 function aplicarMovel(d) {
-    d.addEventListener('pointerdown', e => {
+    d.onpointerdown = e => {
         if (locked) return;
         e.stopPropagation();
         selEl(d);
@@ -248,43 +173,49 @@ function aplicarMovel(d) {
             posBarraElem(d);
         };
         document.addEventListener('pointermove', move);
-        document.addEventListener('pointerup', () => document.removeEventListener('pointermove', move), {once:true});
-    });
+        document.onpointerup = () => document.removeEventListener('pointermove', move);
+    };
 }
 
 function selEl(el) {
-    deselAll(); eS = el;
-    el.style.outline = '3px solid #4D96FF';
-    const be = document.getElementById('barra-elem');
-    be.classList.add('vis');
+    deselAll();
+    eS = el;
+    el.style.outline = '2px dashed #4D96FF';
+    document.getElementById('barra-elem').classList.add('vis');
     posBarraElem(el);
-    document.getElementById('be-plus').onclick = () => { let w=el.offsetWidth; el.style.width=(w*1.1)+'px'; posBarraElem(el); };
-    document.getElementById('be-minus').onclick = () => { let w=el.offsetWidth; el.style.width=(w*0.9)+'px'; posBarraElem(el); };
+    document.getElementById('be-plus').onclick = () => { el.style.width = (el.offsetWidth * 1.1) + 'px'; posBarraElem(el); };
+    document.getElementById('be-minus').onclick = () => { el.style.width = (el.offsetWidth * 0.9) + 'px'; posBarraElem(el); };
     document.getElementById('be-del').onclick = () => { el.remove(); deselAll(); };
 }
 
 function deselAll() {
-    document.querySelectorAll('.elem-arr').forEach(e => e.style.outline = 'none');
+    document.querySelectorAll('.elem-arr').forEach(el => el.style.outline = 'none');
     document.getElementById('barra-elem').classList.remove('vis');
     eS = null;
 }
 
 function posBarraElem(el) {
     const r = el.getBoundingClientRect(), be = document.getElementById('barra-elem');
-    be.style.left = (r.left + r.width/2 - be.offsetWidth/2) + 'px';
-    be.style.top = (r.top - 60) + 'px';
+    be.style.left = (r.left + r.width / 2 - be.offsetWidth / 2) + 'px';
+    be.style.top = (r.top - 50) + 'px';
 }
 
 function toggleLock() {
     locked = !locked;
-    document.getElementById('btn-lock').innerHTML = locked ? '🔒 TRAVADO' : '🔓 MOVER';
+    document.getElementById('btn-lock').textContent = locked ? '🔒 TRAVADO' : '🔓 MOVER';
     deselAll();
 }
 
-function AP(id) { document.getElementById(id).classList.add('open'); document.getElementById(id).style.display='block'; }
-function FP(id) { document.getElementById(id).classList.remove('open'); setTimeout(()=>document.getElementById(id).style.display='none',300); }
+function AP(id) { 
+    document.getElementById(id).style.display = 'block'; 
+    setTimeout(() => document.getElementById(id).classList.add('open'), 10); 
+}
 
-// 4. Exportação (Usa Proxy para evitar erro de segurança)
+function FP(id) { 
+    document.getElementById(id).classList.remove('open'); 
+    setTimeout(() => document.getElementById(id).style.display = 'none', 300); 
+}
+
 async function carregarImagem(src) {
     return new Promise(res => {
         const img = new Image();
@@ -302,22 +233,19 @@ async function expDispositivo() {
     tmp.width = r.width * dpr; tmp.height = r.height * dpr;
     const ctx = tmp.getContext('2d');
     ctx.scale(dpr, dpr);
-
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = "#fff";
     ctx.fillRect(0, 0, r.width, r.height);
     ctx.drawImage(cv, 0, 0, r.width, r.height);
 
     const elems = Array.from(document.querySelectorAll('.elem-arr'));
     for (const el of elems) {
-        const imgEl = el.querySelector('img');
-        const img = await carregarImagem(imgEl.src);
+        const img = await carregarImagem(el.querySelector('img').src);
         if (img) {
             const er = el.getBoundingClientRect();
             const cr = document.getElementById('camada-elementos').getBoundingClientRect();
             ctx.drawImage(img, er.left - cr.left, er.top - cr.top, er.width, er.height);
         }
     }
-
     const link = document.createElement('a');
     link.download = 'meu-clube.png';
     link.href = tmp.toDataURL('image/png');
