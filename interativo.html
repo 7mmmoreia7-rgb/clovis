@@ -2,181 +2,66 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Clube Interativo</title>
-<link rel="icon" href="/icon-192.png" />
-<link rel="apple-touch-icon" href="/icon-512.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interativo</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Pacifico&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;outline:none!important;}
-button{-webkit-appearance:none;appearance:none;border:none;background:transparent;cursor:pointer;}
-html,body{width:100%;height:100%;overflow:hidden;background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;}
-#app{position:relative;width:100%;height:100%;}
-
-/* VÍDEO INICIAL */
-#ecra-video{position:absolute;inset:0;z-index:100;transition:opacity 1s ease;}
-#ecra-video.oculto{opacity:0;pointer-events:none;}
-#meu-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
-#btn-play{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:10%;z-index:10;padding:0;}
-#btn-play img{width:100%;height:auto;display:block;}
-#btn-skip{position:fixed;bottom:3.5%;right:3.4%;width:8%;z-index:200;padding:0;}
-#btn-skip img{width:100%;height:auto;display:block;}
-
-/* FADE */
-#overlay-fade{position:absolute;inset:0;z-index:150;background:#fff;opacity:0;pointer-events:none;transition:opacity .6s ease;}
-#overlay-fade.ativo{opacity:1;pointer-events:all;}
-
-/* QUADRO PRINCIPAL */
-#ecra-quadro{position:absolute;inset:0;z-index:5;display:none;}
-#ecra-quadro.visivel{display:block;}
-#fundo-design{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:1;}
-#camada-fundos,#meu-canvas,#camada-elementos{position:absolute;left:9.5%;top:14.7%;width:80.8%;height:70.5%;z-index:2;}
-#meu-canvas{background:transparent;cursor:crosshair;z-index:6;touch-action:none;}
-#camada-elementos{z-index:5;overflow:hidden;pointer-events:none;}
-.elem-arr{position:absolute;cursor:grab;user-select:none;touch-action:none;pointer-events:none;z-index:1;}
-.elem-arr.movel{pointer-events:all;cursor:grab;}
-.elem-arr img,.elem-arr video{display:block;width:100%;height:auto;pointer-events:none;}
-
-/* Barra de botões */
-#barra-botoes{position:absolute;top:0;left:0;width:100%;height:13.5%;z-index:10;pointer-events:none;}
-#barra-botoes button{position:absolute;background:transparent;border:none;cursor:pointer;pointer-events:all;border-radius:50%;top:30%;height:58%;aspect-ratio:1;}
-#btn-pincel {left:12.2%;}
-#btn-cores {left:22.3%;}
-#btn-texto {left:32.4%;}
-#btn-elem {left:42.5%;}
-#btn-borracha {left:52.6%;}
-#btn-undo {left:62.7%;}
-#btn-guardar {left:72.8%;}
-#btn-importar {left:82.9%;}
-
-/* Botão Índice */
-#btn-idx{position:fixed;bottom:3.5%;right:3.4%;width:8%;z-index:9999;opacity:0;pointer-events:none;transition:opacity .5s;}
-#btn-idx.show{opacity:1;pointer-events:all;}
-
-/* Popups e resto mantidos */
-.pop-bg{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:600;display:none;}
-.pop-bg.open{display:block;}
-.pop-ov{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);width:660px;max-width:90vw;background:white;border-radius:20px;padding:24px;max-height:75vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);z-index:601;display:none;opacity:0;transition:opacity .2s,transform .2s;}
-.pop-ov.open{opacity:1;transform:translate(-50%,-50%) scale(1);}
-.pop-title{font-family:'Pacifico',cursive;font-size:1.2rem;color:#1a1a2e;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
-.pop-x{width:34px;height:34px;border-radius:50%;background:#f0f0f0;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#333;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html,body{width:100%;height:100%;overflow:hidden;background:#000;}
+    #video-container{position:fixed;inset:0;z-index:10;}
+    #meu-video{width:100%;height:100%;object-fit:cover;}
+    #btn-play{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:12%;z-index:20;cursor:pointer;}
+    #canvas-container{position:fixed;inset:0;z-index:5;display:none;}
+    #meu-canvas{width:100%;height:100%;background:transparent;cursor:crosshair;}
+    #btn-idx{position:fixed;bottom:5%;right:5%;width:8%;z-index:30;cursor:pointer;}
 </style>
 </head>
 <body>
-<div id="app">
-<div id="ecra-video">
+
+<div id="video-container">
   <video id="meu-video" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/voador.mp4" playsinline preload="auto"></video>
-  <button id="btn-play" onclick="iniciarVideo()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" alt="Play"></button>
-  <button id="btn-skip" onclick="fazTransicao()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skip.png" alt="Skip"></button>
-</div>
-<div id="overlay-fade"></div>
-<div id="ecra-quadro">
-  <img id="fundo-design" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/interativo1.png" alt="">
-  <div id="camada-fundos"></div>
-  <canvas id="meu-canvas"></canvas>
-  <div id="camada-elementos"></div>
-  <div id="barra-botoes">
-    <button id="btn-pincel" onclick="AP('pop-pinceis')">🖌️</button>
-    <button id="btn-cores" onclick="AP('pop-cores')">🎨</button>
-    <button id="btn-texto" onclick="AP('pop-texto')">🔤</button>
-    <button id="btn-elem" onclick="AP('pop-elem')">🖼️</button>
-    <button id="btn-borracha" onclick="AP('pop-borracha')">🧹</button>
-    <button id="btn-undo" onclick="undo()">↩️</button>
-    <button id="btn-guardar" onclick="AP('pop-export')">💾</button>
-    <button id="btn-importar" onclick="document.getElementById('inp-img').click()">📥</button>
-  </div>
-  <button id="btn-lock" onclick="toggleLock()">🔓</button>
-  <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" onclick="irIndice()" style="cursor:pointer;position:fixed;bottom:3.5%;right:3.4%;width:8%;">
+  <img id="btn-play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" onclick="iniciarVideo()">
 </div>
 
-<!-- Popups mantidos mas simplificados -->
-<div id="pop-export" class="pop-ov" style="max-width:420px">
-  <div class="pop-title">💾 Guardar <button class="pop-x" onclick="FP('pop-export')">×</button></div>
-  <button class="btn-ex azul" onclick="expDispositivo()">📱 Guardar no Dispositivo</button>
-  <button class="btn-ex verde" onclick="expGaleria()">🖼️ Enviar para Galeria</button>
-</div>
-<input type="file" id="inp-img" accept="image/*" style="display:none" onchange="importar(event)">
+<div id="canvas-container">
+  <canvas id="meu-canvas"></canvas>
+  <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" onclick="irIndice()">
 </div>
 
 <script>
-// ==================== VARIÁVEIS BÁSICAS ====================
-const cv = document.getElementById('meu-canvas');
-const cx = cv.getContext('2d');
-let locked = false;
-let ferramenta = 'pincel';
-let cor = '#000000';
-let grossura = 4;
+const videoContainer = document.getElementById('video-container');
+const canvasContainer = document.getElementById('canvas-container');
+const video = document.getElementById('meu-video');
+const canvas = document.getElementById('meu-canvas');
+const ctx = canvas.getContext('2d');
 
-// ==================== VÍDEO INICIAL ====================
 function iniciarVideo(){
-  document.getElementById('btn-play').style.display = 'none';
-  const v = document.getElementById('meu-video');
-  v.play().catch(()=>{});
-  v.onended = fazTransicao;
-}
-function fazTransicao(){
-  document.getElementById('ecra-video').classList.add('oculto');
-  document.getElementById('ecra-quadro').classList.add('visivel');
-  document.getElementById('btn-idx').classList.add('show');
-  initCanvas();
+  videoContainer.style.display = 'none';
+  canvasContainer.style.display = 'block';
+  resizeCanvas();
+  video.pause();
 }
 
-// ==================== CANVAS ====================
-function initCanvas(){
-  sizing();
-  window.addEventListener('resize', sizing);
-  // ... (mantém o teu código de desenho aqui, vou simplificar se quiseres depois)
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
 
-// ==================== EXPORTAÇÕES CORRIGIDAS ====================
-function expDispositivo(){
-  gerarCanvas(canvas => {
-    const link = document.createElement('a');
-    link.download = 'desenho_clube.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    FP('pop-export');
-  });
+window.addEventListener('resize', resizeCanvas);
+
+let drawing = false;
+canvas.addEventListener('mousedown', e => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+canvas.addEventListener('mousemove', e => { if(drawing){ ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); }});
+canvas.addEventListener('mouseup', () => drawing = false);
+canvas.addEventListener('mouseleave', () => drawing = false);
+
+function irIndice(){
+  window.location.href = 'indice.html?skip=1';
 }
 
-function expGaleria(){
-  gerarCanvas(canvas => {
-    canvas.toBlob(blob => {
-      const fd = new FormData();
-      fd.append('file', blob, 'desenho_' + Date.now() + '.png');
-
-      fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload', {
-        method: 'POST',
-        body: fd
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (data.ok) {
-          alert('✅ Desenho enviado para a Galeria!');
-          FP('pop-export');
-        } else {
-          alert('Erro ao enviar');
-        }
-      })
-      .catch(() => alert('Erro ao enviar para a Galeria'));
-    }, 'image/png');
-  });
-}
-
-function gerarCanvas(callback){
-  // Gera canvas com o desenho atual
-  const temp = document.createElement('canvas');
-  temp.width = cv.width;
-  temp.height = cv.height;
-  const ctx = temp.getContext('2d');
-  ctx.drawImage(cv, 0, 0);
-  callback(temp);
-}
-
-// Funções básicas para o resto (simplificadas)
-function FP(id){ document.getElementById(id).style.display = 'none'; }
-function AP(id){ document.getElementById(id).style.display = 'block'; }
-function irIndice(){ window.location.href = 'indice.html?skip=1'; }
+// Configuração básica do desenho
+ctx.strokeStyle = '#000000';
+ctx.lineWidth = 6;
+ctx.lineCap = 'round';
 </script>
 </body>
 </html>
