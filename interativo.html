@@ -321,12 +321,33 @@ function initCanvas(){
   cv.addEventListener('touchend',fim);
   atualizarCanvas();
 }
-function sizing(){
-  const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
-  const snap=hist.length?hist[hist.length-1]:null;
-  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);cx.scale(dpr,dpr);
-  if(snap){const i=new Image();i.src=snap;i.onload=()=>cx.drawImage(i,0,0,r.width,r.height);}
-  else salvar();
+function sizing() {
+  if (!cv) {
+    console.error("Canvas não encontrado (cv é null)");
+    return;
+  }
+
+  const r = cv.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+
+  const snap = hist && hist.length ? hist[hist.length - 1] : null;
+
+  cv.width = Math.round(r.width * dpr);
+  cv.height = Math.round(r.height * dpr);
+
+  // 🔥 reset total do contexto (evita scale acumulado)
+  cx.setTransform(1, 0, 0, 1, 0, 0);
+  cx.scale(dpr, dpr);
+
+  if (snap) {
+    const i = new Image();
+    i.onload = () => {
+      cx.drawImage(i, 0, 0, r.width, r.height);
+    };
+    i.src = snap;
+  } else {
+    salvar();
+  }
 }
 function cfgCtx(){
   if(ferramenta==='borracha'){cx.globalCompositeOperation='destination-out';cx.strokeStyle='rgba(0,0,0,1)';cx.lineWidth=tamBorracha;}
@@ -337,6 +358,29 @@ function ini(x,y){desenhar=true;cfgCtx();cx.beginPath();cx.moveTo(x,y);}
 function cont(x,y){if(!desenhar)return;cx.lineTo(x,y);cx.stroke();}
 function fim(){if(!desenhar)return;desenhar=false;cx.closePath();salvar();}
 function salvar(){if(hist.length>30)hist.shift();hist.push(cv.toDataURL());}
+  function obterCanvasExport(cb){
+  const base = document.getElementById('meu-canvas');
+
+  if (!base) {
+    console.error("Canvas meu-canvas não encontrado");
+    cb(null);
+    return;
+  }
+
+  const r = base.getBoundingClientRect();
+  const W = r.width;
+  const H = r.height;
+
+  const tmp = document.createElement('canvas');
+  tmp.width = W;
+  tmp.height = H;
+
+  const c = tmp.getContext('2d');
+
+  c.drawImage(base, 0, 0, W, H);
+
+  cb(tmp);
+}
 
 /* ══════════════════════════════════════════════════════
    UNDO — ordem: elementos → traços → fundo/cenário
@@ -615,12 +659,13 @@ function carregarImagem(src){
 }
 
 function gerarCanvas(cb){
-  const cv = document.getElementById('canvas');
-  if (!cv) {
-    console.error("Canvas principal não encontrado (#canvas)");
-    cb(null);
-    return;
-  }
+const cv = document.getElementById('meu-canvas');
+
+if (!cv) {
+  console.error("Canvas principal não encontrado (#meu-canvas)");
+  cb(null);
+  return;
+}
 
   const r = cv.getBoundingClientRect();
   const W = r.width, H = r.height;
@@ -717,96 +762,70 @@ function gerarCanvas(cb){
 }
 
 function expDispositivo(){
-  gerarCanvas(t=>{
-    if (!t || !(t instanceof HTMLCanvasElement)) {
+  obterCanvasExport(t=>{
+    if (!t) {
       alert('Falha ao gerar imagem');
       return;
     }
 
-    FP('pop-export');
+    const a = document.createElement('a');
+    a.download = 'desenho.png';
+    a.href = t.toDataURL('image/png');
 
-    try{
-      const a = document.createElement('a');
-      a.download = 'clube-desenho.png';
-      a.href = t.toDataURL('image/png');
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(()=>document.body.removeChild(a), 200);
-    }catch(e){
-      alert('Erro ao guardar: ' + e.message + '\n(Imagens externas podem bloquear a exportação)');
-    }
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   });
 }
 
 function expGaleria(){
-  gerarCanvas(t=>{
-    if (!t || !(t instanceof HTMLCanvasElement)) {
+  obterCanvasExport(t=>{
+    if (!t) {
       alert('Erro ao gerar canvas');
       return;
     }
 
-    FP('pop-export');
+    t.toBlob(blob=>{
+      if (!blob) {
+        alert('Erro ao gerar imagem');
+        return;
+      }
 
-    try{
-      t.toBlob(blob=>{
-        if(!blob){
-          alert('Erro ao gerar imagem (blob vazio)');
-          return;
+      const fd = new FormData();
+      fd.append('file', blob, 'desenho_' + Date.now() + '.jpg');
+
+      fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload', {
+        method: 'POST',
+        body: fd
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (!data || !data.ok) throw new Error("upload falhou");
+
+        const url = 'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/' + data.key;
+
+        let galeria = [];
+        try {
+          galeria = JSON.parse(localStorage.getItem('galeria')) || [];
+        } catch (e) {
+          galeria = [];
         }
 
-        const fd = new FormData();
-        fd.append('file', blob, 'desenho_' + Date.now() + '.jpg');
-
-        const uploadUrl = 'https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload';
-
-        fetch(uploadUrl,{
-          method:'POST',
-          body:fd
-        })
-        .then(r=>{
-          if(!r.ok) throw new Error('Upload erro ' + r.status);
-          return r.json();
-        })
-        .then(data=>{
-          if (!data || data.ok !== true) {
-            throw new Error('Upload inválido ou falhou');
-          }
-
-          const r2BaseUrl = 'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/';
-          if (!data.key) {
-            throw new Error('Key não recebida');
-          }
-
-          const url = r2BaseUrl + data.key;
-
-          let galeria = [];
-          try {
-            galeria = JSON.parse(localStorage.getItem('galeria')) || [];
-          } catch (e) {
-            console.warn("Galeria corrompida, resetando");
-            galeria = [];
-          }
-
-          galeria.unshift({
-            key: data.key,
-            url: url
-          });
-
-          localStorage.setItem('galeria', JSON.stringify(galeria));
-
-          console.log('Enviado para galeria:', data.key);
-          alert('Enviado para a Galeria! ✅');
-        })
-        .catch(e=>{
-          console.error(e);
-          alert('Erro ao enviar: ' + e.message);
+        galeria.unshift({
+          key: data.key,
+          url
         });
 
-      }, 'image/jpeg', 0.92);
+        localStorage.setItem('galeria', JSON.stringify(galeria));
 
-    }catch(e){
-      alert('Erro ao exportar: ' + e.message);
-    }
+        alert("Enviado para galeria!");
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Erro no upload");
+      });
+
+    }, 'image/jpeg', 0.92);
   });
 }
 /* ══════════════════════════════════════════════════════
