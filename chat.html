@@ -267,15 +267,35 @@ function iniciarChat(){
     if(data.length)ultimoId=data[data.length-1].id;
     scrollDown();
   });
-  setInterval(function(){
-    if(!ultimoId)return;
-    sGet('select=*&order=created_at.asc&id=gt.'+ultimoId).then(function(data){
-      if(!Array.isArray(data)||!data.length)return;
-      data.forEach(function(m){if(!idsEnviados[m.id])addMsg(m);delete idsEnviados[m.id];});
-      ultimoId=data[data.length-1].id;scrollDown();
+setInterval(function(){
+  if(!ultimoId) return;
+
+  sGet('select=*&order=created_at.asc&id=gt.'+ultimoId).then(function(data){
+    if(!Array.isArray(data) || !data.length) return;
+
+    data.forEach(function(m){
+
+      if(idsEnviados[m.id]) return;
+
+      addMsg(m);
+
+      // 🔊 só toca se NÃO foste tu a enviar
+      if(m.nome !== nome){
+        try{
+          var s = SOM.cloneNode();
+          s.volume = 0.7;
+          s.play().catch(function(){});
+        }catch(e){}
+      }
+
+      delete idsEnviados[m.id];
     });
-  },2000);
-}
+
+    ultimoId = data[data.length - 1].id;
+    scrollDown();
+  });
+
+}, 2000);
 
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
@@ -328,7 +348,7 @@ function enviar(){
   document.getElementById('chat-input').innerHTML='';
   addMsg({nome:nome,texto:t});scrollDown();sInsert({nome:nome,texto:t});
   // som de notificação (clona para permitir sobreposição rápida)
-  try{var s=SOM.cloneNode();s.volume=0.7;s.play().catch(function(){});}catch(ex){}
+ 
 }
 document.getElementById('btn-enviar').onclick=enviar;
 document.getElementById('chat-input').addEventListener('keydown',function(e){
