@@ -632,21 +632,22 @@ function carregarImagem(src){
       console.log("falhou direto, tenta proxy:", src);
 
       const img2 = new Image();
+
+      img2.crossOrigin = "anonymous";
+
       img2.onload = () => res(img2);
+
       img2.onerror = () => {
         console.log("falhou também proxy:", src);
         res(null);
       };
 
-img.onerror = () => {
-  console.log("falhou direto:", src);
-  res(null);
-};
+      img2.src = src;
+    };
 
     img.src = src;
   });
 }
-
 function gerarCanvas(cb){
 const cv = document.getElementById('meu-canvas');
 
