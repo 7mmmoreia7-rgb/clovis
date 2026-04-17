@@ -11,12 +11,7 @@
 *{margin:0;padding:0;box-sizing:border-box;outline:none!important;-webkit-tap-highlight-color:transparent!important;-webkit-touch-callout:none;}
 button{-webkit-appearance:none;appearance:none;border:none;background:transparent;cursor:pointer;box-shadow:none!important;}
 button:focus,button:active{outline:none!important;box-shadow:none!important;}
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:none;
-}
+html,body{width:100%;height:100%;overflow:hidden;background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;}
 #app{position:relative;width:100%;height:100%;}
 
 /* VÍDEO */
@@ -157,15 +152,15 @@ html,body{
 </div>
 
 <div id="ecra-video">
-  <img id="bg-isto" data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png" alt="">
+  <img id="bg-isto" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png" alt="">
   <video id="meu-video" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/voador.mp4" playsinline preload="auto"></video>
-  <button id="btn-play" onclick="iniciarVideo()"><img data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" alt="Play"></button>
-  <button id="btn-skip" onclick="fazTransicao()"><img data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skipa.png" alt="Skip"></button>
+  <button id="btn-play" onclick="iniciarVideo()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" alt="Play"></button>
+  <button id="btn-skip" onclick="fazTransicao()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skipa.png" alt="Skip"></button>
 </div>
 <div id="overlay-fade"></div>
 
 <div id="ecra-quadro">
-  <img id="fundo-design" data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/interativo1.png" alt="">
+  <img id="fundo-design" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/interativo1.png" alt="">
   <div id="camada-fundos">
     <canvas id="fundo-cor" style="display:none;position:absolute;inset:0;width:100%;height:100%;"></canvas>
   </div>
@@ -182,9 +177,9 @@ html,body{
     <button id="btn-importar" onclick="document.getElementById('inp-img').click()" onmouseenter="TT(event,'Importar')"  onmouseleave="HT()"></button>
   </div>
   <button id="btn-lock" onclick="toggleLock()">
-    <img id="lock-img" data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/aloquete.png" alt="lock">
+    <img id="lock-img" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/aloquete.png" alt="lock">
   </button>
-  <img id="btn-idx" data-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" onclick="irIndice()" style="cursor:pointer;">
+  <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png" onclick="irIndice()" style="cursor:pointer;">
 </div>
 
 <div class="pop-bg" id="pop-bg" onclick="FPTodos()"></div>
@@ -229,62 +224,34 @@ html,body{
 </div>
 
 <script>
-const API_BASE = "https://hidden-hall-2a03.7mmmoreira7.workers.dev";   // ← PRIMEIRO DE TUDO
+/* ══════════════════════════════════════════════════════
+   SUPABASE
+══════════════════════════════════════════════════════ */
+const SURL='https://itqzgxotbzsuwevjpnoi.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0cXpneG90YnpzdXdldmpwbm9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDU4NTgsImV4cCI6MjA4NzI4MTg1OH0.nS4RuwfULc9uHGh_u93vLZ7uRsLnKl7NULrb2Yesw9k';
+const SURL_GAL=SURL+'/storage/v1/object/public/galeria/';
+const SURL_UP =SURL+'/storage/v1/object/galeria/';
 
-function px(url){
-  return API_BASE + "/proxy?url=" + encodeURIComponent(url);
-}
-
-window.addEventListener("DOMContentLoaded", ()=>{
-
-  // Converter todas as imagens do HTML
-  document.querySelectorAll("img[data-src]").forEach(img=>{
-    img.src = px(img.dataset.src);
-  });
-
-});
-  // Repor o fundo do body via proxy
-document.body.style.backgroundImage =
-  `url(${px("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png")})`;
-document.body.style.backgroundSize = "cover";
-document.body.style.backgroundPosition = "center";
-
-  /* ══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════
    ASSETS
 ══════════════════════════════════════════════════════ */
 const CDN='https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/';
 const a=(p,fs)=>fs.map(f=>({url:CDN+p+'/'+f,tipo:f.match(/\.(mp4|webm)$/i)?'video':'img'}));
 
-let ANIMAIS=[
+const ANIMAIS=[
   ...a('animais',['b1.png','b2.png','b3.png','b4.png','b5.jpg','b6.png','b7.png','b10.png','b11.png','b12.png','b13.png','b14.png','b15.png','b16.png','b17.png','b19.png','b21.png','b22.png','b23.png','b24.png','b25.png','b26.png']),
   ...a('animais1',['b8.png','b9.png','doninha.png','elefante.gif','galinha.gif','gato.gif','golfinho.gif','lama.gif','panda.gif','peixe.gif','pombos.gif','rato.gif'])
 ];
-let GAROTOS=a('garotos',['111.png','112.png','113.png','114.png','115.png','116.png','29.png','30.png','bonecaA.png','bonecaB.png','ca.png','go.png','ela.gif','pocoyo.gif']);
-let NATUREZA=[...a('natureza',['a.png','b.png','c.png','d.png','e.png','f.png','g.png','h.png','i.png','j.png','k.png','l.png','m.png','arco.png','arvore.png','cogumelo.png','cora.png','coram.png','corl.png','n1.png','n2.png','n10.png','n12.png']),...a('natureza1',['n4.png','n7.png','n8.png','n9.png','neve.png','nuv.png','trov.png','p.png','q.png','r.png','s.png','u.png','v.png','w.png','x.png','z.png'])];
-let CASAS=a('casas',['c1.png','c2.png','c3.png','c4.png','c5.png','c6.png','c7.png','c8.png','c9.png','c10.png','c11.png','c12.png','c13.png','c14.png','c15.png']);
-let TRECOS=a('trecos',['love.gif','t1.png','t2.png','t3.png','t4.png','t5.jpg','t7.png','t8.png']);
-let BRILHOS=a('brilhos',['bolas.gif','estrela.gif','foguete.gif','g1.gif','g2.gif','luzinhas.gif']);
-let FUNDOS=a('fundos',['castelo.jpg','flores.jpg','ceu.mp4','floresta.mp4','gliter.mp4','mar.mp4']);
+const GAROTOS=a('garotos',['111.png','112.png','113.png','114.png','115.png','116.png','29.png','30.png','bonecaA.png','bonecaB.png','ca.png','go.png','ela.gif','pocoyo.gif']);
+const NATUREZA=[...a('natureza',['a.png','b.png','c.png','d.png','e.png','f.png','g.png','h.png','i.png','j.png','k.png','l.png','m.png','arco.png','arvore.png','cogumelo.png','cora.png','coram.png','corl.png','n1.png','n2.png','n10.png','n12.png']),...a('natureza1',['n4.png','n7.png','n8.png','n9.png','neve.png','nuv.png','trov.png','p.png','q.png','r.png','s.png','u.png','v.png','w.png','x.png','z.png'])];
+const CASAS=a('casas',['c1.png','c2.png','c3.png','c4.png','c5.png','c6.png','c7.png','c8.png','c9.png','c10.png','c11.png','c12.png','c13.png','c14.png','c15.png']);
+const TRECOS=a('trecos',['love.gif','t1.png','t2.png','t3.png','t4.png','t5.jpg','t7.png','t8.png']);
+const BRILHOS=a('brilhos',['bolas.gif','estrela.gif','foguete.gif','g1.gif','g2.gif','luzinhas.gif']);
+const FUNDOS=a('fundos',['castelo.jpg','flores.jpg','ceu.mp4','floresta.mp4','gliter.mp4','mar.mp4']);
 const CENARIOS=[{nome:'☀️ Dia',g:'#87CEEB',g2:'#E0F7FA'},{nome:'🌊 Mar',g:'#006994',g2:'#00CED1'},{nome:'🌅 Pôr do Sol',g:'#FF6B35',g2:'#FFD700'},{nome:'🌿 Natureza',g:'#228B22',g2:'#90EE90'},{nome:'🌙 Noite',g:'#0D1B2A',g2:'#1B2A4A'},{nome:'🌸 Primavera',g:'#FFB7C5',g2:'#FFF0F5'},{nome:'❄️ Neve',g:'#E8F4FD',g2:'#FFFFFF'},{nome:'🔥 Fogo',g:'#8B0000',g2:'#FF4500'},{nome:'🏖️ Praia',g:'#F4D03F',g2:'#85C1E9'},{nome:'🌌 Galáxia',g:'#0B0C10',g2:'#45A29E'}];
 const CORES=['#000000','#FFFFFF','#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#C77DFF','#FF9A3C','#FF6BB5','#00C9A7','#E63946','#F4A261','#2A9D8F','#264653','#A8DADC','#EF476F','#06D6A0','#118AB2','#FFB703','#FB8500','#9B2226','#EE9B00','#94D2BD','#0A9396','#E9D8A6','#6d4c41','#78909c','#37474f'];
 const FONTES=[{nome:'Nunito',css:"'Nunito',sans-serif",prev:'Texto divertido Aa'},{nome:'Pacifico',css:"'Pacifico',cursive",prev:'Texto cursivo Aa'},{nome:'Georgia',css:'Georgia,serif',prev:'Texto clássico Aa'},{nome:'Impact',css:'Impact,sans-serif',prev:'IMPACTO FORTE'},{nome:'Courier New',css:"'Courier New',monospace",prev:'Máquina escrever'},{nome:'Arial Black',css:"'Arial Black',sans-serif",prev:'Texto pesado Aa'}];
 const PINCEIS=[{nome:'Fino 1px',tipo:'round',px:1},{nome:'Normal 4px',tipo:'round',px:4},{nome:'Médio 10px',tipo:'round',px:10},{nome:'Grosso 20px',tipo:'round',px:20},{nome:'Quadrado 8px',tipo:'square',px:8},{nome:'Marcador 16px',tipo:'square',px:16}];
-function proxifyList(lista){
-  return lista.map(item=>{
-    if(item.tipo === 'img'){
-      item.url = px(item.url);
-    }
-    return item;
-  });
-}
-
-ANIMAIS = proxifyList(ANIMAIS);
-GAROTOS = proxifyList(GAROTOS);
-NATUREZA = proxifyList(NATUREZA);
-CASAS = proxifyList(CASAS);
-TRECOS = proxifyList(TRECOS);
-BRILHOS = proxifyList(BRILHOS);
-FUNDOS = proxifyList(FUNDOS);
 
 /* ══════════════════════════════════════════════════════
    ESTADO
@@ -618,128 +585,87 @@ document.addEventListener('keydown',e=>{
     const s=eS;if(s){s.remove();deselAll();}
   }
 });
+
 /* ══════════════════════════════════════════════════════
-   CORREÇÕES EXPORTAÇÃO + CORS
-════════════════════════════════════════════════════════ */
-// Carrega imagem SEM taint CORS (sempre via proxy)
+   GUARDAR
+══════════════════════════════════════════════════════ */
+
+// Carrega uma imagem sem taint CORS: tenta crossOrigin, fallback blob via fetch
 function carregarImagem(src){
   return new Promise(res=>{
-    if(!src){
-      console.warn("carregarImagem: src vazio");
-      return res(null);
-    }
-
     const img = new Image();
-    img.crossOrigin = "anonymous";
+    img.crossOrigin = 'anonymous';
 
     img.onload = ()=>res(img);
-    img.onerror = (e)=>{
-      console.error("Erro ao carregar imagem:", src, e);
-      res(null);
-    };
+    img.onerror = ()=>res(null);
 
-    // 🔥 FORÇAR SEMPRE PROXY
+    // 🔥 FORÇAR SEMPRE proxy (não só r2.dev)
     img.src = API_BASE + "/proxy?url=" + encodeURIComponent(src);
   });
 }
 
+
 function gerarCanvas(cb){
-  const r = cv.getBoundingClientRect();
-  const W = r.width, H = r.height;
-  const dpr = window.devicePixelRatio || 1;
+  const r=cv.getBoundingClientRect();
+  const W=r.width, H=r.height;
+  const dpr=window.devicePixelRatio||1;
 
-  const tmp = document.createElement("canvas");
-  tmp.width = Math.round(W * dpr);
-  tmp.height = Math.round(H * dpr);
+  const tmp=document.createElement('canvas');
+  tmp.width=Math.round(W*dpr);
+  tmp.height=Math.round(H*dpr);
+  const c=tmp.getContext('2d');
+  c.scale(dpr,dpr);
 
-  const c = tmp.getContext("2d");
-  c.scale(dpr, dpr);
-
-  /* 1. Fundo cor */
-  const fc = document.getElementById("fundo-cor");
-  try{
-    if(fc && fc.style.display !== "none" && fc.width > 0){
-      c.drawImage(fc, 0, 0, W, H);
-    }else{
-      c.fillStyle = "#cfc0a0";
-      c.fillRect(0, 0, W, H);
-    }
-  }catch(e){
-    console.error("Erro fundo-cor:", e);
-    c.fillStyle = "#cfc0a0";
-    c.fillRect(0, 0, W, H);
+  // 1. fundo de cor / cenário
+  const fc=document.getElementById('fundo-cor');
+  if(fc.style.display!=='none'&&fc.width>0){
+    c.drawImage(fc,0,0,W,H);
+  }else{
+    c.fillStyle='#cfc0a0';
+    c.fillRect(0,0,W,H);
   }
 
-  /* 2. Fundo imagem ou vídeo */
-  const fm = document.querySelector("#camada-fundos img:not([id])");
-  const fv = document.querySelector("#camada-fundos video");
+  // 2. fundo imagem ou vídeo
+  const fm=document.querySelector('#camada-fundos img:not([id])');
+  const fv=document.querySelector('#camada-fundos video');
 
-  const p1 = fm
-    ? carregarImagem(fm.src).then(img=>{
-        if(img){
-          try{ c.drawImage(img, 0, 0, W, H); }
-          catch(e){ console.error("Erro fundo-imagem:", e); }
-        }
-      })
+  const p1=fm
+    ? carregarImagem(fm.getAttribute('src')).then(img=>{if(img)c.drawImage(img,0,0,W,H);})
     : fv
-      ? new Promise(res=>{
-          try{ c.drawImage(fv, 0, 0, W, H); }
-          catch(e){ console.error("Erro fundo-vídeo:", e); }
-          res();
-        })
+      ? new Promise(res=>{try{c.drawImage(fv,0,0,W,H);}catch(e){}res();})
       : Promise.resolve();
 
   p1.then(()=>{
-
-    /* 3. Canvas de desenho */
+    // 3. traços do canvas de desenho
     try{
-      c.drawImage(cv, 0, 0, cv.width, cv.height, 0, 0, W, H);
-    }catch(e){
-      console.error("Erro ao desenhar canvas principal:", e);
-    }
+      c.drawImage(cv,0,0,cv.width,cv.height,0,0,W,H);
+    }catch(e){console.warn('draw canvas:',e);}
 
-    /* 4. Elementos */
-    const camada = document.getElementById("camada-elementos");
-    const cr = camada.getBoundingClientRect();
-    const elems = [...document.querySelectorAll("#camada-elementos .elem-arr")];
+    // 4. elementos
+    const cr=document.getElementById('camada-elementos').getBoundingClientRect();
+    const elems=Array.from(document.querySelectorAll('#camada-elementos .elem-arr'));
 
-    const promises = elems.map(el=>{
-      const er = el.getBoundingClientRect();
-      const x = er.left - cr.left;
-      const y = er.top - cr.top;
-      const w = er.width;
-      const h = er.height;
-
-      const im = el.querySelector("img");
-      let txDiv = null;
-
-      el.querySelectorAll("div").forEach(dv=>{
-        if(dv.style.fontSize) txDiv = dv;
-      });
+    const promises=elems.map(el=>{
+      const er=el.getBoundingClientRect();
+      const x=er.left-cr.left, y=er.top-cr.top, w=er.width, h=er.height;
+      const im=el.querySelector('img');
+      let txDiv=null;
+      el.querySelectorAll('div').forEach(dv=>{if(dv.style.fontSize)txDiv=dv;});
 
       if(im){
-        return carregarImagem(im.src).then(img=>{
-          if(img){
-            try{ c.drawImage(img, x, y, w, h); }
-            catch(e){ console.error("Erro elemento imagem:", e); }
-          }
-        });
+      return carregarImagem(im.getAttribute('src')).then(img=>{
+  if (img) c.drawImage(img, x, y, w, h);
+         return;
+});
       }
-
       if(txDiv){
-        try{
-          const fs = parseFloat(getComputedStyle(txDiv).fontSize) || 32;
-          c.save();
-          c.font = `${fs}px ${txDiv.style.fontFamily || "sans-serif"}`;
-          c.fillStyle = txDiv.style.color || "#000";
-          c.textBaseline = "top";
-          c.fillText(txDiv.textContent, x, y);
-          c.restore();
-        }catch(e){
-          console.error("Erro elemento texto:", e);
-        }
+        const fs=parseFloat(getComputedStyle(txDiv).fontSize)||32;
+        c.save();
+        c.font=`${fs}px ${txDiv.style.fontFamily||'sans-serif'}`;
+        c.fillStyle=txDiv.style.color||'#000';
+        c.fillText(txDiv.textContent,x,y+fs);
+        c.restore();
       }
-
       return Promise.resolve();
     });
 
@@ -749,68 +675,55 @@ function gerarCanvas(cb){
 
 function expDispositivo(){
   gerarCanvas(t=>{
-    FP("pop-export");
-
-    let dataUrl;
+    FP('pop-export');
     try{
-      dataUrl = t.toDataURL("image/png");
+      const a=document.createElement('a');
+      a.download='clube-desenho.png';
+      a.href=t.toDataURL('image/png');
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>document.body.removeChild(a),200);
     }catch(e){
-      console.error("toDataURL falhou (CORS):", e);
-      alert("Erro ao gerar imagem (CORS). Verifica o proxy.");
-      return;
+      alert('Erro ao guardar: '+e.message+'\n(Imagens externas podem bloquear a exportação)');
     }
-
-    const a = document.createElement("a");
-    a.download = "clube-desenho.png";
-    a.href = dataUrl;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(()=>a.remove(), 200);
   });
 }
 
 function expGaleria(){
   gerarCanvas(t=>{
-    FP("pop-export");
+    FP('pop-export');
+    try{
+      t.toBlob(blob=>{
+        if(!blob){alert('Erro ao gerar imagem');return;}
+        const fd=new FormData();
+        fd.append('file', blob, 'desenho_'+Date.now()+'.jpg');
+        fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload',{
+          method:'POST',
+          body:fd
+        })
+        .then(r=>{if(!r.ok)throw new Error('Upload erro '+r.status);return r.json();})
+.then(data=>{
+  if(!data.ok) throw new Error('Upload falhou');
 
-    t.toBlob(blob=>{
-      if(!blob){
-        alert("Erro ao gerar imagem");
-        return;
-      }
+const url = 'https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/' + data.key;
 
-      const fd = new FormData();
-      fd.append("file", blob, "desenho_" + Date.now() + ".jpg");
+  // 🧠 ir buscar galeria atual
+  let galeria = JSON.parse(localStorage.getItem('galeria') || '[]');
 
-      fetch("https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload",{
-        method:"POST",
-        body:fd
-      })
-      .then(r=>{
-        if(!r.ok) throw new Error("Upload erro " + r.status);
-        return r.json();
-      })
-      .then(data=>{
-        if(!data.ok || !data.key)
-          throw new Error("Resposta inesperada do servidor");
+  // ➕ adicionar novo desenho no início
+  galeria.unshift({
+    key: data.key,
+    url: url
+  });
 
-        const url = "https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/" + data.key;
+  localStorage.setItem('galeria', JSON.stringify(galeria));
 
-        let galeria = JSON.parse(localStorage.getItem("galeria") || "[]");
-        if(!Array.isArray(galeria)) galeria = [];
-
-        galeria.unshift({ key:data.key, url });
-
-        localStorage.setItem("galeria", JSON.stringify(galeria));
-
-        alert("Enviado para a Galeria! ✅");
-      })
-      .catch(e=>{
-        console.error("Erro upload:", e);
-        alert("Erro ao enviar: " + e.message);
-      });
-
-    }, "image/jpeg", 0.92);
+  console.log('Enviado para galeria:', data.key);
+  alert('Enviado para a Galeria! ✅');
+})
+        .catch(e=>{console.error(e);alert('Erro ao enviar: '+e.message);});
+      },'image/jpeg',0.92);
+    }catch(e){alert('Erro ao exportar: '+e.message);}
   });
 }
 
