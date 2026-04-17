@@ -101,75 +101,85 @@ istalaçao  ultima inacabada gpt, antes do grok:
        src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
 <script>
-  let deferredPrompt = null;
+let estado = "inicio"; 
+let deferredPrompt = null;
+let instalado = localStorage.getItem("app_instalada") === "true";
+
+const play = document.getElementById('btn-play');
+const logo = document.getElementById('logo');
+const som = document.getElementById('som-moeda');
+const btnFinal = document.getElementById('btn-final');
+
 window.addEventListener('beforeinstallprompt', (e) => {
-  console.log("🔥 INSTALL DISPONÍVEL");
   e.preventDefault();
   deferredPrompt = e;
+  console.log("🔥 INSTALL DISPONÍVEL");
 });
-  const play = document.getElementById('btn-play');
-  const logo = document.getElementById('logo');
-  const som = document.getElementById('som-moeda');
-  const btnFinal = document.getElementById('btn-final');
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-  });
 
   /* PLAY → delay → animação */
-  play.onclick = function () {
-    play.style.opacity = '0';
-    setTimeout(() => play.style.display = 'none', 300);
+play.onclick = function () {
+  play.style.opacity = '0';
+  setTimeout(() => play.style.display = 'none', 300);
 
-    setTimeout(() => {
-      som.currentTime = 0;
-      som.play().catch(()=>{});
+  estado = "animacao";
 
-      logo.style.display = 'block';
-      logo.classList.add('rodar');
-    }, 500); // pequeno espaço antes da animação
-  };
-
-  /* Som durante animação */
-  logo.addEventListener('animationiteration', () => {
-    som.volume = 0.4;
+  setTimeout(() => {
     som.currentTime = 0;
     som.play().catch(()=>{});
-  });
 
-  /* Fim da animação → brilho → logo vira botão de instalação */
-  logo.addEventListener('animationend', () => {
-    logo.classList.add('flash');
+    logo.style.display = 'block';
+    logo.classList.add('rodar');
+  }, 500);
+};
 
-    logo.onclick = async () => {
-  if (deferredPrompt) {
+let animacaoTerminada = false;
+
+/* Fim da animação → brilho → logo vira botão de instalação */
+logo.addEventListener('animationend', () => {
+
+  if (animacaoTerminada) return;
+  animacaoTerminada = true;
+
+  logo.classList.add('flash');
+
+  // se já está instalada, vai direto ao final
+  if (localStorage.getItem("app_instalada") === "true") {
+    mostrarFinal();
+    return;
+  }
+
+  // ainda não instalada → ativa modo install
+  logo.style.cursor = "pointer";
+
+  logo.onclick = async () => {
+
+    if (!deferredPrompt) {
+      btnFinal.style.display = 'block';
+      return;
+    }
+
     deferredPrompt.prompt();
+
     const escolha = await deferredPrompt.userChoice;
 
-    if (escolha.outcome === 'accepted') {
+    if (escolha.outcome === "accepted") {
       localStorage.setItem("app_instalada", "true");
-      btnFinal.style.display = 'block';
+      mostrarFinal();
     }
 
     deferredPrompt = null;
-
-  } else {
-    // fallback: se não houver install, segue na mesma
-    btnFinal.style.display = 'block';
-  }
-};
-  });
-
-  /* Botão final → home */
-  btnFinal.onclick = () => {
-    window.location.href = 'index.html';
   };
+});
 
-  /* SW */
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-  }
+/* Botão final → home */
+btnFinal.onclick = () => {
+  window.location.href = 'index.html';
+};
+
+/* Service Worker */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
 </script>
 
 </body>
