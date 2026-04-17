@@ -590,20 +590,30 @@ document.addEventListener('keydown',e=>{
    GUARDAR
 ══════════════════════════════════════════════════════ */
 
-// Carrega uma imagem sem taint CORS: tenta crossOrigin, fallback blob via fetch
 function carregarImagem(src){
   return new Promise(res=>{
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+
+    img.crossOrigin = "anonymous";
 
     img.onload = ()=>res(img);
-    img.onerror = ()=>res(null);
 
-    // 🔥 FORÇAR SEMPRE proxy (não só r2.dev)
-    img.src = API_BASE + "/proxy?url=" + encodeURIComponent(src);
+    img.onerror = () => {
+      console.log("falhou direto, tenta proxy:", src);
+
+      const img2 = new Image();
+      img2.onload = () => res(img2);
+      img2.onerror = () => {
+        console.log("falhou também proxy:", src);
+        res(null);
+      };
+
+      img2.src = API_BASE + "/proxy?url=" + encodeURIComponent(src);
+    };
+
+    img.src = src;
   });
 }
-
 
 function gerarCanvas(cb){
   const r=cv.getBoundingClientRect();
