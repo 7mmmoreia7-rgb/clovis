@@ -676,27 +676,24 @@ if (!cv) {
   }
 
   // 2. fundo imagem ou vídeo
-  const fm = document.querySelector('#camada-fundos img:not([id])');
-  const fv = document.querySelector('#camada-fundos video');
+ const fm = document.querySelector('#camada-fundos img:not([id])');
+const fv = document.querySelector('#camada-fundos video');
 
-  const p1 = fm
-    ? carregarImagem(fm.getAttribute('src')).then(img=>{
-        if (img) c.drawImage(img, 0, 0, W, H);
-      })
-    : fv
-      ? new Promise(resolve=>{
-          try {
-            if (fv.readyState >= 2) {
-              c.drawImage(fv, 0, 0, W, H);
-            }
-          } catch(e) {
-            console.warn('Erro vídeo:', e);
-          }
-          resolve();
-        })
-      : Promise.resolve();
-
-  p1.then(()=>{
+const p1 = fm
+  ? carregarImagem(fm.getAttribute('src')).then(img => {
+      if (img) c.drawImage(img, 0, 0, W, H);
+    })
+  : fv
+  ? new Promise(resolve => {
+      try {
+        console.warn('Vídeo ignorado no export (evita canvas tainted)');
+      } catch (e) {
+        console.warn('Erro vídeo:', e);
+      }
+      resolve();
+    })
+  : Promise.resolve();
+     p1.then(()=>{
     // 3. traços do canvas de desenho
     try{
       c.drawImage(cv, 0, 0, cv.width, cv.height, 0, 0, W, H);
