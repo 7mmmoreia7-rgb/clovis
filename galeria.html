@@ -220,22 +220,33 @@ html,body{
 .sc:hover{background:rgba(255,255,255,.38);}
 
 /* FULLSCREEN */
-#fsmod{
-  display:none;position:absolute;inset:0;z-index:100;
-  background:url(https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/fundilho.png) center/cover;
-  flex-direction:column;align-items:center;justify-content:center;gap:10px;
+#fsmod {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  background: url(https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/fundilho.png) center/cover;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
-#fsmod.on{display:flex;}
-/* FULLSCREEN — CORRIGIDO */
+
+#fsmod.on {
+  display: flex;
+}
+
+/* FULLSCREEN CONTENT */
 #fscont {
   width: 100%;
-  height: calc(100% - 60px); /* espaço para os botões */
+  height: calc(100% - 60px);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
 }
 
+/* MEDIA */
 #fscont img,
 #fscont video {
   max-width: 90%;
@@ -243,14 +254,13 @@ html,body{
   object-fit: contain;
   display: block;
   border-radius: 8px;
-}
-#fscont video {
-  width: auto !important;
-  height: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  object-fit: contain !important;
   background: transparent !important;
+}
+
+/* REMOVE INTERAÇÃO DO MEDIA */
+#fscont video,
+#fscont img {
+  pointer-events: none;
 }
 
 /* Barra de botões */
@@ -586,10 +596,11 @@ function verSlot(idx) {
   const isVideo = s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i);
 
   if (isVideo) {
-    const v = document.createElement("video");
-    v.src = s.url;
-    v.controls = true;
-    v.autoplay = false;
+  const v = document.createElement("video");
+v.src = s.url;
+v.controls = true;
+v.controlsList = "nodownload";
+v.autoplay = false;
     v.style.width = "100%";
     v.style.height = "100%";
     v.style.objectFit = "contain";
@@ -615,18 +626,34 @@ fscls.onclick = () => {
 /* ------------------------------
    DOWNLOAD (Guardar no dispositivo)
 --------------------------------*/
-fsdl.onclick = () => {
+fsdl.onclick = async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
   const el = fscont.querySelector("img,video");
   if (!el) return;
 
-  const a = document.createElement("a");
-  a.href = el.src;
-  a.download = "media";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-};
+  try {
+    const res = await fetch(el.src);
+    const blob = await res.blob();
 
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "media";
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+
+  } catch (err) {
+    console.error(err);
+    toast("Erro ao descarregar");
+  }
+};
 
 /* ------------------------------
    APAGAR PERMANENTE
