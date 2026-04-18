@@ -304,7 +304,7 @@ function mostrarCTA() {
     tempo += 2200; // espaçamento entre frases
   });
 
-  // 🎯 FINAL
+ // 🎯 FINAL
   setTimeout(() => {
     logo.classList.remove("logo-blur");
     logo.classList.add("logo-focus");
@@ -316,31 +316,7 @@ function mostrarCTA() {
 
   }, tempo);
 }
-
-  // 💥 "AGORA"
-if (i === 4) {
-
-  document.body.animate([
-    { transform: "scale(1)" },
-    { transform: "scale(1.15)" },
-    { transform: "scale(1)" }
-  ], { duration: 300 });
-
-  setTimeout(() => {
-    logo.classList.remove("logo-blur");
-    logo.classList.add("logo-focus");
-
-    setTimeout(() => {
-      btnFinal.style.display = "block";
-    }, 1200);
-
-  }, 700);
-}
-
-}, i * 700);   // 👈 fecha setTimeout do forEach
-});            // 👈 fecha imgs.forEach
-}              // 👈 fecha mostrarCTA
-  </script>
+</script>
 
 </div>
 </body>
