@@ -61,7 +61,15 @@
       50%  { filter: brightness(3); }
       100% { filter: brightness(1); }
     }
+/* 👇 ADICIONA ISTO AQUI */
+#scene.zoom-panic {
+  animation: zoomPanic 0.4s ease-out forwards;
+}
 
+@keyframes zoomPanic {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.3); }
+}
     /* BOTÃO FINAL */
     #btn-final {
       position: fixed;
@@ -78,11 +86,34 @@
     #btn-final:hover {
       content: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mas-se-der-asneira-n-o-fui-eu.png');
     }
+    #call-to-action {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.cta-img {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  opacity: 0;
+  transition: all 0.25s ease;
+  width: 320px;
+}
+
+.cta-show {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
   </style>
 </head>
 
 <body>
-
+<div id="scene">
   <!-- PLAY -->
   <img id="btn-play"
        src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
@@ -95,7 +126,12 @@
   <!-- BOTÃO FINAL -->
   <img id="btn-final"
        src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
+<div id="call-to-action"></div>
 
+<audio id="som-alerta" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/alert.wav"></audio>
+
+<!-- 🔊 VOZ (vais trocar depois) -->
+<audio id="som-voz" src=""></audio>
 <script>
  function mostrarFinal() {
   estado = "final";
@@ -109,11 +145,13 @@
 let estado = "inicio"; 
 let deferredPrompt = null;
 let instalado = localStorage.getItem("app_instalada") === "true";
-
+let faseCTA = 0;   // 👈 AQUI
 const play = document.getElementById('btn-play');
 const logo = document.getElementById('logo');
 const som = document.getElementById('som-moeda');
 const btnFinal = document.getElementById('btn-final');
+  const alerta = document.getElementById('som-alerta');
+const voz = document.getElementById('som-voz');
  /* 👇 AQUI MESMO */
 if (instalado) {
   play.style.display = "none";
@@ -153,13 +191,15 @@ logo.addEventListener('animationend', () => {
 
   logo.classList.add('flash');
 
+  // 🔥 AQUI É O SÍTIO CERTO
+  mostrarCTA();
+
   // se já está instalada, vai direto ao final
   if (localStorage.getItem("app_instalada") === "true") {
     mostrarFinal();
     return;
   }
 
-  // ainda não instalada → ativa modo install
   logo.style.cursor = "pointer";
 
   logo.onclick = async () => {
@@ -191,7 +231,81 @@ btnFinal.onclick = () => {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
-</script>
+function mostrarCTA() {
+  const cta = document.getElementById('call-to-action');
 
+  const imgs = [
+    'clk1.png',
+    'clk2.png',
+    'clk3.png',
+    'clk4.png',
+    'clk5.png'
+  ].map(n =>
+    `https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/${n}`
+  );
+
+  imgs.forEach((src, i) => {
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = 'cta-img';
+    img.style.top = (20 + i * 12) + '%';
+
+    cta.appendChild(img);
+
+    setTimeout(() => {
+
+      img.classList.add('cta-show');
+
+      // 🔥 ZOOM só no momento CLÍMAX (3º)
+      if (i === 2) {
+        document.getElementById("scene").classList.add("zoom-panic");
+
+        setTimeout(() => {
+          document.getElementById("scene").classList.remove("zoom-panic");
+        }, 400);
+      }
+
+      // ⚡ impacto no "CLIKA"
+      if (i === 3) {
+        document.getElementById("scene").animate([
+          { transform: "scale(1)" },
+          { transform: "scale(1.12)" },
+          { transform: "scale(1)" }
+        ], {
+          duration: 250,
+          iterations: 1
+        });
+      }
+
+      // 💥 FINAL "AGORA"
+      if (i === 4) {
+        document.body.animate([
+          { transform: "scale(1)" },
+          { transform: "scale(1.15)" },
+          { transform: "scale(1)" }
+        ], {
+          duration: 300,
+          iterations: 1
+        });
+      }
+
+    }, i * 650);
+  });
+}
+      // 🔊 som alerta
+      alerta.currentTime = 0;
+      alerta.play().catch(()=>{});
+
+      // 🔊 VOZ (no meio da sequência)
+      if (i === 2) {
+voz.src = "URL_DO_TEU_AUDIO.mp3";
+voz.currentTime = 0;
+voz.play().catch(()=>{});
+}
+    }, i * 700);
+  });
+}
+</script>
+</div>
 </body>
 </html>
