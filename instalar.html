@@ -35,9 +35,8 @@
 }
 
 .logo-blur {
-  filter: blur(6px) brightness(0.7) contrast(0.9);
-  transform: translate(-50%, -50%) scale(1.05);
-  opacity: 0.85;
+  filter: blur(14px) brightness(0.5) contrast(0.8);
+  opacity: 0.6;
 }
 
 .logo-focus {
@@ -111,17 +110,18 @@
 }
 
 .cta-img {
-  position: absolute;
+  position: fixed;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%) scale(0);
+  transform: translate(-50%, -50%) scale(0.8);
   opacity: 0;
-  transition: all 0.25s ease;
-  width: 320px;
+  transition: all 0.4s ease;
+  width: 380px;
 }
 
 .cta-show {
   opacity: 1;
-  transform: translateX(-50%) scale(1);
+  transform: translate(-50%, -50%) scale(1);
 }
   </style>
 </head>
@@ -183,8 +183,14 @@ window.addEventListener('beforeinstallprompt', (e) => {
 play.onclick = () => {
   play.style.display = "none";
 
+ som.currentTime = 0;
+som.play();
+
+// segundo som na segunda volta (~600ms depois)
+setTimeout(() => {
   som.currentTime = 0;
   som.play();
+}, 600);
 
   setTimeout(() => {
     logo.style.display = "block";
@@ -255,38 +261,61 @@ function mostrarCTA() {
     `https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/${n}`
   );
 
+  let tempo = 0;
+
   imgs.forEach((src, i) => {
+
     const img = document.createElement('img');
     img.src = src;
     img.className = 'cta-img';
-    img.style.top = (20 + i * 12) + '%';
-
     cta.appendChild(img);
 
-   setTimeout(() => {
-img.classList.add('cta-show');
-
-  // 🔥 ZOOM CLÍMAX + VOZ
-  if (i === 2) {
-    document.getElementById("scene").classList.add("zoom-panic");
-
+    // ⏱️ ENTRADA
     setTimeout(() => {
-      document.getElementById("scene").classList.remove("zoom-panic");
-    }, 400);
+      img.classList.add('cta-show');
 
-    voz.src = "URL_DO_TEU_AUDIO.mp3";
-    voz.currentTime = 0;
-    voz.play().catch(()=>{});
-  }
+      alerta.currentTime = 0;
+      alerta.play().catch(()=>{});
 
-  // ⚡ impacto "CLIKA"
-  if (i === 3) {
-    document.getElementById("scene").animate([
-      { transform: "scale(1)" },
-      { transform: "scale(1.12)" },
-      { transform: "scale(1)" }
-    ], { duration: 250 });
-  }
+      // 🎤 VOZ no momento certo
+      if (i === 2) {
+        voz.src = "URL_DO_TEU_AUDIO.mp3";
+        voz.currentTime = 0;
+        voz.play().catch(()=>{});
+      }
+
+      // 🔥 ZOOM dramático (clk2 e clk5)
+      if (i === 1 || i === 4) {
+        img.style.transform = "translate(-50%, -50%) scale(1.2)";
+      }
+
+    }, tempo);
+
+    // ⏱️ SAÍDA
+    setTimeout(() => {
+      img.classList.remove('cta-show');
+    }, tempo + 1800); // tempo de leitura
+
+    // ⏱️ REMOVE do DOM
+    setTimeout(() => {
+      img.remove();
+    }, tempo + 2200);
+
+    tempo += 2200; // espaçamento entre frases
+  });
+
+  // 🎯 FINAL
+  setTimeout(() => {
+    logo.classList.remove("logo-blur");
+    logo.classList.add("logo-focus");
+
+    // só mostra botão depois de instalar
+    if (localStorage.getItem("app_instalada") === "true") {
+      btnFinal.style.display = "block";
+    }
+
+  }, tempo);
+}
 
   // 💥 "AGORA"
 if (i === 4) {
