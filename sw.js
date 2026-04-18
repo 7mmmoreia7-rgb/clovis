@@ -56,9 +56,14 @@ self.addEventListener('fetch', event => {
   }
 
   // 2. Rede primeiro, cache depois
-  event.respondWith(
-    fetch(event.request)
-      .catch(() => caches.match(event.request))
-  );
+event.respondWith(
+  fetch(event.request)
+    .then(response => {
+      return response;
+    })
+    .catch(() => {
+      return caches.match(event.request);
+    })
+);
 });
 
