@@ -30,7 +30,21 @@
       transition: opacity .3s;
       filter: drop-shadow(0 0 8px rgba(0,0,0,0.4));
     }
+#logo {
+  transition: filter 0.4s ease, transform 0.4s ease, opacity 0.4s ease;
+}
 
+.logo-blur {
+  filter: blur(6px) brightness(0.7) contrast(0.9);
+  transform: translate(-50%, -50%) scale(1.05);
+  opacity: 0.85;
+}
+
+.logo-focus {
+  filter: none;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
     /* LOGO — sem cortes */
     #logo {
       position: fixed;
@@ -166,18 +180,15 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
   /* PLAY → delay → animação */
-play.onclick = function () {
-  play.style.opacity = '0';
-  setTimeout(() => play.style.display = 'none', 300);
+play.onclick = () => {
+  play.style.display = "none";
 
-  estado = "animacao";
+  som.currentTime = 0;
+  som.play();
 
   setTimeout(() => {
-    som.currentTime = 0;
-    som.play().catch(()=>{});
-
-    logo.style.display = 'block';
-    logo.classList.add('rodar');
+    logo.style.display = "block";
+    logo.classList.add("rodar");
   }, 500);
 };
 
@@ -189,7 +200,7 @@ logo.addEventListener('animationend', () => {
   if (animacaoTerminada) return;
   animacaoTerminada = true;
 
-  logo.classList.add('flash');
+  logo.classList.add("logo-blur"); // 👈 IMPORTANTE
 
   // 🔥 AQUI É O SÍTIO CERTO
   mostrarCTA();
@@ -278,20 +289,24 @@ img.classList.add('cta-show');
   }
 
   // 💥 "AGORA"
-  if (i === 4) {
-    document.body.animate([
-      { transform: "scale(1)" },
-      { transform: "scale(1.15)" },
-      { transform: "scale(1)" }
-    ], { duration: 300 });
-  }
+ if (i === 4) {
 
-  // 🔊 ALERTA (UMA VEZ só)
-  alerta.currentTime = 0;
-  alerta.play().catch(()=>{});
+  document.body.animate([
+    { transform: "scale(1)" },
+    { transform: "scale(1.15)" },
+    { transform: "scale(1)" }
+  ], { duration: 300 });
 
-}, i * 700);
-});
+  setTimeout(() => {
+    logo.classList.remove("logo-blur");
+    logo.classList.add("logo-focus");
+
+    // 🔥 AQUI ENTRA O FINAL
+    setTimeout(() => {
+      btnFinal.style.display = "block";
+    }, 1200);
+
+  }, 700);
 }
 
 </script>
