@@ -252,45 +252,47 @@ function mostrarCTA() {
 
     cta.appendChild(img);
 
+   setTimeout(() => {
+
+  img.classList.add('cta-show');
+
+  // 🔥 ZOOM CLÍMAX
+  if (i === 2) {
+    document.getElementById("scene").classList.add("zoom-panic");
+
     setTimeout(() => {
+      document.getElementById("scene").classList.remove("zoom-panic");
+    }, 400);
 
-      img.classList.add('cta-show');
+    voz.src = "URL_DO_TEU_AUDIO.mp3";
+    voz.currentTime = 0;
+    voz.play().catch(()=>{});
+  }
 
-      // 🔥 ZOOM só no momento CLÍMAX (3º)
-      if (i === 2) {
-        document.getElementById("scene").classList.add("zoom-panic");
+  // ⚡ impacto "CLIKA"
+  if (i === 3) {
+    document.getElementById("scene").animate([
+      { transform: "scale(1)" },
+      { transform: "scale(1.12)" },
+      { transform: "scale(1)" }
+    ], { duration: 250 });
+  }
 
-        setTimeout(() => {
-          document.getElementById("scene").classList.remove("zoom-panic");
-        }, 400);
-      }
+  // 💥 "AGORA"
+  if (i === 4) {
+    document.body.animate([
+      { transform: "scale(1)" },
+      { transform: "scale(1.15)" },
+      { transform: "scale(1)" }
+    ], { duration: 300 });
+  }
 
-      // ⚡ impacto no "CLIKA"
-      if (i === 3) {
-        document.getElementById("scene").animate([
-          { transform: "scale(1)" },
-          { transform: "scale(1.12)" },
-          { transform: "scale(1)" }
-        ], {
-          duration: 250,
-          iterations: 1
-        });
-      }
+  alerta.currentTime = 0;
+  alerta.play().catch(()=>{});
 
-      // 💥 FINAL "AGORA"
-      if (i === 4) {
-        document.body.animate([
-          { transform: "scale(1)" },
-          { transform: "scale(1.15)" },
-          { transform: "scale(1)" }
-        ], {
-          duration: 300,
-          iterations: 1
-        });
-      }
+}, i * 650);
 
-    }, i * 650);
-  });
+});
 }
       // 🔊 som alerta
       alerta.currentTime = 0;
