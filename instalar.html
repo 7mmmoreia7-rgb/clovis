@@ -289,7 +289,7 @@ img.classList.add('cta-show');
   }
 
   // 💥 "AGORA"
- if (i === 4) {
+if (i === 4) {
 
   document.body.animate([
     { transform: "scale(1)" },
@@ -301,7 +301,6 @@ img.classList.add('cta-show');
     logo.classList.remove("logo-blur");
     logo.classList.add("logo-focus");
 
-    // 🔥 AQUI ENTRA O FINAL
     setTimeout(() => {
       btnFinal.style.display = "block";
     }, 1200);
@@ -309,7 +308,11 @@ img.classList.add('cta-show');
   }, 700);
 }
 
-</script>
+}, i * 700);   // 👈 fecha setTimeout do forEach
+});            // 👈 fecha imgs.forEach
+}              // 👈 fecha mostrarCTA
+  </script>
+
 </div>
 </body>
 </html>
