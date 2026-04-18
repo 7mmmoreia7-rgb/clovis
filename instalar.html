@@ -253,10 +253,9 @@ function mostrarCTA() {
     cta.appendChild(img);
 
    setTimeout(() => {
+img.classList.add('cta-show');
 
-  img.classList.add('cta-show');
-
-  // 🔥 ZOOM CLÍMAX
+  // 🔥 ZOOM CLÍMAX + VOZ
   if (i === 2) {
     document.getElementById("scene").classList.add("zoom-panic");
 
@@ -287,26 +286,14 @@ function mostrarCTA() {
     ], { duration: 300 });
   }
 
+  // 🔊 ALERTA (UMA VEZ só)
   alerta.currentTime = 0;
   alerta.play().catch(()=>{});
 
-}, i * 650);
-
+}, i * 700);
 });
 }
-      // 🔊 som alerta
-      alerta.currentTime = 0;
-      alerta.play().catch(()=>{});
 
-      // 🔊 VOZ (no meio da sequência)
-      if (i === 2) {
-voz.src = "URL_DO_TEU_AUDIO.mp3";
-voz.currentTime = 0;
-voz.play().catch(()=>{});
-}
-    }, i * 700);
-  });
-}
 </script>
 </div>
 </body>
