@@ -1,8 +1,7 @@
 const CACHE_NAME = 'nem-eu-v1';
 const ASSETS_TO_CACHE = [
-  '/',
   '/index.html',
-  '/instalacao.html',
+  '/instalar.html',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png'
