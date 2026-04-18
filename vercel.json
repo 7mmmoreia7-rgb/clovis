@@ -2,7 +2,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
-    { "source": "/instalar", "destination": "/instalar.html" },
+    { "source": "/instalaçao", "destination": "/instalaçao.html" },
     { "source": "/indice", "destination": "/indice.html" },
     { "source": "/regras", "destination": "/regras.html" },
     { "source": "/beatriz", "destination": "/beatriz.html" },
