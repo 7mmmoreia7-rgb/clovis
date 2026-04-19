@@ -1,323 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>Instalação</title>
+<meta charset="UTF-8">
+<title>Instalação</title>
 
-  <link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="/manifest.json">
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/fundilho.png');
-      background-size: cover;
-      background-position: center;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      font-family: sans-serif;
-    }
-
-    /* PLAY */
-    #btn-play {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 10%;
-      cursor: pointer;
-      z-index: 10;
-      transition: opacity .3s;
-      filter: drop-shadow(0 0 8px rgba(0,0,0,0.4));
-    }
-#logo {
-  transition: filter 0.4s ease, transform 0.4s ease, opacity 0.4s ease;
+<style>
+body {
+  margin:0;
+  overflow:hidden;
+  background:black;
 }
 
-.logo-blur {
-  filter: blur(14px) brightness(0.5) contrast(0.8);
-  opacity: 0.6;
+#video {
+  position:fixed;
+  width:100%;
+  height:100%;
+  object-fit:cover;
 }
 
-.logo-focus {
-  filter: none;
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
+#btn {
+  position:fixed;
+  bottom:40px;
+  left:50%;
+  transform:translateX(-50%);
+  width:260px;
+  display:none;
+  cursor:pointer;
 }
-    /* LOGO — sem cortes */
-    #logo {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 400px;
-      display: none;
-      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
-    }
-
-    .rodar {
-      animation: rodar 1.2s ease-out 2 forwards;
-    }
-
-    @keyframes rodar {
-      0%   { transform: translate(-50%, -50%) rotateY(0deg) scale(1); }
-      40%  { transform: translate(-50%, -50%) rotateY(180deg) scale(0.9); }
-      100% { transform: translate(-50%, -50%) rotateY(360deg) scale(1); }
-    }
-
-    /* BRILHO FINAL — sem apagar o logo */
-    .flash {
-      animation: flash 0.4s ease-out forwards;
-    }
-
-    @keyframes flash {
-      0%   { filter: brightness(1); }
-      50%  { filter: brightness(3); }
-      100% { filter: brightness(1); }
-    }
-/* 👇 ADICIONA ISTO AQUI */
-#scene.zoom-panic {
-  animation: zoomPanic 0.4s ease-out forwards;
-}
-
-@keyframes zoomPanic {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.3); }
-}
-    /* BOTÃO FINAL */
-    #btn-final {
-      position: fixed;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 260px;
-      display: none;
-      cursor: pointer;
-      transition: .3s;
-      z-index: 15;
-    }
-
-    #btn-final:hover {
-      content: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mas-se-der-asneira-n-o-fui-eu.png');
-    }
-    #call-to-action {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 20;
-}
-
-.cta-img {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
-  opacity: 0;
-  transition: all 0.4s ease;
-  width: 380px;
-}
-
-.cta-show {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-  </style>
+</style>
 </head>
 
 <body>
-<div id="scene">
-  <!-- PLAY -->
-  <img id="btn-play"
-       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 
-  <!-- LOGO -->
-  <img id="logo" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/icon-512.png">
-  <!-- SOM -->
-  <audio id="som-moeda" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/coin.wav"></audio>
+<video id="video" autoplay muted playsinline>
+  <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
+</video>
 
-  <!-- BOTÃO FINAL -->
-  <img id="btn-final"
-       src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
-<div id="call-to-action"></div>
+<img id="btn"
+src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
-<audio id="som-alerta" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/alert.wav"></audio>
-
-<!-- 🔊 VOZ (vais trocar depois) -->
-<audio id="som-voz" src=""></audio>
 <script>
- function mostrarFinal() {
-  estado = "final";
-
-  logo.classList.remove("flash");
-  logo.onclick = null;
-
-  logo.style.display = "none";
-  btnFinal.style.display = "block";
-}
-let estado = "inicio"; 
 let deferredPrompt = null;
-let instalado = localStorage.getItem("app_instalada") === "true";
-let faseCTA = 0;   // 👈 AQUI
-const play = document.getElementById('btn-play');
-const logo = document.getElementById('logo');
-const som = document.getElementById('som-moeda');
-const btnFinal = document.getElementById('btn-final');
-  const alerta = document.getElementById('som-alerta');
-const voz = document.getElementById('som-voz');
- /* 👇 AQUI MESMO */
-if (instalado) {
-  play.style.display = "none";
-  logo.style.display = "none";
-  btnFinal.style.display = "block";
-}
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  console.log("🔥 INSTALL DISPONÍVEL");
 });
 
-  /* PLAY → delay → animação */
-play.onclick = () => {
-  play.style.display = "none";
+const video = document.getElementById("video");
+const btn = document.getElementById("btn");
 
- som.currentTime = 0;
-som.play();
+// 👉 se já instalou → salta tudo
+if (localStorage.getItem("app_instalada") === "true") {
+  window.location.href = "index.html";
+}
 
-// segundo som na segunda volta (~600ms depois)
-setTimeout(() => {
-  som.currentTime = 0;
-  som.play();
-}, 600);
-
-  setTimeout(() => {
-    logo.style.display = "block";
-    logo.classList.add("rodar");
-  }, 500);
+// 👉 quando vídeo acaba → mostra botão
+video.onended = () => {
+  btn.style.display = "block";
 };
 
-let animacaoTerminada = false;
+// 👉 botão
+btn.onclick = async () => {
 
-/* Fim da animação → brilho → logo vira botão de instalação */
-logo.addEventListener('animationend', () => {
-
-  if (animacaoTerminada) return;
-  animacaoTerminada = true;
-
-  logo.classList.add("logo-blur"); // 👈 IMPORTANTE
-
-  // 🔥 AQUI É O SÍTIO CERTO
-  mostrarCTA();
-
-  // se já está instalada, vai direto ao final
-  if (localStorage.getItem("app_instalada") === "true") {
-    mostrarFinal();
-    return;
-  }
-
-  logo.style.cursor = "pointer";
-
-  logo.onclick = async () => {
-
-    if (!deferredPrompt) {
-      btnFinal.style.display = 'block';
-      return;
-    }
-
+  // tenta instalar
+  if (deferredPrompt) {
     deferredPrompt.prompt();
 
     const escolha = await deferredPrompt.userChoice;
 
     if (escolha.outcome === "accepted") {
       localStorage.setItem("app_instalada", "true");
-      mostrarFinal();
     }
 
     deferredPrompt = null;
-  };
-});
+  }
 
-/* Botão final → home */
-btnFinal.onclick = () => {
-  window.location.href = 'index.html';
+  // SEMPRE entra na app
+  window.location.href = "index.html";
 };
 
-/* Service Worker */
+// service worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
-function mostrarCTA() {
-  const cta = document.getElementById('call-to-action');
-
-  const imgs = [
-    'clk1.png',
-    'clk2.png',
-    'clk3.png',
-    'clk4.png',
-    'clk5.png'
-  ].map(n =>
-    `https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/${n}`
-  );
-
-  let tempo = 0;
-
-  imgs.forEach((src, i) => {
-
-    const img = document.createElement('img');
-    img.src = src;
-    img.className = 'cta-img';
-    cta.appendChild(img);
-
-    // ⏱️ ENTRADA
-    setTimeout(() => {
-      img.classList.add('cta-show');
-
-      alerta.currentTime = 0;
-      alerta.play().catch(()=>{});
-
-      // 🎤 VOZ no momento certo
-      if (i === 2) {
-        voz.src = "https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/esteD.wav";
-        voz.currentTime = 0;
-        voz.play().catch(()=>{});
-      }
-
-      // 🔥 ZOOM dramático (clk2 e clk5)
-      if (i === 1 || i === 4) {
-        img.style.transform = "translate(-50%, -50%) scale(1.2)";
-      }
-
-    }, tempo);
-
-    // ⏱️ SAÍDA
-    setTimeout(() => {
-      img.classList.remove('cta-show');
-    }, tempo + 1800); // tempo de leitura
-
-    // ⏱️ REMOVE do DOM
-    setTimeout(() => {
-      img.remove();
-    }, tempo + 2200);
-
-    tempo += 2200; // espaçamento entre frases
-  });
-
- // 🎯 FINAL
-  setTimeout(() => {
-    logo.classList.remove("logo-blur");
-    logo.classList.add("logo-focus");
-
-    // só mostra botão depois de instalar
-    if (localStorage.getItem("app_instalada") === "true") {
-      btnFinal.style.display = "block";
-    }
-
-  }, tempo);
-}
 </script>
 
-</div>
 </body>
 </html>
