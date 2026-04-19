@@ -34,7 +34,11 @@ body {
 
 <body>
 
-<video id="video" autoplay muted playsinline>
+<img id="play"
+src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png"
+style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;cursor:pointer;z-index:10;">
+
+<video id="video" playsinline style="display:none;">
   <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
 </video>
 
@@ -51,15 +55,46 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 const video = document.getElementById("video");
 const btn = document.getElementById("btn");
+const play = document.getElementById("play");
 
-// 👉 se já instalou → salta tudo
+// 👉 se já instalou → salta tudo (primeiro!)
 if (localStorage.getItem("app_instalada") === "true") {
   window.location.href = "index.html";
 }
 
+// ▶️ PLAY
+play.onclick = () => {
+  play.style.pointerEvents = "none";
+  play.style.display = "none";
+  video.style.display = "block";
+  video.play();
+};
+
 // 👉 quando vídeo acaba → mostra botão
-video.onended = () => {
-  btn.style.display = "block";
+video.onended = async () => {
+
+  let instaladoAgora = false;
+
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+
+    const escolha = await deferredPrompt.userChoice;
+
+    if (escolha.outcome === "accepted") {
+      localStorage.setItem("app_instalada", "true");
+      instaladoAgora = true;
+    }
+
+    deferredPrompt = null;
+  }
+
+  // 👉 só mostra botão se instalou
+  if (instaladoAgora || localStorage.getItem("app_instalada") === "true") {
+    btn.style.display = "block";
+  } else {
+    // 👉 fallback: entra direto
+    window.location.href = "index.html";
+  }
 };
 
 // 👉 botão
