@@ -4,40 +4,25 @@
 <meta charset="UTF-8">
 <title>Instalação</title>
 
-<link rel="manifest" href="/manifest.json">
-
 <style>
 body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-
-  background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  background-color: black;
-}
-#bg {
-  position: fixed;
-  inset: 0;
   background: black;
-  z-index: 0;
 }
-/* 🎬 VIDEO */
+
+/* 🎬 VÍDEO É O FUNDO */
 #video {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-  display: none;
   background: black;
-  z-index: 10;
 }
 
-/* ▶️ PLAY */
+/* ▶️ PLAY por cima do primeiro frame */
 #play {
   position: fixed;
   top: 50%;
@@ -48,23 +33,7 @@ body {
   z-index: 10;
 }
 
-/* 🚀 BOTÃO FINAL */
-#btn {
-  position: fixed;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 260px;
-  display: none;
-  cursor: pointer;
-  z-index: 30;
-}
-
-#btn:hover {
-  content: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mas-se-der-asneira-n-o-fui-eu.png');
-}
-
-/* 🟡 ÁREA INVISÍVEL DE INSTALAÇÃO */
+/* 🟡 ZONA INVISÍVEL (instalação no fim) */
 #installZone {
   position: fixed;
   inset: 0;
@@ -76,60 +45,48 @@ body {
 </head>
 
 <body>
-<div id="bg"></div>
+
+<!-- 🎬 VIDEO (já visível desde o início) -->
+<video id="video" playsinline preload="auto">
+  <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
+</video>
+
 <!-- ▶️ PLAY -->
 <img id="play"
 src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 
-<!-- 🎬 VIDEO -->
-<video id="video" playsinline preload="auto" poster="">
-  <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
-</video>
-
-<!-- 🟡 ÁREA INVISÍVEL -->
+<!-- 🟡 CLICK FINAL -->
 <div id="installZone"></div>
-
-<!-- 🚀 BOTÃO FINAL -->
-<img id="btn"
-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
 <script>
 let deferredPrompt = null;
 
-// captura instalação PWA
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
 });
 
-// já instalado → entra direto
-if (localStorage.getItem("app_instalada") === "true") {
-  window.location.href = "index.html";
-}
-
 const video = document.getElementById("video");
 const play = document.getElementById("play");
-const btn = document.getElementById("btn");
 const installZone = document.getElementById("installZone");
 
-// ▶️ PLAY → inicia vídeo
+// ▶️ play → inicia vídeo
 play.onclick = async () => {
   play.style.display = "none";
-  video.style.display = "block";
 
   try {
     await video.play();
   } catch (e) {
-    console.log("Erro a tocar vídeo:", e);
+    console.log(e);
   }
 };
 
-// 🎬 fim do vídeo → ativa zona de instalação
+// 🎬 fim do vídeo → ativa instalação
 video.onended = () => {
   installZone.style.display = "block";
 };
 
-// 🟡 clique → instalação
+// 🟡 instalação
 installZone.onclick = async () => {
 
   if (deferredPrompt) {
@@ -146,12 +103,6 @@ installZone.onclick = async () => {
     return;
   }
 
-  // fallback
-  window.location.href = "index.html";
-};
-
-// botão final (caso o tenhas noutro fluxo)
-btn.onclick = () => {
   window.location.href = "index.html";
 };
 
