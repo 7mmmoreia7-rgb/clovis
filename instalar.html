@@ -9,22 +9,29 @@
 <style>
 body {
   margin: 0;
+  padding: 0;
   overflow: hidden;
+  background-color: black;
   background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png');
   background-size: cover;
   background-position: center;
-  background-color: black;
 }
-
+#bg {
+  position: fixed;
+  inset: 0;
+  background: black;
+  z-index: 0;
+}
 /* 🎬 VIDEO */
 #video {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   object-fit: cover;
   display: none;
   background: black;
+  z-index: 10;
 }
 
 /* ▶️ PLAY */
@@ -66,13 +73,13 @@ body {
 </head>
 
 <body>
-
+<div id="bg"></div>
 <!-- ▶️ PLAY -->
 <img id="play"
 src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 
 <!-- 🎬 VIDEO -->
-<video id="video" playsinline preload="auto">
+<video id="video" playsinline preload="auto" poster="">
   <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
 </video>
 
