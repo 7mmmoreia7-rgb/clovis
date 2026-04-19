@@ -61,10 +61,11 @@ src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 <div id="installZone"></div>
 
 <script>
-  if (
-  localStorage.getItem("app_instalada") === "true" ||
-  window.matchMedia('(display-mode: standalone)').matches
-) {
+const isStandalone =
+  window.matchMedia('(display-mode: standalone)').matches ||
+  window.navigator.standalone === true;
+
+if (isStandalone) {
   window.location.href = "index.html";
 }
 let deferredPrompt = null;
@@ -74,11 +75,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
 });
-
-// se já instalada → entra direto na app
-if (localStorage.getItem("app_instalada") === "true") {
-  window.location.href = "index.html";
-}
 
 const video = document.getElementById("video");
 const play = document.getElementById("play");
