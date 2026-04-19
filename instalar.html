@@ -16,10 +16,13 @@ body {
 }
 
 #video {
-  position:fixed;
-  width:100%;
-  height:100%;
-  object-fit:cover;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png');
+  background-size: cover;
+  background-position: center;
 }
 
 #btn {
@@ -40,7 +43,7 @@ body {
 src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png"
 style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;cursor:pointer;z-index:10;">
 
-<video id="video" playsinline style="display:none;">
+<video id="video" playsinline preload="auto" style="display:none;">
   <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
 </video>
 <img id="logo"
@@ -70,7 +73,9 @@ const video = document.getElementById("video");
 const btn = document.getElementById("btn");
 const play = document.getElementById("play");
 const logo = document.getElementById("logo");
-  
+video.onended = () => {
+  logo.style.display = "block";
+};  
 // 👉 se já instalou → salta tudo (primeiro!)
 if (localStorage.getItem("app_instalada") === "true") {
   window.location.href = "index.html";
@@ -83,9 +88,6 @@ play.onclick = () => {
   video.style.display = "block";
   video.play();
 };
-
-// 👉 quando vídeo acaba → mostra botão
-video.onended = async () => {
 
   let instaladoAgora = false;
 
@@ -135,6 +137,23 @@ btn.onclick = async () => {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
+  logo.onclick = async () => {
+
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+
+    const escolha = await deferredPrompt.userChoice;
+
+    if (escolha.outcome === "accepted") {
+      localStorage.setItem("app_instalada", "true");
+    }
+
+    deferredPrompt = null;
+  }
+
+  // 👉 entra sempre na app
+  window.location.href = "index.html";
+};
 </script>
 
 </body>
