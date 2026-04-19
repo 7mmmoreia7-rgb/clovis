@@ -8,67 +8,59 @@
 
 <style>
 body {
-  margin:0;
-  overflow:hidden;
+  margin: 0;
+  overflow: hidden;
   background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png');
   background-size: cover;
   background-position: center;
+  background-color: black;
 }
 
 /* 🎬 VIDEO */
 #video {
   position: fixed;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  display:none;
+  display: none;
   background: black;
 }
 
 /* ▶️ PLAY */
 #play {
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:140px;
-  cursor:pointer;
-  z-index:10;
-}
-
-/* 🌀 LOGO (clicável) */
-#logo {
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:220px;
-
-  opacity:0;          /* invisível */
-  z-index:20;
-  cursor:pointer;
-}
-
-#logo:hover {
-  transform:translate(-50%,-50%) scale(1.05);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140px;
+  cursor: pointer;
+  z-index: 10;
 }
 
 /* 🚀 BOTÃO FINAL */
 #btn {
-  position:fixed;
-  bottom:40px;
-  left:50%;
-  transform:translateX(-50%);
-  width:260px;
-  display:none;
-  cursor:pointer;
-  z-index:30;
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  display: none;
+  cursor: pointer;
+  z-index: 30;
 }
 
 #btn:hover {
   content: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mas-se-der-asneira-n-o-fui-eu.png');
+}
+
+/* 🟡 ÁREA INVISÍVEL DE INSTALAÇÃO */
+#installZone {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: transparent;
+  display: none;
 }
 </style>
 </head>
@@ -84,9 +76,8 @@ src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
   <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
 </video>
 
-<!-- 🌀 LOGO -->
-<img id="logo"
-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/icon-512.png">
+<!-- 🟡 ÁREA INVISÍVEL -->
+<div id="installZone"></div>
 
 <!-- 🚀 BOTÃO FINAL -->
 <img id="btn"
@@ -95,35 +86,41 @@ src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-ach
 <script>
 let deferredPrompt = null;
 
+// captura instalação PWA
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
 });
 
-const video = document.getElementById("video");
-const play = document.getElementById("play");
-const logo = document.getElementById("logo");
-const btn = document.getElementById("btn");
-
-// 👉 se já está instalada → entra direto
+// já instalado → entra direto
 if (localStorage.getItem("app_instalada") === "true") {
   window.location.href = "index.html";
 }
 
-// ▶️ PLAY
-play.onclick = () => {
+const video = document.getElementById("video");
+const play = document.getElementById("play");
+const btn = document.getElementById("btn");
+const installZone = document.getElementById("installZone");
+
+// ▶️ PLAY → inicia vídeo
+play.onclick = async () => {
   play.style.display = "none";
   video.style.display = "block";
-  video.play();
+
+  try {
+    await video.play();
+  } catch (e) {
+    console.log("Erro a tocar vídeo:", e);
+  }
 };
 
-// 🎬 fim do vídeo → mostra logo
+// 🎬 fim do vídeo → ativa zona de instalação
 video.onended = () => {
-  // não mostra logo
+  installZone.style.display = "block";
 };
 
-// 🌀 LOGO = instalar + entrar
-logo.onclick = async () => {
+// 🟡 clique → instalação
+installZone.onclick = async () => {
 
   if (deferredPrompt) {
     deferredPrompt.prompt();
@@ -132,18 +129,18 @@ logo.onclick = async () => {
 
     if (escolha.outcome === "accepted") {
       localStorage.setItem("app_instalada", "true");
-      btn.style.display = "block"; // mostra botão final
-      return;
+      window.location.href = "index.html";
     }
 
     deferredPrompt = null;
+    return;
   }
 
-  // fallback → entra na app
+  // fallback
   window.location.href = "index.html";
 };
 
-// 🚀 BOTÃO FINAL → entrar na app
+// botão final (caso o tenhas noutro fluxo)
 btn.onclick = () => {
   window.location.href = "index.html";
 };
