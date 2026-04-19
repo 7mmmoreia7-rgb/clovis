@@ -10,7 +10,9 @@
 body {
   margin:0;
   overflow:hidden;
-  background:black;
+  background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png');
+  background-size: cover;
+  background-position: center;
 }
 
 #video {
@@ -41,7 +43,18 @@ style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:120p
 <video id="video" playsinline style="display:none;">
   <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
 </video>
-
+<img id="logo"
+src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/icon-512.png"
+style="
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:200px;
+display:none;
+z-index:20;
+cursor:pointer;
+">
 <img id="btn"
 src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
@@ -56,7 +69,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
 const video = document.getElementById("video");
 const btn = document.getElementById("btn");
 const play = document.getElementById("play");
-
+const logo = document.getElementById("logo");
+  
 // 👉 se já instalou → salta tudo (primeiro!)
 if (localStorage.getItem("app_instalada") === "true") {
   window.location.href = "index.html";
