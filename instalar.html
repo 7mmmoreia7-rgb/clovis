@@ -24,6 +24,7 @@ body {
   height:100vh;
   object-fit: cover;
   display:none;
+  background: black;
 }
 
 /* ▶️ PLAY */
@@ -44,10 +45,10 @@ body {
   left:50%;
   transform:translate(-50%,-50%);
   width:220px;
-  display:none;
+
+  opacity:0;          /* invisível */
   z-index:20;
   cursor:pointer;
-  transition: transform .3s;
 }
 
 #logo:hover {
@@ -118,7 +119,7 @@ play.onclick = () => {
 
 // 🎬 fim do vídeo → mostra logo
 video.onended = () => {
-  logo.style.display = "block";
+  // não mostra logo
 };
 
 // 🌀 LOGO = instalar + entrar
