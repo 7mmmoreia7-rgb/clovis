@@ -15,16 +15,46 @@ body {
   background-position: center;
 }
 
+/* 🎬 VIDEO */
 #video {
   position: fixed;
-  width: 100%;
-  height: 100%;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
   object-fit: cover;
-  background-image: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png');
-  background-size: cover;
-  background-position: center;
+  display:none;
 }
 
+/* ▶️ PLAY */
+#play {
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:140px;
+  cursor:pointer;
+  z-index:10;
+}
+
+/* 🌀 LOGO (clicável) */
+#logo {
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:220px;
+  display:none;
+  z-index:20;
+  cursor:pointer;
+  transition: transform .3s;
+}
+
+#logo:hover {
+  transform:translate(-50%,-50%) scale(1.05);
+}
+
+/* 🚀 BOTÃO FINAL */
 #btn {
   position:fixed;
   bottom:40px;
@@ -33,31 +63,31 @@ body {
   width:260px;
   display:none;
   cursor:pointer;
+  z-index:30;
+}
+
+#btn:hover {
+  content: url('https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/mas-se-der-asneira-n-o-fui-eu.png');
 }
 </style>
 </head>
 
 <body>
 
+<!-- ▶️ PLAY -->
 <img id="play"
-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png"
-style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;cursor:pointer;z-index:10;">
+src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 
-<video id="video" playsinline preload="auto" style="display:none;">
+<!-- 🎬 VIDEO -->
+<video id="video" playsinline preload="auto">
   <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
 </video>
+
+<!-- 🌀 LOGO -->
 <img id="logo"
-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/icon-512.png"
-style="
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:200px;
-display:none;
-z-index:20;
-cursor:pointer;
-">
+src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/icon-512.png">
+
+<!-- 🚀 BOTÃO FINAL -->
 <img id="btn"
 src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/pronto-j-est-acho-eu.png">
 
@@ -70,53 +100,30 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 const video = document.getElementById("video");
-const btn = document.getElementById("btn");
 const play = document.getElementById("play");
 const logo = document.getElementById("logo");
-video.onended = () => {
-  logo.style.display = "block";
-};  
-// 👉 se já instalou → salta tudo (primeiro!)
+const btn = document.getElementById("btn");
+
+// 👉 se já está instalada → entra direto
 if (localStorage.getItem("app_instalada") === "true") {
   window.location.href = "index.html";
 }
 
 // ▶️ PLAY
 play.onclick = () => {
-  play.style.pointerEvents = "none";
   play.style.display = "none";
   video.style.display = "block";
   video.play();
 };
 
-  let instaladoAgora = false;
-
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-
-    const escolha = await deferredPrompt.userChoice;
-
-    if (escolha.outcome === "accepted") {
-      localStorage.setItem("app_instalada", "true");
-      instaladoAgora = true;
-    }
-
-    deferredPrompt = null;
-  }
-
-  // 👉 só mostra botão se instalou
-  if (instaladoAgora || localStorage.getItem("app_instalada") === "true") {
-    btn.style.display = "block";
-  } else {
-    // 👉 fallback: entra direto
-    window.location.href = "index.html";
-  }
+// 🎬 fim do vídeo → mostra logo
+video.onended = () => {
+  logo.style.display = "block";
 };
 
-// 👉 botão
-btn.onclick = async () => {
+// 🌀 LOGO = instalar + entrar
+logo.onclick = async () => {
 
-  // tenta instalar
   if (deferredPrompt) {
     deferredPrompt.prompt();
 
@@ -124,12 +131,19 @@ btn.onclick = async () => {
 
     if (escolha.outcome === "accepted") {
       localStorage.setItem("app_instalada", "true");
+      btn.style.display = "block"; // mostra botão final
+      return;
     }
 
     deferredPrompt = null;
   }
 
-  // SEMPRE entra na app
+  // fallback → entra na app
+  window.location.href = "index.html";
+};
+
+// 🚀 BOTÃO FINAL → entrar na app
+btn.onclick = () => {
   window.location.href = "index.html";
 };
 
@@ -137,23 +151,6 @@ btn.onclick = async () => {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
-  logo.onclick = async () => {
-
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-
-    const escolha = await deferredPrompt.userChoice;
-
-    if (escolha.outcome === "accepted") {
-      localStorage.setItem("app_instalada", "true");
-    }
-
-    deferredPrompt = null;
-  }
-
-  // 👉 entra sempre na app
-  window.location.href = "index.html";
-};
 </script>
 
 </body>
