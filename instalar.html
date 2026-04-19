@@ -2,7 +2,9 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<title>Instalação</title>
+<title>App</title>
+
+<link rel="manifest" href="/manifest.json">
 
 <style>
 body {
@@ -12,7 +14,7 @@ body {
   background: black;
 }
 
-/* 🎬 VÍDEO (sem flash) */
+/* 🎬 VÍDEO */
 #video {
   position: fixed;
   inset: 0;
@@ -33,26 +35,21 @@ body {
   z-index: 10;
 }
 
-/* 🌀 LOGO (vem no vídeo/design e só ativa no fim) */
-#logo {
+/* 🟡 CLICK FINAL (instalação) */
+#installZone {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 220px;
-  opacity: 0;
-  pointer-events: none;
+  inset: 0;
   z-index: 20;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
+  display: none;
+  background: transparent;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🎬 VÍDEO -->
-<video id="video" playsinline preload="auto" poster="">
+<!-- 🎬 VÍDEO (a tua instalação está DENTRO do vídeo) -->
+<video id="video" playsinline preload="auto">
   <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
 </video>
 
@@ -60,36 +57,46 @@ body {
 <img id="play"
 src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 
-<!-- 🌀 LOGO (já está no design) -->
-<img id="logo"
-src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/icon-512.png">
+<!-- 🟡 ZONA CLICÁVEL FINAL -->
+<div id="installZone"></div>
 
 <script>
+  if (
+  localStorage.getItem("app_instalada") === "true" ||
+  window.matchMedia('(display-mode: standalone)').matches
+) {
+  window.location.href = "index.html";
+}
 let deferredPrompt = null;
 
+// PWA install hook
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
 });
 
+// se já instalada → entra direto na app
+if (localStorage.getItem("app_instalada") === "true") {
+  window.location.href = "index.html";
+}
+
 const video = document.getElementById("video");
 const play = document.getElementById("play");
-const logo = document.getElementById("logo");
+const installZone = document.getElementById("installZone");
 
-/* ▶️ PLAY → vídeo */
+// ▶️ play → inicia vídeo
 play.onclick = async () => {
   play.style.display = "none";
   await video.play().catch(() => {});
 };
 
-/* 🎬 FIM DO VÍDEO → mostra logo clicável */
+// 🎬 fim do vídeo → ativa clique
 video.onended = () => {
-  logo.style.opacity = "1";
-  logo.style.pointerEvents = "auto";
+  installZone.style.display = "block";
 };
 
-/* 🌀 LOGO → instalação PWA oficial */
-logo.onclick = async () => {
+// 🟡 clique → instalação + app
+installZone.onclick = async () => {
 
   if (deferredPrompt) {
     deferredPrompt.prompt();
@@ -105,6 +112,11 @@ logo.onclick = async () => {
 
   window.location.href = "index.html";
 };
+
+// service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
 </script>
 
 </body>
