@@ -12,7 +12,7 @@ body {
   background: black;
 }
 
-/* 🎬 VÍDEO É O FUNDO */
+/* 🎬 VÍDEO (sem flash) */
 #video {
   position: fixed;
   inset: 0;
@@ -22,7 +22,7 @@ body {
   background: black;
 }
 
-/* ▶️ PLAY por cima do primeiro frame */
+/* ▶️ PLAY */
 #play {
   position: fixed;
   top: 50%;
@@ -33,21 +33,26 @@ body {
   z-index: 10;
 }
 
-/* 🟡 ZONA INVISÍVEL (instalação no fim) */
-#installZone {
+/* 🌀 LOGO (vem no vídeo/design e só ativa no fim) */
+#logo {
   position: fixed;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  opacity: 0;
+  pointer-events: none;
   z-index: 20;
-  background: transparent;
-  display: none;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🎬 VIDEO (já visível desde o início) -->
-<video id="video" playsinline preload="auto">
+<!-- 🎬 VÍDEO -->
+<video id="video" playsinline preload="auto" poster="">
   <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
 </video>
 
@@ -55,8 +60,9 @@ body {
 <img id="play"
 src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 
-<!-- 🟡 CLICK FINAL -->
-<div id="installZone"></div>
+<!-- 🌀 LOGO (já está no design) -->
+<img id="logo"
+src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/icon-512.png">
 
 <script>
 let deferredPrompt = null;
@@ -68,48 +74,37 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 const video = document.getElementById("video");
 const play = document.getElementById("play");
-const installZone = document.getElementById("installZone");
+const logo = document.getElementById("logo");
 
-// ▶️ play → inicia vídeo
+/* ▶️ PLAY → vídeo */
 play.onclick = async () => {
   play.style.display = "none";
-
-  try {
-    await video.play();
-  } catch (e) {
-    console.log(e);
-  }
+  await video.play().catch(() => {});
 };
 
-// 🎬 fim do vídeo → ativa instalação
+/* 🎬 FIM DO VÍDEO → mostra logo clicável */
 video.onended = () => {
-  installZone.style.display = "block";
+  logo.style.opacity = "1";
+  logo.style.pointerEvents = "auto";
 };
 
-// 🟡 instalação
-installZone.onclick = async () => {
+/* 🌀 LOGO → instalação PWA oficial */
+logo.onclick = async () => {
 
   if (deferredPrompt) {
     deferredPrompt.prompt();
 
-    const escolha = await deferredPrompt.userChoice;
+    const choice = await deferredPrompt.userChoice;
 
-    if (escolha.outcome === "accepted") {
+    if (choice.outcome === "accepted") {
       localStorage.setItem("app_instalada", "true");
-      window.location.href = "index.html";
     }
 
     deferredPrompt = null;
-    return;
   }
 
   window.location.href = "index.html";
 };
-
-// service worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
-}
 </script>
 
 </body>
