@@ -61,21 +61,72 @@ src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 <div id="installZone"></div>
 
 <script>
+  
 const isStandalone =
   window.matchMedia('(display-mode: standalone)').matches ||
   window.navigator.standalone === true;
 
+// 👉 se já está instalada → vai direto à app
 if (isStandalone) {
   window.location.href = "index.html";
 }
-let deferredPrompt = null;
 
-// PWA install hook
+// 👉 estado da instalação
+let deferredPrompt = null;
+let installAvailable = false;
+
+// 👉 captura do install prompt
+  
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
+  installAvailable = true;
 });
+async function tryInstall() {
 
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+
+    const choice = await deferredPrompt.userChoice;
+
+    if (choice.outcome === "accepted") {
+      localStorage.setItem("app_instalada", "true");
+    }
+
+    deferredPrompt = null;
+    return;
+  }
+
+  showFallbackInstall();
+}
+  function showFallbackInstall() {
+
+  const fallback = document.createElement("div");
+
+  fallback.innerHTML = `
+    <div style="
+      position:fixed;
+      inset:0;
+      background:black;
+      color:white;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      font-family:sans-serif;
+      z-index:9999;
+      padding:20px;
+    ">
+      <h2>Instalar App</h2>
+      <p>Se não apareceu automaticamente:</p>
+      <p><b>Chrome → ⋮ → “Adicionar ao ecrã inicial”</b></p>
+      <p>ou “Instalar app” no menu do browser</p>
+    </div>
+  `;
+
+  document.body.appendChild(fallback);
+}
 const video = document.getElementById("video");
 const play = document.getElementById("play");
 const installZone = document.getElementById("installZone");
@@ -88,6 +139,7 @@ play.onclick = async () => {
 
 // 🎬 fim do vídeo → ativa clique
 video.onended = () => {
+  installZone.onclick = tryInstall;
   installZone.style.display = "block";
 };
 
@@ -113,6 +165,7 @@ installZone.onclick = async () => {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
+
 </script>
 
 </body>
