@@ -17,22 +17,25 @@ html,body{
   width:100%;
   height:100%;
   overflow:hidden;
-
-  /* 💣 FIX FLASH PRETO */
   background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
 }
 
-#wrap,#stage{
+/* WRAP */
+#wrap{
+  position:relative;
+  width:100%;
+  height:100%;
+  background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
+}
+
+#stage{
   position:relative;
   width:100%;
   height:100%;
   overflow:hidden;
-
-  /* 💣 FIX FLASH PRETO */
-  background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
 }
 
-/* VIDEO */
+/* VIDEO INICIAL */
 #vid{
   position:absolute;
   inset:0;
@@ -40,6 +43,8 @@ html,body{
   height:100%;
   object-fit:cover;
   z-index:1;
+  background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
+  transition:opacity .2s ease;
 }
 
 /* PLAY */
@@ -51,11 +56,30 @@ html,body{
   width:10%;
   cursor:pointer;
   z-index:1000;
+  transition:opacity .4s;
 }
-
 #play.gone{opacity:0;pointer-events:none;}
 
-/* GALERIA BACKGROUND */
+/* SKIP (MANTIDO COMO TINHAS) */
+#btn-skip{
+  position:fixed;
+  bottom:3.5%;
+  right:3.4%;
+  width:8%;
+  cursor:pointer;
+  z-index:800;
+  border:none;
+  background:transparent;
+}
+#btn-skip img{
+  width:100%;
+  display:block;
+}
+#btn-skip:hover img{
+  content:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/ok-vai-mesmo.png");
+}
+
+/* GALERIA */
 #gbg{
   position:absolute;
   inset:0;
@@ -64,12 +88,10 @@ html,body{
   object-fit:cover;
   z-index:2;
   opacity:0;
-  transition:opacity 1s ease;
+  transition:opacity 1.2s ease;
 }
-
 #gbg.show{opacity:1;}
 
-/* SLOTS */
 #slots{
   position:absolute;
   left:9.2%;
@@ -81,13 +103,30 @@ html,body{
   grid-template-rows:repeat(3,1fr);
   z-index:5;
   opacity:0;
-  transition:opacity 1s ease;
+  transition:opacity 1.2s ease;
 }
-
 #slots.show{opacity:1;}
 
 .slot{position:relative;overflow:hidden;}
-.slot img,.slot video{width:100%;height:100%;object-fit:cover}
+
+.slot img,.slot video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* BOTÃO ÍNDICE */
+#btn-idx{
+  position:fixed;
+  bottom:3.5%;
+  right:3.4%;
+  width:8%;
+  cursor:pointer;
+  z-index:900;
+  opacity:0;
+  pointer-events:none;
+}
+#btn-idx.show{opacity:1;pointer-events:all;}
 
 /* FULLSCREEN */
 #fsmod{
@@ -99,40 +138,57 @@ html,body{
   align-items:center;
   justify-content:center;
 }
-
 #fsmod.on{display:flex;}
 
 #fscont{
   width:100%;
-  height:100%;
+  height:calc(100% - 60px);
   display:flex;
   align-items:center;
   justify-content:center;
 }
 
-/* VIDEO FULLSCREEN FIX */
-#fscont video{
-  width:100%;
-  height:100%;
+/* VIDEO FULLSCREEN (SEM BLOQUEAR CLIQUE NO CONTROLO) */
+#fscont video,
+#fscont img{
+  max-width:90%;
+  max-height:90%;
   object-fit:contain;
-  background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
 }
 
-/* BOTÃO */
-#btn-idx{
-  position:fixed;
-  bottom:3.5%;
-  right:3.4%;
-  width:8%;
+/* CONTROLOS */
+#fsbar{
+  position:absolute;
+  bottom:10px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:12px;
+}
+
+.fsbtn{
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.3);
+  color:#fff;
+  padding:8px 14px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* TOAST */
+#toast{
+  position:absolute;
+  bottom:3%;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.8);
+  color:#fff;
+  padding:10px 20px;
+  border-radius:20px;
   opacity:0;
-  pointer-events:none;
+  transition:.3s;
 }
-
-#btn-idx.show{
-  opacity:1;
-  pointer-events:all;
-}
-
+#toast.on{opacity:1;}
 </style>
 </head>
 
@@ -141,7 +197,7 @@ html,body{
 <div id="wrap">
   <div id="stage">
 
-    <video id="vid" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/galeria/galeria.mp4" playsinline></video>
+    <video id="vid" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/galeria/galeria.mp4" playsinline preload="auto"></video>
 
     <img id="play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 
@@ -149,71 +205,90 @@ html,body{
 
     <div id="slots"></div>
 
+    <img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png">
+
+    <button id="btn-skip">
+      <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/vai-l-eu-deixo.png">
+    </button>
+
     <div id="fsmod">
       <div id="fscont"></div>
+      <div id="fsbar">
+        <button class="fsbtn" id="fscls">Fechar</button>
+      </div>
     </div>
+
+    <div id="toast"></div>
 
   </div>
 </div>
 
-<img id="btn-idx">
-
 <script>
-
-let currentVideo = null;
-
 const vid = document.getElementById("vid");
 const play = document.getElementById("play");
+const btnSkip = document.getElementById("btn-skip");
 const gbg = document.getElementById("gbg");
 const slots = document.getElementById("slots");
+const btnIdx = document.getElementById("btn-idx");
+
 const fsmod = document.getElementById("fsmod");
 const fscont = document.getElementById("fscont");
-const btnIdx = document.getElementById("btn-idx");
+const fscls = document.getElementById("fscls");
+
+let currentVideo = null;
 
 /* PLAY */
 play.onclick = () => {
   play.classList.add("gone");
-  vid.play().catch(()=>{});
+  btnSkip.classList.add("gone");
+
+  vid.play().catch(() => {
+    vid.muted = true;
+    vid.play();
+  });
 };
 
-/* TRANSIÇÃO SEM FLASH */
-vid.onended = () => {
+/* SKIP (CORRIGIDO E CONSISTENTE) */
+btnSkip.onclick = () => {
+  play.classList.add("gone");
+  btnSkip.classList.add("gone");
+
+  vid.pause();
+  vid.currentTime = vid.duration;
   vid.style.opacity = "0";
 
-  setTimeout(() => {
-    gbg.classList.add("show");
-    slots.classList.add("show");
-    btnIdx.classList.add("show");
-  }, 120);
+  setTimeout(goGallery, 150);
 };
 
+/* FIM DO VÍDEO */
+vid.onended = () => {
+  vid.style.opacity = "0";
+  goGallery();
+};
+
+/* GALERIA */
+function goGallery(){
+  gbg.classList.add("show");
+  slots.classList.add("show");
+  btnIdx.classList.add("show");
+}
+
 /* FULLSCREEN */
-function verSlot(idx){
+function verSlot(url){
+  fscont.innerHTML = "";
+
   const v = document.createElement("video");
-
-  currentVideo = v;
-
-  v.src = data[idx].url;
+  v.src = url;
   v.controls = true;
   v.playsInline = true;
-  v.preload = "auto";
 
-  fscont.innerHTML = "";
   fscont.appendChild(v);
 
   fsmod.classList.add("on");
 }
 
-/* FECHAR FULLSCREEN */
-fsmod.onclick = () => {
+fscls.onclick = () => {
   fsmod.classList.remove("on");
-
-  if(currentVideo){
-    currentVideo.pause();
-    currentVideo.remove();
-    currentVideo = null;
-  }
-
   fscont.innerHTML = "";
 };
 
