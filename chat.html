@@ -436,6 +436,10 @@ document.getElementById('msgs-box').addEventListener('click',function(e){
   var t=e.target;
   if(t.tagName==='VIDEO'){abrirFs('video',t.getAttribute('data-vsrc')||t.src);return;}
   if(t.tagName==='IMG'&&t.classList.contains('media-img')){abrirFs('img',t.getAttribute('data-f')||t.src);return;}
+  if(t.tagName==='IMG' && t.classList.contains('emoji')){
+  abrirFs('img', t.src);
+  return;
+}
 });
 
 document.getElementById('btn-export').onclick=function(){if(fsAtualSrc)guardarFs();};
@@ -446,6 +450,22 @@ function abrirFs(tipo,src){
   var img=document.getElementById('fs-img'),vid=document.getElementById('fs-vid');
   if(tipo==='img'){img.src=src;img.style.display='block';vid.pause();vid.src='';vid.style.display='none';}
   else{vid.src=src;vid.style.display='block';vid.play().catch(function(){});img.src='';img.style.display='none';}
+  document.getElementById('fs-overlay').classList.add('open');
+}
+  function abrirEmojiFs(src){
+  var img=document.getElementById('fs-img');
+  var vid=document.getElementById('fs-vid');
+
+  fsAtualSrc=src;
+  fsAtualTipo='img';
+
+  vid.pause();
+  vid.src='';
+  vid.style.display='none';
+
+  img.src=src;
+  img.style.display='block';
+
   document.getElementById('fs-overlay').classList.add('open');
 }
 function fecharFs(){
@@ -461,7 +481,9 @@ function guardarFs(){
   .then(function(blob){
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
-    a.href=url;a.download=fsAtualTipo==='video'?'video.mp4':'imagem.jpg';
+    a.download = fsAtualTipo === 'video'
+  ? 'video.mp4'
+  : 'emoji.png';
     document.body.appendChild(a);a.click();
     document.body.removeChild(a);URL.revokeObjectURL(url);
   }).catch(function(){
