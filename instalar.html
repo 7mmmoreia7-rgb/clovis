@@ -21,7 +21,7 @@ body {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-  background: black;
+  background: transparent;
 }
 
 /* ▶️ PLAY */
@@ -49,7 +49,7 @@ body {
 <body>
 
 <!-- 🎬 VÍDEO (a tua instalação está DENTRO do vídeo) -->
-<video id="video" playsinline preload="auto">
+<video id="video" playsinline preload="auto" muted>
   <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/instalar.mp4">
 </video>
 
@@ -130,6 +130,10 @@ async function tryInstall() {
   document.body.appendChild(fallback);
 }
 const video = document.getElementById("video");
+  // 🔥 força primeiro frame (adeus flash preto)
+video.addEventListener("loadeddata", () => {
+  video.currentTime = 0.01;
+});
 const play = document.getElementById("play");
 const installZone = document.getElementById("installZone");
 
