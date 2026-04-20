@@ -10,6 +10,16 @@
 <link rel="manifest" href="/manifest.json">
 
 <script>
+  const isStandalone =
+  window.matchMedia('(display-mode: standalone)').matches ||
+  window.navigator.standalone === true;
+
+const jaInstalada = localStorage.getItem("app_instalada") === "true";
+
+// 👉 se NÃO está instalada → manda para instalação
+if (!isStandalone && !jaInstalada) {
+  window.location.href = "instalar.html";
+}
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
