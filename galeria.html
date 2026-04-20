@@ -422,7 +422,6 @@ const FILE_URL = API_BASE + "/file?key=";
 /* ------------------------------
    ELEMENTOS
 --------------------------------*/
-  let currentVideo = null;
 const vid = document.getElementById("vid");
 const play = document.getElementById("play");
 const btnSkip = document.getElementById("btn-skip");
@@ -590,22 +589,23 @@ function uploadStorage(file, slot) {
 /* ------------------------------
    FULLSCREEN
 --------------------------------*/
+function verSlot(idx) {
+  const s = data[idx];
+  if (!s || !s.url) return;
+
+  fscont.innerHTML = "";
+  btnIdx.classList.add("gone");
+
+  const isVideo = s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i);
+
 if (isVideo) {
   const v = document.createElement("video");
-  currentVideo = v;
-
   v.src = s.url;
-
-  v.autoplay = true;
-  v.loop = true;
-  v.playsInline = true;
-  v.preload = "auto";
-
-  // 🔥 ISTO É O CRÍTICO
-  v.muted = true;
 
   v.controls = true;
   v.controlsList = "nodownload";
+  v.playsInline = true;
+  v.preload = "auto";
 
   v.style.width = "100%";
   v.style.height = "100%";
@@ -615,14 +615,10 @@ if (isVideo) {
 
   v.load();
 
-  // garante play quando estiver pronto
-  v.addEventListener("canplay", () => {
-    v.play().catch(err => {
-      console.log("Autoplay bloqueado:", err);
-    });
+  v.play().catch(() => {
+    console.log("Esperando interação do utilizador");
   });
 
-  // clique para som (boa prática)
   const enableSound = () => {
     v.muted = false;
     v.volume = 1;
@@ -632,6 +628,16 @@ if (isVideo) {
   v.addEventListener("click", enableSound);
   v.addEventListener("touchstart", enableSound);
 }
+
+  fsmod.classList.add("on");
+}
+
+
+fscls.onclick = () => {
+  fsmod.classList.remove("on");
+  btnIdx.classList.remove("gone"); // voltar a mostrar índice
+};
+
 /* ------------------------------
    DOWNLOAD (Guardar no dispositivo)
 --------------------------------*/
