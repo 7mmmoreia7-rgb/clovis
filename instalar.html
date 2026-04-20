@@ -61,7 +61,9 @@ src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 <div id="installZone"></div>
 
 <script>
-  
+if (localStorage.getItem("app_instalada") === "true") {
+  window.location.href = "index.html";
+}  
 const isStandalone =
   window.matchMedia('(display-mode: standalone)').matches ||
   window.navigator.standalone === true;
