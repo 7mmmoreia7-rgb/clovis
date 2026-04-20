@@ -604,10 +604,8 @@ if (isVideo) {
 
   v.controls = true;
   v.controlsList = "nodownload";
-
-  v.autoplay = true;
-  v.muted = true;
   v.playsInline = true;
+  v.preload = "auto";
 
   v.style.width = "100%";
   v.style.height = "100%";
@@ -615,7 +613,20 @@ if (isVideo) {
 
   fscont.appendChild(v);
 
-  v.play().catch(() => {});
+  v.load();
+
+  v.play().catch(() => {
+    console.log("Esperando interação do utilizador");
+  });
+
+  const enableSound = () => {
+    v.muted = false;
+    v.volume = 1;
+    v.play().catch(() => {});
+  };
+
+  v.addEventListener("click", enableSound);
+  v.addEventListener("touchstart", enableSound);
 }
 
   fsmod.classList.add("on");
