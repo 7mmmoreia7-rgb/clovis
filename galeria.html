@@ -32,6 +32,7 @@ html,body{
   width:100%;
   height:100%;
   overflow:hidden;
+  background: url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
 }
 
 /* remover preto atrás do vídeo */
@@ -43,6 +44,7 @@ html,body{
   object-fit:cover;
   z-index:1;
   background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
+  transition: opacity .6s ease;
 }
 
 /* PLAY */
@@ -258,9 +260,12 @@ html,body{
 }
 
 /* REMOVE INTERAÇÃO DO MEDIA */
-#fscont video,
 #fscont img {
   pointer-events: none;
+}
+
+#fscont video {
+  pointer-events: auto;
 }
 
 /* Barra de botões */
@@ -484,6 +489,9 @@ vid.onended = () => goGallery();
    MOSTRAR GALERIA
 --------------------------------*/
 function goGallery() {
+  vid.pause();
+  vid.style.opacity = "0";
+
   gbg.classList.add("show");
   slots.classList.add("show");
   btnIdx.classList.add("show");
@@ -524,7 +532,7 @@ function build() {
     } else {
       if (s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i)) {
        d.innerHTML = `
-  <video class="m" src="${s.url}" muted playsinline autoplay loop>
+  <video class="m" src="${s.url}" muted playsinline autoplay>
   </video>
 `;
       } else {
@@ -634,10 +642,25 @@ if (isVideo) {
 
 
 fscls.onclick = () => {
-  fsmod.classList.remove("on");
-  btnIdx.classList.remove("gone"); // voltar a mostrar índice
-};
+  const v = fscont.querySelector("video");
 
+  if (v) {
+    v.pause();
+    v.currentTime = 0;
+    v.src = "";
+    v.load();
+  }
+
+  fscont.innerHTML = "";
+  fsmod.classList.remove("on");
+  btnIdx.classList.remove("gone");
+};
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) {
+    const v = fscont.querySelector("video");
+    if (v) v.pause();
+  }
+});
 /* ------------------------------
    DOWNLOAD (Guardar no dispositivo)
 --------------------------------*/
