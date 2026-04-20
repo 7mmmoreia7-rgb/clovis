@@ -11,7 +11,8 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: black;
+  body {background: url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
+
 }
 
 /* 🎬 VÍDEO */
@@ -140,6 +141,9 @@ const installZone = document.getElementById("installZone");
 // ▶️ play → inicia vídeo
 play.onclick = async () => {
   play.style.display = "none";
+
+  video.muted = false; // 🔊 DEVOLVE O SOM
+
   await video.play().catch(() => {});
 };
 
