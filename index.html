@@ -29,6 +29,7 @@ html, body {
   background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
 }
 
+/* VIDEO */
 #myVideo {
   position:fixed;
   top:0;
@@ -36,8 +37,10 @@ html, body {
   width:100%;
   height:100%;
   object-fit:cover;
+  z-index:1;
 }
 
+/* PLAY */
 #btn-play {
   position:fixed;
   top:50%;
@@ -46,17 +49,26 @@ html, body {
   width:10%;
   cursor:pointer;
   z-index:10;
+  transition:opacity .3s;
 }
 
+/* SKIP */
 #btn-skip-home {
   position:fixed;
   bottom:3.5%;
   right:3.4%;
   width:6%;
-  cursor:pointer;
   z-index:10;
+  cursor:pointer;
+  transition:transform .2s ease;
 }
 
+#btn-skip-home:hover {
+  content:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/clika2.png");
+  transform:scale(1.25);
+}
+
+/* ÍNDICE */
 #btn-idx {
   position:fixed;
   bottom:3.5%;
@@ -74,14 +86,23 @@ html, body {
 <body>
 
 <video id="myVideo" playsinline>
-  <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/home/home.mp4">
+  <source src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/home/home.mp4" type="video/mp4">
 </video>
 
-<img id="btn-play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
+<!-- PLAY -->
+<img id="btn-play"
+     src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png"
+     alt="Play" />
 
-<img id="btn-skip-home" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/clika1.png">
+<!-- SKIP -->
+<img id="btn-skip-home"
+     src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/clika1.png"
+     alt="Skip Home" />
 
-<img id="btn-idx" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png">
+<!-- ÍNDICE -->
+<img id="btn-idx"
+     src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png"
+     alt="Índice" />
 
 <script>
 
@@ -90,56 +111,42 @@ const skip = document.getElementById('btn-skip-home');
 const vid  = document.getElementById('myVideo');
 const idx  = document.getElementById('btn-idx');
 
-/* instalação */
-let deferredPrompt = null;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
-
 function hideStartButtons() {
-  play.style.display = "none";
-  skip.style.display = "none";
+  play.style.opacity = '0';
+  play.style.pointerEvents = 'none';
+
+  skip.style.opacity = '0';
+  skip.style.pointerEvents = 'none';
 }
 
-/* play */
-play.onclick = () => {
+/* PLAY */
+play.onclick = function () {
   hideStartButtons();
-  vid.play().catch(() => {
+
+  vid.play().catch(function(){
     vid.muted = true;
     vid.play();
   });
 };
 
-/* skip */
-skip.onclick = () => {
+/* SKIP */
+skip.onclick = function () {
   hideStartButtons();
+
+  vid.pause();
   vid.currentTime = vid.duration;
+
   vid.dispatchEvent(new Event('ended'));
 };
 
-/* fim vídeo */
-vid.onended = () => {
+/* FIM DO VÍDEO */
+vid.onended = function () {
   idx.style.opacity = '1';
   idx.style.pointerEvents = 'all';
 };
 
-/* botão final */
-idx.onclick = async () => {
-
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-
-    const choice = await deferredPrompt.userChoice;
-
-    if (choice.outcome === "accepted") {
-      localStorage.setItem("app_instalada", "true");
-    }
-
-    deferredPrompt = null;
-  }
-
+/* ÍNDICE */
+idx.onclick = function () {
   window.location.href = 'indice.html?skip=1';
 };
 
