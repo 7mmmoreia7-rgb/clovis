@@ -10,7 +10,9 @@
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Pacifico&display=swap');
-
+:root{
+  --vh: 1vh;
+}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 
 html,body{
@@ -80,8 +82,8 @@ html,body{
   position:absolute;
   left:9.2%;
   right:9.5%;
-  top:8.87%;
-  bottom:7.70%;
+ top: calc(var(--vh) * 8.87);
+  bottom: calc(var(--vh) * 7.70);
   display:grid;
   grid-template-columns:repeat(3,1fr);
   grid-template-rows:repeat(3,1fr);
@@ -376,6 +378,16 @@ html,body{
 #fscont video {
   background: transparent !important;
 }
+@media (max-width: 1024px) and (orientation: portrait){
+
+  #slots{
+    top: calc(var(--vh) * 9.5);
+    bottom: calc(var(--vh) * 9.5);
+  }
+
+  #vline1, #vline2{
+    height: 100%;
+  }
 
 </style>
 </head>
@@ -727,6 +739,12 @@ btnIdx.onclick = () => {
 --------------------------------*/
 loadState();
 build();
+  function setVH(){
+  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+}
+
+setVH();
+window.addEventListener('resize', setVH);
 </script>
 
 </body>
