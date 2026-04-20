@@ -523,7 +523,10 @@ function build() {
       `;
     } else {
       if (s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i)) {
-        d.innerHTML = `<video class="m" src="${s.url}" muted></video>`;
+       d.innerHTML = `
+  <video class="m" src="${s.url}" muted playsinline autoplay loop>
+  </video>
+`;
       } else {
         d.innerHTML = `<img class="m" src="${s.url}">`;
       }
@@ -595,24 +598,25 @@ function verSlot(idx) {
 
   const isVideo = s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i);
 
-  if (isVideo) {
+if (isVideo) {
   const v = document.createElement("video");
-v.src = s.url;
-v.controls = true;
-v.controlsList = "nodownload";
-v.autoplay = false;
-    v.style.width = "100%";
-    v.style.height = "100%";
-    v.style.objectFit = "contain";
-    fscont.appendChild(v);
-  } else {
-    const i = document.createElement("img");
-    i.src = s.url;
-    i.style.width = "100%";
-    i.style.height = "100%";
-    i.style.objectFit = "contain";
-    fscont.appendChild(i);
-  }
+  v.src = s.url;
+
+  v.controls = true;
+  v.controlsList = "nodownload";
+
+  v.autoplay = true;
+  v.muted = true;
+  v.playsInline = true;
+
+  v.style.width = "100%";
+  v.style.height = "100%";
+  v.style.objectFit = "contain";
+
+  fscont.appendChild(v);
+
+  v.play().catch(() => {});
+}
 
   fsmod.classList.add("on");
 }
