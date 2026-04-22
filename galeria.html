@@ -544,8 +544,8 @@ function build() {
     } else {
       if (s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i)) {
        d.innerHTML = `
-  <video class="m" src="${s.url}" muted playsinline autoplay>
-  </video>
+ <video class="m" src="${s.url}" muted playsinline preload="none"></video>
+ 
 `;
       } else {
         d.innerHTML = `<img class="m" src="${s.url}">`;
@@ -561,6 +561,7 @@ function build() {
 
     slots.appendChild(d);
   });
+  lazyVideos();
 }
 
 /* ------------------------------
@@ -575,6 +576,12 @@ function openImport(idx) {
 fsin.onchange = () => {
   const f = fsin.files[0];
   if (!f || activeSlot === null) return;
+
+  if (f.type === "image/gif") {
+    alert("❌ GIFs são pesados 😬\nUsa vídeo (.mp4)");
+    return;
+  }
+
   uploadStorage(f, activeSlot);
 };
 
@@ -600,8 +607,8 @@ function uploadStorage(file, slot) {
 
       data[slot] = { url, key };
       saveState();
-      build();
-      toast("✓ Guardado!");
+    build();
+toast("✓ Guardado!");
     })
     .catch(() => toast("Erro no upload"));
 }
@@ -621,12 +628,10 @@ function verSlot(idx) {
 if (isVideo) {
   const v = document.createElement("video");
   v.src = s.url;
-
+v.preload = "auto";
   v.controls = true;
   v.controlsList = "nodownload";
   v.playsInline = true;
-  v.preload = "auto";
-
   v.style.width = "100%";
   v.style.height = "100%";
   v.style.objectFit = "contain";
@@ -737,8 +742,24 @@ btnIdx.onclick = () => {
 /* ------------------------------
    INICIAR
 --------------------------------*/
+  function lazyVideos(){
+  const vids = document.querySelectorAll("video.m");
+
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const v = e.target;
+        v.play().catch(()=>{});
+        obs.unobserve(v);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  vids.forEach(v=>obs.observe(v));
+}
 loadState();
 build();
+lazyVideos();
   function setVH(){
   document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
 }
