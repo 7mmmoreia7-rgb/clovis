@@ -128,8 +128,8 @@ html,body{
 /* barras verticais — CORRIGIDO */
 #vline1,#vline2{
   position:absolute;
-  top:0;
-  height:100%;
+  top: 0.5cm;        /* 👈 desce a linha */
+  height: calc(100% - 0.5cm); /* 👈 mantém alinhado em baixo */
   width:3px;
   background:#7a6245;
   z-index:6;
