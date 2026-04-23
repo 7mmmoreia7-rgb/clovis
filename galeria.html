@@ -84,6 +84,8 @@ html,body{
   right:9.5%;
  top: calc(var(--vh) * 7.87);
   bottom: calc(var(--vh) * 6.70);
+  padding-top: 1cm;
+  padding-bottom: 1cm;
   display:grid;
   grid-template-columns:repeat(3,1fr);
   grid-template-rows:repeat(3,1fr);
@@ -383,8 +385,10 @@ html,body{
   #slots{
     top: calc(var(--vh) * 9.5);
     bottom: calc(var(--vh) * 9.5);
+    padding-top: 1cm;
+  padding-bottom: 1cm;
   }
-
+}
   #vline1, #vline2{
     height: 100%;
   }
@@ -741,6 +745,27 @@ lazyVideos();
 
 setVH();
 window.addEventListener('resize', setVH);
+  fscls.onclick = (e) => {
+  e.stopPropagation();
+
+  const v = fscont.querySelector("video");
+
+  if (v) {
+    v.pause();
+    v.src = "";
+    v.load();
+  }
+
+  fscont.innerHTML = "";
+  fsmod.classList.remove("on");
+  btnIdx.classList.remove("gone");
+};
+
+fsmod.onclick = (e) => {
+  if (e.target === fsmod) {
+    fscls.onclick(e);
+  }
+};
 </script>
 
 </body>
