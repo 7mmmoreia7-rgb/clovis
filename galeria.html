@@ -112,31 +112,6 @@ html,body{
    object-fit: contain;
 }
 
-/* barras horizontais */
-#slots::before,#slots::after{
-  content:'';
-  position:absolute;
-  left:0;
-  right:0;
-  height:3px;
-  background:#7a6245;
-  z-index:6;
-}
-#slots::before{top:calc(100%/3);}
-#slots::after{top:calc(200%/3);}
-
-/* barras verticais — CORRIGIDO */
-#vline1,#vline2{
-  position:absolute;
-  top: 0.5cm;        /* 👈 desce a linha */
-  bottom: 0;
-  width:3px;
-  background:#7a6245;
-  z-index:6;
-  pointer-events:none;
-}
-#vline1{left:calc(100%/3 - 1.5px);}
-#vline2{left:calc(200%/3 - 1.5px);}
 
 /* BOTÃO ÍNDICE */
 #btn-idx{
