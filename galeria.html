@@ -82,8 +82,8 @@ html,body{
   position:absolute;
   left:9.2%;
   right:9.5%;
- top: calc(var(--vh) * 8.87);
-  bottom: calc(var(--vh) * 7.70);
+ top: calc(var(--vh) * 7.87);
+  bottom: calc(var(--vh) * 6.70);
   display:grid;
   grid-template-columns:repeat(3,1fr);
   grid-template-rows:repeat(3,1fr);
@@ -106,7 +106,7 @@ html,body{
   inset:0;
   width:100%;
   height:100%;
-  object-fit:cover;
+   object-fit: contain;
 }
 
 /* barras horizontais */
@@ -388,7 +388,7 @@ html,body{
   #vline1, #vline2{
     height: 100%;
   }
-
+}
 </style>
 </head>
 
@@ -625,59 +625,34 @@ function verSlot(idx) {
 
   const isVideo = s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i);
 
-if (isVideo) {
-  const v = document.createElement("video");
-  v.src = s.url;
-v.preload = "auto";
-  v.controls = true;
-  v.controlsList = "nodownload";
-  v.playsInline = true;
-  v.style.width = "100%";
-  v.style.height = "100%";
-  v.style.objectFit = "contain";
+  if (isVideo) {
+    const v = document.createElement("video");
+    v.src = s.url;
+    v.controls = true;
+    v.playsInline = true;
 
-  fscont.appendChild(v);
+    fscont.appendChild(v);
 
-  v.load();
-
-  v.play().catch(() => {
-    console.log("Esperando interação do utilizador");
-  });
-
-  const enableSound = () => {
-    v.muted = false;
-    v.volume = 1;
+    v.load();
     v.play().catch(() => {});
-  };
 
-  v.addEventListener("click", enableSound);
-  v.addEventListener("touchstart", enableSound);
-}
+    const enableSound = () => {
+      v.muted = false;
+      v.volume = 1;
+      v.play().catch(() => {});
+    };
+
+    v.addEventListener("click", enableSound);
+    v.addEventListener("touchstart", enableSound);
+
+  } else {
+    const img = document.createElement("img");
+    img.src = s.url;
+    fscont.appendChild(img);
+  }
 
   fsmod.classList.add("on");
 }
-
-
-fscls.onclick = () => {
-  const v = fscont.querySelector("video");
-
-  if (v) {
-    v.pause();
-    v.currentTime = 0;
-    v.src = "";
-    v.load();
-  }
-
-  fscont.innerHTML = "";
-  fsmod.classList.remove("on");
-  btnIdx.classList.remove("gone");
-};
-document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement) {
-    const v = fscont.querySelector("video");
-    if (v) v.pause();
-  }
-});
 /* ------------------------------
    DOWNLOAD (Guardar no dispositivo)
 --------------------------------*/
