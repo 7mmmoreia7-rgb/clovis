@@ -80,17 +80,23 @@ html,body{
 /* SLOTS */
 #slots{
   position:absolute;
-  inset: 10% 9.5% 10% 9.2%;
-  
+
+  left:9.2%;
+  right:9.5%;
+  top:10%;
+  height:80%;
+
   display:grid;
   grid-template-columns:repeat(3,1fr);
   grid-template-rows:repeat(3,1fr);
+
+  transform: scale(0.985);
+  transform-origin: center;
 
   z-index:5;
   opacity:0;
   transition:opacity 1.4s ease;
 }
-
 #slots.show{opacity:1;}
 
 .slot{
