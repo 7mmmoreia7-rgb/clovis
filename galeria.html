@@ -82,13 +82,14 @@ html,body{
   position:absolute;
   left:9.2%;
   right:9.5%;
- top: calc(var(--vh) * 7.87);
-  bottom: calc(var(--vh) * 6.70);
-  padding-top: 1cm;
-  padding-bottom: 1cm;
+
+  top: 10%;
+  height: 80%;
+
   display:grid;
   grid-template-columns:repeat(3,1fr);
   grid-template-rows:repeat(3,1fr);
+
   z-index:5;
   opacity:0;
   transition:opacity 1.4s ease;
@@ -128,7 +129,7 @@ html,body{
 #vline1,#vline2{
   position:absolute;
   top:0;
-  bottom:0;
+  height:100%;
   width:3px;
   background:#7a6245;
   z-index:6;
