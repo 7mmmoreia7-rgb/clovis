@@ -79,10 +79,10 @@ html,body{
 
 #slots{
   position:absolute;
-  left:9.35%;              /* +0.15% → move 1mm para a direita */
-  right:9.65%;             /* +0.15% → reduz 1mm de largura */
-  top: calc(var(--vh) * 9.05);   /* +0.18vh → desce ~2mm */
-  bottom: calc(var(--vh) * 7.30);/* -0.40vh → aumenta ~0.5cm */
+  left:9.10%;                     /* -0.10% → corrige 1mm para a esquerda */
+  right:9.60%;                    /* +0.10% → corrige 1mm de largura a mais */
+  top: calc(var(--vh) * 9.05);    /* +0.18vh → desce ~2mm */
+  bottom: calc(var(--vh) * 7.95); /* +0.25vh → reduz ~0.25cm de altura */
   display:grid;
   grid-template-columns:repeat(3,1fr);
   grid-template-rows:repeat(3,1fr);
@@ -90,6 +90,7 @@ html,body{
   opacity:0;
   transition:opacity 1.4s ease;
 }
+
 
 #slots.show{
   opacity:1;
