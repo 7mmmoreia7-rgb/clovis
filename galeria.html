@@ -79,10 +79,10 @@ html,body{
 
 #slots{
   position:absolute;
-  left:9.65%;      /* mantém igual */
+ left:calc(9.65% - 8px); /* mantém igual */
   top:calc(9.00% + 8px);  /* desce ~2mm */
   width:81.40%;
-  height:79.80%;
+  height:calc(79.80% - 8px);
   display:grid;
   grid-template-columns:repeat(3,1fr);
   grid-template-rows:repeat(3,1fr);
