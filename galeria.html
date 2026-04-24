@@ -448,6 +448,7 @@ const fsdl = document.getElementById("fsdl");
    DADOS + PERSISTÊNCIA
 --------------------------------*/
 let data = Array(9).fill(null).map(() => ({ url: null, key: null }));
+let activeSlot = null;
 
 function saveState() {
  localStorage.setItem("galeria", JSON.stringify(data));
@@ -483,7 +484,11 @@ btnSkip.onclick = () => {
   play.classList.add("gone");
   btnSkip.classList.add("gone");
   vid.pause();
-  vid.currentTime = vid.duration;
+
+  if (!isNaN(vid.duration)) {
+    vid.currentTime = vid.duration;
+  }
+
   goGallery();
 };
 
