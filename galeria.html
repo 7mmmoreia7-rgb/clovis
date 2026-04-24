@@ -79,18 +79,10 @@ html,body{
 
 #slots{
   position:absolute;
-
-  left:7.55%;
-  top:6.9%;
-  width:81.4%;
-  height:79.8%;
-
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  grid-template-rows:repeat(3, 1fr);
-
-  gap:0;
-
+  left:7.8%;
+  top:7.2%;
+  width:80.8%;
+  height:78.6%;
   z-index:5;
   opacity:0;
   transition:opacity 1.4s ease;
@@ -101,22 +93,32 @@ html,body{
 }
 
 .slot{
-  position:relative;
-  width:100%;
-  height:100%;
+  position:absolute;
   overflow:hidden;
 }
 
-/* AQUI ESTÁ O SEGREDO */
+/* LINHA 1 */
+.slot:nth-child(1){ left:0%; top:0%; width:33.2%; height:33.2%; }
+.slot:nth-child(2){ left:33.4%; top:0%; width:33.2%; height:33.2%; }
+.slot:nth-child(3){ left:66.8%; top:0%; width:33.2%; height:33.2%; }
+
+/* LINHA 2 */
+.slot:nth-child(4){ left:0%; top:33.4%; width:33.2%; height:33.2%; }
+.slot:nth-child(5){ left:33.4%; top:33.4%; width:33.2%; height:33.2%; }
+.slot:nth-child(6){ left:66.8%; top:33.4%; width:33.2%; height:33.2%; }
+
+/* LINHA 3 */
+.slot:nth-child(7){ left:0%; top:66.8%; width:33.2%; height:33.2%; }
+.slot:nth-child(8){ left:33.4%; top:66.8%; width:33.2%; height:33.2%; }
+.slot:nth-child(9){ left:66.8%; top:66.8%; width:33.2%; height:33.2%; }
+
 .slot img.m,
 .slot video.m{
   position:absolute;
   inset:0;
-
   width:100%;
   height:100%;
-
-  object-fit: cover;   /* ← trocar contain por cover */
+  object-fit:cover;
   display:block;
 }
 
@@ -522,10 +524,7 @@ function toast(msg) {
    BUILD DAS SLOTS
 --------------------------------*/
 function build() {
-  slots.innerHTML = `
-    <div id="vline1"></div>
-    <div id="vline2"></div>
-  `;
+slots.innerHTML = ``;
 
   data.forEach((s, idx) => {
     const d = document.createElement("div");
