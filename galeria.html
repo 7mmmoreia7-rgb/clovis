@@ -79,10 +79,13 @@ html,body{
 
 #slots{
   position:absolute;
-  left:9%;
-  top:10.8%;
-  width:80%;
-  height:69%;
+  left:9.35%;              /* +0.15% → move 1mm para a direita */
+  right:9.65%;             /* +0.15% → reduz 1mm de largura */
+  top: calc(var(--vh) * 9.05);   /* +0.18vh → desce ~2mm */
+  bottom: calc(var(--vh) * 7.30);/* -0.40vh → aumenta ~0.5cm */
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);
   z-index:5;
   opacity:0;
   transition:opacity 1.4s ease;
