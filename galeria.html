@@ -557,7 +557,10 @@ function toast(msg) {
    BUILD DAS SLOTS
 --------------------------------*/
 function build() {
-slots.innerHTML = ``;
+slots.innerHTML = `
+  <div id="vline1"></div>
+  <div id="vline2"></div>
+`;
 
   data.forEach((s, idx) => {
     const d = document.createElement("div");
