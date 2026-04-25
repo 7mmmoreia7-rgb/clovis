@@ -515,6 +515,9 @@ function loadState() {
 play.onclick = () => {
   play.classList.add("gone");
   btnSkip.classList.add("gone");
+
+  vid.style.opacity = "1";
+
   vid.play().catch(() => {
     vid.muted = true;
     vid.play();
