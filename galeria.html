@@ -502,9 +502,9 @@ async function saveState() {
 }
 
 async function loadState() {
- const res = await fetch(API_BASE + "/load-gallery", {
-  cache: "no-store"
-});
+  const res = await fetch(API_BASE + "/load-gallery", {
+    cache: "no-store"
+  });
 
   console.log("load-gallery status:", res.status);
 
@@ -512,13 +512,20 @@ async function loadState() {
   console.log("galeria recebida:", json);
 
   if (Array.isArray(json)) {
-  data = json.map(x => ({
-    ...x,
-    url: x.url || (x.key ? API_BASE + "/file?key=" + x.key : null)
-  }));
-}
-}
+    data = Array(9).fill(null).map((_, i) => {
+      const x = json[i] || {};
 
+      return {
+        key: x.key || null,
+        url: x.url || (
+          x.key
+            ? API_BASE + "/file?key=" + encodeURIComponent(x.key)
+            : null
+        )
+      };
+    });
+  }
+}
 /* ------------------------------
    PLAY / SKIP
 --------------------------------*/
