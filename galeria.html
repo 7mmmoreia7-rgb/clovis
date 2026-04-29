@@ -620,12 +620,9 @@ function build() {
   <div id="vline2"></div>
 `;
 
-const existingSlots = Array.from(document.querySelectorAll(".slot"));
-
 slots.innerHTML = lines;
-existingSlots.forEach(s => slots.appendChild(s));
 
-  data.forEach((s, idx) => {
+ data.forEach((s, idx) => {
     const d = document.createElement("div");
     d.className = "slot";
 
