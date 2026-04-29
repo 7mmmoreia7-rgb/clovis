@@ -502,9 +502,9 @@ async function saveState() {
 }
 
 async function loadState() {
-  const res = await fetch(API_BASE + "/load-gallery", {
-    cache: "no-store"
-  });
+ const res = await fetch(API_BASE + "/load-gallery", {
+  cache: "force-cache"
+});
 
   console.log("load-gallery status:", res.status);
 
@@ -596,7 +596,7 @@ slots.innerHTML = `
  
 `;
       } else {
-        d.innerHTML = `<img class="m" src="${s.url}">`;
+        d.innerHTML = `<img class="m" loading="lazy" src="${s.url}">`;
       }
 
       d.innerHTML += `
