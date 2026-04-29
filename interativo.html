@@ -876,13 +876,12 @@ const tip=document.getElementById('tip');
 function TT(e,t){tip.textContent=t;tip.style.left=(e.clientX+10)+'px';tip.style.top=(e.clientY+26)+'px';tip.classList.add('v');}
 function HT(){tip.classList.remove('v');}
 function irIndice(){window.location.href='indice.html?skip=1';}
-  document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("btn-skip")?.addEventListener("click", goGallery);
-});
-
 function goGallery(){
   console.log("SKIP OK");
   alert("SKIP FUNCIONA");
+}
+  function goGallery(){
+  fazTransicao();
 }
 </script>
 </body>
