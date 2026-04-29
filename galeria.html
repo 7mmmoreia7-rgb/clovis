@@ -594,80 +594,64 @@ function build() {
     const d = document.createElement("div");
     d.className = "slot";
 
-    // -------------------------
-    // SLOT VAZIO (IMPORTANTE)
-    // -------------------------
-   if (!s || !s.url) {
-  d.innerHTML = `
-    <div class="slot-add" onclick="openImport(${idx})">
-      <svg viewBox="0 0 24 24">
-        <path fill="currentColor" d="M19 11H13V5h-2v6H5v2h6v6h2v-6h6z"/>
-      </svg>
-      <span>Adicionar</span>
-    </div>
+    const url = s?.url;
 
-    <div class="slot-ctrl">
-      <button class="sc" onclick="openImport(${idx})">➕ Upload</button>
-    </div>
-  `;
-
-  slots.appendChild(d);
-  return;
-}
-
-    // -------------------------
-    // SLOT COM MEDIA
-    // -------------------------
-    const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(s.url);
-
-    let media;
-
-    if (isVideo) {
-      media = document.createElement("video");
-      media.className = "m";
-      media.src = s.url;
-      media.muted = true;
-      media.playsInline = true;
-      media.preload = "metadata";
-
-      media.addEventListener("error", () => {
-        d.remove();
-      });
-
-    } else {
-      media = document.createElement("img");
-      media.className = "m";
-      media.src = s.url;
-      media.loading = "lazy";
-
-      media.addEventListener("error", () => {
-        d.remove();
-      });
+    // 🔥 SLOT VAZIO → MOSTRA "+"
+    if (!url) {
+      d.innerHTML = `
+        <div class="slot-add" onclick="openImport(${idx})">
+          <svg viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 5v14m-7-7h14"/>
+          </svg>
+          <span>Adicionar</span>
+        </div>
+      `;
+      slots.appendChild(d);
+      return;
     }
 
-    d.appendChild(media);
+    // 🔥 SLOT COM CONTEÚDO
+    const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(url);
 
-    // -------------------------
-    // CONTROLOS
-    // -------------------------
+    if (isVideo) {
+      const v = document.createElement("video");
+      v.className = "m";
+      v.src = url;
+      v.muted = true;
+      v.playsInline = true;
+      v.preload = "metadata";
+
+      v.onerror = () => {
+        // 🔥 se link morreu → volta a slot vazio
+        data[idx] = { url: null, key: null };
+        build();
+      };
+
+      d.appendChild(v);
+    } else {
+      const img = document.createElement("img");
+      img.className = "m";
+      img.src = url;
+      img.loading = "lazy";
+
+      img.onerror = () => {
+        data[idx] = { url: null, key: null };
+        build();
+      };
+
+      d.appendChild(img);
+    }
+
+    // 🔥 CONTROLOS SEMPRE PRESENTES EM SLOT OCUPADO
     const ctrl = document.createElement("div");
     ctrl.className = "slot-ctrl";
 
-    const v = document.createElement("button");
-    v.className = "sc";
-    v.textContent = "👁 Ver";
-    v.onclick = () => verSlot(idx);
-
-    const del = document.createElement("button");
-    del.className = "sc";
-    del.textContent = "🗑 Apagar";
-    del.onclick = () => apagarSlot(idx);
-
-    ctrl.appendChild(v);
-    ctrl.appendChild(del);
+    ctrl.innerHTML = `
+      <button class="sc" onclick="verSlot(${idx})">👁 Ver</button>
+      <button class="sc" onclick="apagarSlot(${idx})">🗑 Apagar</button>
+    `;
 
     d.appendChild(ctrl);
-
     slots.appendChild(d);
   });
 
