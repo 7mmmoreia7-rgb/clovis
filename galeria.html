@@ -597,18 +597,23 @@ function build() {
     // -------------------------
     // SLOT VAZIO (IMPORTANTE)
     // -------------------------
-    if (!s || !s.url) {
-      d.innerHTML = `
-        <div class="slot-add" onclick="openImport(${idx})">
-          <svg viewBox="0 0 24 24">
-            <path fill="currentColor" d="M19 11H13V5h-2v6H5v2h6v6h2v-6h6z"/>
-          </svg>
-          <span>Adicionar</span>
-        </div>
-      `;
-      slots.appendChild(d);
-      return;
-    }
+   if (!s || !s.url) {
+  d.innerHTML = `
+    <div class="slot-add" onclick="openImport(${idx})">
+      <svg viewBox="0 0 24 24">
+        <path fill="currentColor" d="M19 11H13V5h-2v6H5v2h6v6h2v-6h6z"/>
+      </svg>
+      <span>Adicionar</span>
+    </div>
+
+    <div class="slot-ctrl">
+      <button class="sc" onclick="openImport(${idx})">➕ Upload</button>
+    </div>
+  `;
+
+  slots.appendChild(d);
+  return;
+}
 
     // -------------------------
     // SLOT COM MEDIA
