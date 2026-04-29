@@ -782,17 +782,7 @@ btnIdx.onclick = () => {
   vids.forEach(v=>obs.observe(v));
 }
 (async () => {
-  try {
-    await loadState();
-  } catch (e) {
-    console.error("Erro loadState:", e);
-
-    data = Array(9).fill(null).map(() => ({
-      url: null,
-      key: null
-    }));
-  }
-
+  await loadState();
   build();
   lazyVideos();
 })();
