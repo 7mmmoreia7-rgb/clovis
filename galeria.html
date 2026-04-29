@@ -584,7 +584,6 @@ function toast(msg) {
 /* ------------------------------
    BUILD DAS SLOTS
 --------------------------------*/
-
 function build() {
   slots.innerHTML = `
     <div id="vline1"></div>
@@ -592,11 +591,28 @@ function build() {
   `;
 
   data.forEach((s, idx) => {
-    if (!s?.url) return;
-
     const d = document.createElement("div");
     d.className = "slot";
 
+    // -------------------------
+    // SLOT VAZIO (IMPORTANTE)
+    // -------------------------
+    if (!s || !s.url) {
+      d.innerHTML = `
+        <div class="slot-add" onclick="openImport(${idx})">
+          <svg viewBox="0 0 24 24">
+            <path fill="currentColor" d="M19 11H13V5h-2v6H5v2h6v6h2v-6h6z"/>
+          </svg>
+          <span>Adicionar</span>
+        </div>
+      `;
+      slots.appendChild(d);
+      return;
+    }
+
+    // -------------------------
+    // SLOT COM MEDIA
+    // -------------------------
     const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(s.url);
 
     let media;
@@ -610,7 +626,7 @@ function build() {
       media.preload = "metadata";
 
       media.addEventListener("error", () => {
-        d.remove(); // limpa slot morto
+        d.remove();
       });
 
     } else {
@@ -626,6 +642,9 @@ function build() {
 
     d.appendChild(media);
 
+    // -------------------------
+    // CONTROLOS
+    // -------------------------
     const ctrl = document.createElement("div");
     ctrl.className = "slot-ctrl";
 
@@ -643,6 +662,7 @@ function build() {
     ctrl.appendChild(del);
 
     d.appendChild(ctrl);
+
     slots.appendChild(d);
   });
 
