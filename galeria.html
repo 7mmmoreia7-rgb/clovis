@@ -502,15 +502,17 @@ async function saveState() {
 }
 
 async function loadState() {
-  try {
-    const res = await fetch(API_BASE + "/load-gallery");
-    const json = await res.json();
+  const res = await fetch(API_BASE + "/load-gallery", {
+    cache: "no-store"
+  });
 
-    if (Array.isArray(json)) {
-      data = json;
-    }
-  } catch (e) {
-    console.error("Erro ao carregar galeria:", e);
+  console.log("load-gallery status:", res.status);
+
+  const json = await res.json();
+  console.log("galeria recebida:", json);
+
+  if (Array.isArray(json)) {
+    data = json;
   }
 }
 
@@ -779,9 +781,24 @@ btnIdx.onclick = () => {
   vids.forEach(v=>obs.observe(v));
 }
 (async () => {
-  await loadState();
-  build();
-  lazyVideos();
+  try {
+    await loadState();
+  } catch (e) {
+    console.error("Falha ao carregar galeria:", e);
+
+    // fallback para não rebentar tudo
+    data = Array(9).fill(null).map(() => ({
+      url: null,
+      key: null
+    }));
+  }
+
+  try {
+    build();
+    lazyVideos();
+  } catch (e) {
+    console.error("Erro no build:", e);
+  }
 })();
   function setVH(){
   document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
