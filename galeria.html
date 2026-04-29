@@ -506,22 +506,27 @@ async function loadState() {
     cache: "no-store"
   });
 
-  console.log("load-gallery status:", res.status);
-
   const json = await res.json();
-  console.log("galeria recebida:", json);
 
- if (Array.isArray(json)) {
+  if (!Array.isArray(json)) {
+    data = Array(9).fill(null).map(() => ({ url: null, key: null }));
+    return;
+  }
+
   data = json
     .filter(x => x && (x.url || x.key))
-    .map(x => ({
-      url: x.url || (x.key ? API_BASE + "/file?key=" + encodeURIComponent(x.key) : null),
-      key: x.key || null
-    }))
-    .filter(x => x.url);
-}
-}
+    .map(x => {
+      const url = x.url || (x.key
+        ? API_BASE + "/file?key=" + encodeURIComponent(x.key)
+        : null);
 
+      return {
+        url,
+        key: x.key || null
+      };
+    })
+    .filter(x => x.url); // elimina mortos logo aqui
+}
 
 /* ------------------------------
    PLAY / SKIP
@@ -579,9 +584,7 @@ function toast(msg) {
 /* ------------------------------
    BUILD DAS SLOTS
 --------------------------------*/
-/* ------------------------------
-   BUILD DAS SLOTS
---------------------------------*/
+
 function build() {
   slots.innerHTML = `
     <div id="vline1"></div>
@@ -589,57 +592,62 @@ function build() {
   `;
 
   data.forEach((s, idx) => {
+    if (!s?.url) return;
+
     const d = document.createElement("div");
     d.className = "slot";
 
-    // 🔥 FILTRO REAL DE SEGURANÇA
-    if (!s || (!s.url && !s.key)) {
-      d.remove();
-      return;
-    }
+    const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(s.url);
 
-    // garante URL sempre válida
-    const url = s.url || (s.key ? API_BASE + "/file?key=" + encodeURIComponent(s.key) : null);
-
-    if (!url) {
-      d.remove();
-      return;
-    }
-
-    const isVideo = url.match(/\.(mp4|mov|webm|mkv|avi)$/i);
+    let media;
 
     if (isVideo) {
-      d.innerHTML = `
-        <video class="m"
-          src="${encodeURI(url)}"
-          muted
-          playsinline
-          preload="metadata"
-          onerror="this.parentElement.style.display='none'">
-        </video>
-      `;
+      media = document.createElement("video");
+      media.className = "m";
+      media.src = s.url;
+      media.muted = true;
+      media.playsInline = true;
+      media.preload = "metadata";
+
+      media.addEventListener("error", () => {
+        d.remove(); // limpa slot morto
+      });
+
     } else {
-      d.innerHTML = `
-        <img class="m"
-          src="${encodeURI(url)}"
-          loading="lazy"
-          onerror="this.parentElement.style.display='none'">
-      `;
+      media = document.createElement("img");
+      media.className = "m";
+      media.src = s.url;
+      media.loading = "lazy";
+
+      media.addEventListener("error", () => {
+        d.remove();
+      });
     }
 
-    d.innerHTML += `
-      <div class="slot-ctrl">
-        <button class="sc" onclick="verSlot(${idx})">👁 Ver</button>
-        <button class="sc" onclick="apagarSlot(${idx})">🗑 Apagar</button>
-      </div>
-    `;
+    d.appendChild(media);
 
+    const ctrl = document.createElement("div");
+    ctrl.className = "slot-ctrl";
+
+    const v = document.createElement("button");
+    v.className = "sc";
+    v.textContent = "👁 Ver";
+    v.onclick = () => verSlot(idx);
+
+    const del = document.createElement("button");
+    del.className = "sc";
+    del.textContent = "🗑 Apagar";
+    del.onclick = () => apagarSlot(idx);
+
+    ctrl.appendChild(v);
+    ctrl.appendChild(del);
+
+    d.appendChild(ctrl);
     slots.appendChild(d);
   });
 
   lazyVideos();
 }
-
 /* ------------------------------
    IMPORTAR
 --------------------------------*/
@@ -675,20 +683,25 @@ function uploadStorage(file, slot) {
     body: form,
   })
     .then((r) => r.json())
-    .then(async (res) => {
-      if (!res.ok || !res.key) throw new Error("Upload falhou");
+   .then(async (res) => {
 
-      const key = res.key;
-      const url = API_BASE + "/file?key=" + encodeURIComponent(key);
+  // 🧨 validação defensiva logo no início
+  if (!res || !res.key) {
+    toast("Upload inválido");
+    return;
+  }
 
-      data[slot] = { url, key };
+  if (!res.ok) throw new Error("Upload falhou");
 
-await saveState();
-build();
-toast("✓ Guardado!");
-    })
-    .catch(() => toast("Erro no upload"));
-}
+  const key = res.key;
+  const url = API_BASE + "/file?key=" + encodeURIComponent(key);
+
+  data[slot] = { url, key };
+
+  await saveState();
+  build();
+  toast("✓ Guardado!");
+})
 
 /* ------------------------------
    FULLSCREEN
@@ -776,9 +789,9 @@ function apagarSlot(idx) {
   })
     .then((r) => {
       if (!r.ok) throw new Error();
-      data[idx] = { url: null, key: null };
-      saveState();
-      build();
+     data = data.filter((_, i) => i !== idx).concat({ url: null, key: null });
+saveState();
+build();
       toast("✓ Apagado!");
     })
     .catch(() => toast("Erro ao apagar"));
