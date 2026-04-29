@@ -778,9 +778,11 @@ btnIdx.onclick = () => {
 
   vids.forEach(v=>obs.observe(v));
 }
-loadState();
-build();
-lazyVideos();
+(async () => {
+  await loadState();
+  build();
+  lazyVideos();
+})();
   function setVH(){
   document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
 }
