@@ -576,30 +576,63 @@ function toast(msg) {
    BUILD DAS SLOTS
 --------------------------------*/
 function build() {
-slots.innerHTML = `
-  <div id="vline1"></div>
-  <div id="vline2"></div>
-`;
+  slots.innerHTML = `
+    <div id="vline1"></div>
+    <div id="vline2"></div>
+  `;
 
   data.forEach((s, idx) => {
     const d = document.createElement("div");
     d.className = "slot";
 
-    if (!s.url) {
+    const url = s?.url || "";
+    const key = s?.key || "";
+
+    const hasMedia = url.trim() !== "" || key.trim() !== "";
+
+    if (!hasMedia) {
       d.innerHTML = `
         <div class="slot-add" onclick="openImport(${idx})">
-          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5v14m-7-7h14"/></svg>
+          <svg viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 5v14m-7-7h14"/>
+          </svg>
           <span>Adicionar</span>
         </div>
       `;
     } else {
-      if (s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i)) {
-       d.innerHTML = `
- <video class="m" src="${s.url}" muted playsinline preload="none"></video>
- 
-`;
+      const mediaRef = url || (API_BASE + "/file?key=" + encodeURIComponent(key));
+
+      const isVideo =
+        /\.mp4|\.mov|\.webm|\.mkv|\.avi/i.test(key) ||
+        /\.mp4|\.mov|\.webm|\.mkv|\.avi/i.test(url);
+
+      if (isVideo) {
+        d.innerHTML = `
+          <video
+            class="m"
+            src="${mediaRef}"
+            muted
+            playsinline
+            preload="metadata"
+            onerror="this.parentElement.innerHTML=
+              '<div class=slot-add onclick=openImport(${idx})>\
+              <svg viewBox=0 0 24 24>\
+              <path fill=currentColor d=\'M12 5v14m-7-7h14\'/>\
+              </svg><span>Adicionar</span></div>';">
+          </video>
+        `;
       } else {
-        d.innerHTML = `<img class="m" loading="lazy" src="${s.url}">`;
+        d.innerHTML = `
+          <img
+            class="m"
+            src="${mediaRef}"
+            loading="lazy"
+            onerror="this.parentElement.innerHTML=
+              '<div class=slot-add onclick=openImport(${idx})>\
+              <svg viewBox=0 0 24 24>\
+              <path fill=currentColor d=\'M12 5v14m-7-7h14\'/>\
+              </svg><span>Adicionar</span></div>';">
+        `;
       }
 
       d.innerHTML += `
@@ -612,6 +645,7 @@ slots.innerHTML = `
 
     slots.appendChild(d);
   });
+
   lazyVideos();
 }
 
