@@ -270,6 +270,29 @@ bottom:10.30%;
   color:white;
   z-index:10; /* AQUI ESTÁ A CURA */
 }
+  #slots {
+  position: relative;
+}
+
+.slot {
+  position: relative;
+  z-index: 10; /* sobe as slots acima da moldura */
+}
+
+.slot-add,
+.slot-ctrl,
+.m {
+  position: relative;
+  z-index: 20; /* garante que os botões e media aparecem */
+}
+
+#vline1,
+#vline2,
+#slots::before,
+#slots::after {
+  z-index: 1; /* baixa as linhas da moldura */
+}
+
 /* FULLSCREEN */
 #fsmod {
   display: none;
