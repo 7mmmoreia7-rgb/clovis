@@ -502,6 +502,10 @@ async function saveState() {
 }
 
 async function loadState() {
+  const res = await fetch(API_BASE + "/load-gallery", {
+    cache: "no-store"
+  });
+
   console.log("load-gallery status:", res.status);
 
   const json = await res.json();
