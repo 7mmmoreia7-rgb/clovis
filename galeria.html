@@ -717,7 +717,7 @@ function verSlot(idx) {
   fscont.innerHTML = "";
   btnIdx.classList.add("gone");
 
-  const isVideo = s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i);
+  const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(s.url);
 
   if (isVideo) {
     const v = document.createElement("video");
@@ -725,10 +725,16 @@ function verSlot(idx) {
     v.controls = true;
     v.playsInline = true;
 
+    // 🔧 importante: evita autoplay prematuro em alguns browsers
+    v.preload = "metadata";
+
     fscont.appendChild(v);
 
     v.load();
-    v.play().catch(() => {});
+
+    v.onloadeddata = () => {
+      v.play().catch(() => {});
+    };
 
     const enableSound = () => {
       v.muted = false;
@@ -742,6 +748,10 @@ function verSlot(idx) {
   } else {
     const img = document.createElement("img");
     img.src = s.url;
+
+    // 🔧 evita layout shift e loads “estranhos”
+    img.loading = "eager";
+
     fscont.appendChild(img);
   }
 
@@ -793,9 +803,13 @@ function apagarSlot(idx) {
   })
     .then((r) => {
       if (!r.ok) throw new Error();
-     data = data.filter((_, i) => i !== idx).concat({ url: null, key: null });
-saveState();
-build();
+
+      data[idx] = null;
+
+      const slot = slots.children[idx];
+      if (slot) slot.remove();
+
+      saveState();
       toast("✓ Apagado!");
     })
     .catch(() => toast("Erro ao apagar"));
@@ -811,40 +825,54 @@ btnIdx.onclick = () => {
 /* ------------------------------
    INICIAR
 --------------------------------*/
-  function lazyVideos(){
+ function lazyVideos() {
   const vids = document.querySelectorAll("video.m");
 
-  const obs = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        const v = e.target;
-        v.play().catch(()=>{});
-        obs.unobserve(v);
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const v = e.target;
+
+      if (e.isIntersecting) {
+        if (!v.dataset.loaded) {
+          v.load();              // evita “play imediato pesado”
+          v.dataset.loaded = "1";
+        }
+
+        v.play().catch(() => {});
+      } else {
+        v.pause(); // liberta CPU/memória
       }
     });
-  }, { threshold: 0.5 });
+  }, { threshold: 0.25 });
 
-  vids.forEach(v=>obs.observe(v));
+  vids.forEach(v => obs.observe(v));
 }
+
 (async () => {
   await loadState();
   build();
-  lazyVideos();
+
+  // dá 1 frame para DOM estabilizar antes de observar vídeos
+  requestAnimationFrame(() => {
+    lazyVideos();
+  });
 })();
-  function setVH(){
+
+function setVH() {
   document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
 }
 
 setVH();
 window.addEventListener('resize', setVH);
-  fscls.onclick = (e) => {
+
+fscls.onclick = (e) => {
   e.stopPropagation();
 
   const v = fscont.querySelector("video");
 
   if (v) {
     v.pause();
-    v.src = "";
+    v.removeAttribute("src"); // mais seguro que src=""
     v.load();
   }
 
