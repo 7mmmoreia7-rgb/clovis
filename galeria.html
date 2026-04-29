@@ -589,68 +589,63 @@ function build() {
     <div id="vline1"></div>
     <div id="vline2"></div>
   `;
-data.forEach((s, idx) => {
-  const d = document.createElement("div");
-  d.className = "slot";
 
-  const hasMedia = s && typeof s.url === "string" && s.url.trim() !== "";
+  data.forEach((s, idx) => {
+    const d = document.createElement("div");
+    d.className = "slot";
 
-  // 🔥 SLOT VAZIO → MOSTRA "+"
-  if (!hasMedia) {
-    d.innerHTML = `
-      <div class="slot-add" onclick="openImport(${idx})">
-        <svg viewBox="0 0 24 24">
-          <path fill="currentColor" d="M12 5v14m-7-7h14"/>
-        </svg>
-        <span>Adicionar</span>
-      </div>
-    `;
+    const hasMedia = s && typeof s.url === "string" && s.url.trim() !== "";
 
-    slots.appendChild(d);
-    return;
-  }
+    if (!hasMedia) {
+      d.innerHTML = `
+        <div class="slot-add" onclick="openImport(${idx})">
+          <svg viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 5v14m-7-7h14"/>
+          </svg>
+          <span>Adicionar</span>
+        </div>
+      `;
+      slots.appendChild(d);
+      return;
+    }
 
-  const url = s.url;
+    const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(s.url);
 
-  // 🔥 SLOT COM CONTEÚDO
-  const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(url);
+    const media = document.createElement(isVideo ? "video" : "img");
+    media.className = "m";
+    media.src = s.url;
 
-  if (isVideo) {
-    const v = document.createElement("video");
-    v.className = "m";
-    v.src = url;
-    v.muted = true;
-    v.playsInline = true;
-    v.preload = "metadata";
+    if (isVideo) {
+      media.muted = true;
+      media.playsInline = true;
+      media.preload = "metadata";
+    } else {
+      media.loading = "lazy";
+    }
 
-    v.onerror = () => {
+    media.onerror = () => {
       data[idx] = { url: null, key: null };
+      saveState();
       build();
     };
 
-    d.appendChild(v);
+    d.appendChild(media);
 
-  } else {
-    const img = document.createElement("img");
-    img.className = "m";
-    img.src = url;
-
-    img.onerror = () => {
-      data[idx] = { url: null, key: null };
-      build();
-    };
-
-    d.appendChild(img);
-  }
-
-    // 🔥 CONTROLOS SEMPRE PRESENTES EM SLOT OCUPADO
     const ctrl = document.createElement("div");
     ctrl.className = "slot-ctrl";
 
-    ctrl.innerHTML = `
-      <button class="sc" onclick="verSlot(${idx})">👁 Ver</button>
-      <button class="sc" onclick="apagarSlot(${idx})">🗑 Apagar</button>
-    `;
+    const v = document.createElement("button");
+    v.className = "sc";
+    v.textContent = "👁 Ver";
+    v.onclick = () => verSlot(idx);
+
+    const del = document.createElement("button");
+    del.className = "sc";
+    del.textContent = "🗑 Apagar";
+    del.onclick = () => apagarSlot(idx);
+
+    ctrl.appendChild(v);
+    ctrl.appendChild(del);
 
     d.appendChild(ctrl);
     slots.appendChild(d);
