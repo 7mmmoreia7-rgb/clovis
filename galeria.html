@@ -589,58 +589,59 @@ function build() {
     <div id="vline1"></div>
     <div id="vline2"></div>
   `;
+data.forEach((s, idx) => {
+  const d = document.createElement("div");
+  d.className = "slot";
 
-  data.forEach((s, idx) => {
-    const d = document.createElement("div");
-    d.className = "slot";
+  const hasMedia = s && typeof s.url === "string" && s.url.trim() !== "";
 
-    const url = s?.url;
+  // 🔥 SLOT VAZIO → MOSTRA "+"
+  if (!hasMedia) {
+    d.innerHTML = `
+      <div class="slot-add" onclick="openImport(${idx})">
+        <svg viewBox="0 0 24 24">
+          <path fill="currentColor" d="M12 5v14m-7-7h14"/>
+        </svg>
+        <span>Adicionar</span>
+      </div>
+    `;
 
-    // 🔥 SLOT VAZIO → MOSTRA "+"
-    if (!url) {
-      d.innerHTML = `
-        <div class="slot-add" onclick="openImport(${idx})">
-          <svg viewBox="0 0 24 24">
-            <path fill="currentColor" d="M12 5v14m-7-7h14"/>
-          </svg>
-          <span>Adicionar</span>
-        </div>
-      `;
-      slots.appendChild(d);
-      return;
-    }
+    slots.appendChild(d);
+    return;
+  }
 
-    // 🔥 SLOT COM CONTEÚDO
-    const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(url);
+  const url = s.url;
 
-    if (isVideo) {
-      const v = document.createElement("video");
-      v.className = "m";
-      v.src = url;
-      v.muted = true;
-      v.playsInline = true;
-      v.preload = "metadata";
+  // 🔥 SLOT COM CONTEÚDO
+  const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(url);
 
-      v.onerror = () => {
-        // 🔥 se link morreu → volta a slot vazio
-        data[idx] = { url: null, key: null };
-        build();
-      };
+  if (isVideo) {
+    const v = document.createElement("video");
+    v.className = "m";
+    v.src = url;
+    v.muted = true;
+    v.playsInline = true;
+    v.preload = "metadata";
 
-      d.appendChild(v);
-    } else {
-      const img = document.createElement("img");
-      img.className = "m";
-      img.src = url;
-      img.loading = "lazy";
+    v.onerror = () => {
+      data[idx] = { url: null, key: null };
+      build();
+    };
 
-      img.onerror = () => {
-        data[idx] = { url: null, key: null };
-        build();
-      };
+    d.appendChild(v);
 
-      d.appendChild(img);
-    }
+  } else {
+    const img = document.createElement("img");
+    img.className = "m";
+    img.src = url;
+
+    img.onerror = () => {
+      data[idx] = { url: null, key: null };
+      build();
+    };
+
+    d.appendChild(img);
+  }
 
     // 🔥 CONTROLOS SEMPRE PRESENTES EM SLOT OCUPADO
     const ctrl = document.createElement("div");
