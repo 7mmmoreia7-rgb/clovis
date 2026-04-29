@@ -683,25 +683,29 @@ function uploadStorage(file, slot) {
     body: form,
   })
     .then((r) => r.json())
-   .then(async (res) => {
+    .then(async (res) => {
 
-  // 🧨 validação defensiva logo no início
-  if (!res || !res.key) {
-    toast("Upload inválido");
-    return;
-  }
+      // 🧨 validação defensiva logo no início
+      if (!res || !res.key) {
+        toast("Upload inválido");
+        return;
+      }
 
-  if (!res.ok) throw new Error("Upload falhou");
+      if (!res.ok) throw new Error("Upload falhou");
 
-  const key = res.key;
-  const url = API_BASE + "/file?key=" + encodeURIComponent(key);
+      const key = res.key;
+      const url = API_BASE + "/file?key=" + encodeURIComponent(key);
 
-  data[slot] = { url, key };
+      data[slot] = { url, key };
 
-  await saveState();
-  build();
-  toast("✓ Guardado!");
-})
+      await saveState();
+      build();
+      toast("✓ Guardado!");
+    })
+    .catch(() => {
+      toast("Erro no upload");
+    });
+}
 
 /* ------------------------------
    FULLSCREEN
