@@ -208,39 +208,14 @@ bottom:10.30%;
   color:rgba(80,65,50,.3);
 }
 
-.slot{
-  position:relative;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  z-index:1;
-}
-
 .slot-ctrl{
-  position:absolute;
-  bottom:0;
-  left:0;
-  right:0;
-
-  display:flex;
-  justify-content:center;
-  gap:4px;
-
+  position:absolute;bottom:0;left:0;right:0;
+  display:flex;justify-content:center;gap:4px;
   padding:4px 6px;
   background:linear-gradient(transparent,rgba(0,0,0,.65));
-
-  opacity:0;
-  transition:opacity .25s;
-
-  z-index:10;
-
-  pointer-events:none;
+  opacity:0;transition:opacity .25s;z-index:5;
 }
-
-.slot:hover .slot-ctrl{
-  opacity:1;
-  pointer-events:auto;
-}
+.slot:hover .slot-ctrl{opacity:1;}
 
 .sc{
   background:rgba(255,255,255,.22);
@@ -253,45 +228,6 @@ bottom:10.30%;
   transition:background .15s;
 }
 .sc:hover{background:rgba(255,255,255,.38);}
-#slots::before,
-#slots::after,
-#vline1,
-#vline2{
-  pointer-events:none;
-}
-  .slot-add {
-  position:absolute;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  background:rgba(0,0,0,0.4); /* opcional */
-  color:white;
-  z-index:10; /* AQUI ESTÁ A CURA */
-}
-  #slots {
-  position: relative;
-}
-
-.slot {
-  position: relative;
-  z-index: 10; /* sobe as slots acima da moldura */
-}
-
-.slot-add,
-.slot-ctrl,
-.m {
-  position: relative;
-  z-index: 20; /* garante que os botões e media aparecem */
-}
-
-#vline1,
-#vline2,
-#slots::before,
-#slots::after {
-  z-index: 1; /* baixa as linhas da moldura */
-}
 
 /* FULLSCREEN */
 #fsmod {
@@ -566,30 +502,21 @@ async function saveState() {
 }
 
 async function loadState() {
-  const res = await fetch(API_BASE + "/load-gallery", {
-    cache: "no-store"
-  });
+ const res = await fetch(API_BASE + "/load-gallery", {
+  cache: "no-store"
+});
+
+  console.log("load-gallery status:", res.status);
 
   const json = await res.json();
+  console.log("galeria recebida:", json);
 
-  if (!Array.isArray(json)) {
-    data = Array(9).fill(null).map(() => ({ url: null, key: null }));
-    return;
-  }
-
-  data = json
-    .filter(x => x && (x.url || x.key))
-    .map(x => {
-      const url = x.url || (x.key
-        ? API_BASE + "/file?key=" + encodeURIComponent(x.key)
-        : null);
-
-      return {
-        url,
-        key: x.key || null
-      };
-    })
-    .filter(x => x.url); // elimina mortos logo aqui
+  if (Array.isArray(json)) {
+  data = json.map(x => ({
+    ...x,
+    url: x.url || (x.key ? API_BASE + "/file?key=" + x.key : null)
+  }));
+}
 }
 
 /* ------------------------------
@@ -649,76 +576,45 @@ function toast(msg) {
    BUILD DAS SLOTS
 --------------------------------*/
 function build() {
- const lines = `
+slots.innerHTML = `
   <div id="vline1"></div>
   <div id="vline2"></div>
 `;
 
-slots.innerHTML = lines;
-
- data.forEach((s, idx) => {
+  data.forEach((s, idx) => {
     const d = document.createElement("div");
     d.className = "slot";
 
-    const hasMedia = s && typeof s.url === "string" && s.url.trim() !== "";
-
-    if (!hasMedia) {
+    if (!s.url) {
       d.innerHTML = `
         <div class="slot-add" onclick="openImport(${idx})">
-          <svg viewBox="0 0 24 24">
-            <path fill="currentColor" d="M12 5v14m-7-7h14"/>
-          </svg>
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5v14m-7-7h14"/></svg>
           <span>Adicionar</span>
         </div>
       `;
-      slots.appendChild(d);
-      return;
-    }
-
-    const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(s.url);
-
-    const media = document.createElement(isVideo ? "video" : "img");
-    media.className = "m";
-    media.src = s.url;
-
-    if (isVideo) {
-      media.muted = true;
-      media.playsInline = true;
-      media.preload = "metadata";
     } else {
-      media.loading = "lazy";
+      if (s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i)) {
+       d.innerHTML = `
+ <video class="m" src="${s.url}" muted playsinline preload="none"></video>
+ 
+`;
+      } else {
+        d.innerHTML = `<img class="m" loading="lazy" src="${s.url}">`;
+      }
+
+      d.innerHTML += `
+        <div class="slot-ctrl">
+          <button class="sc" onclick="verSlot(${idx})">👁 Ver</button>
+          <button class="sc" onclick="apagarSlot(${idx})">🗑 Apagar</button>
+        </div>
+      `;
     }
 
-    media.onerror = () => {
-      data[idx] = { url: null, key: null };
-      saveState();
-      build();
-    };
-
-    d.appendChild(media);
-
-    const ctrl = document.createElement("div");
-    ctrl.className = "slot-ctrl";
-
-    const v = document.createElement("button");
-    v.className = "sc";
-    v.textContent = "👁 Ver";
-    v.onclick = () => verSlot(idx);
-
-    const del = document.createElement("button");
-    del.className = "sc";
-    del.textContent = "🗑 Apagar";
-    del.onclick = () => apagarSlot(idx);
-
-    ctrl.appendChild(v);
-    ctrl.appendChild(del);
-
-    d.appendChild(ctrl);
     slots.appendChild(d);
   });
-
   lazyVideos();
 }
+
 /* ------------------------------
    IMPORTAR
 --------------------------------*/
@@ -755,27 +651,18 @@ function uploadStorage(file, slot) {
   })
     .then((r) => r.json())
     .then(async (res) => {
-
-      // 🧨 validação defensiva logo no início
-      if (!res || !res.key) {
-        toast("Upload inválido");
-        return;
-      }
-
-      if (!res.ok) throw new Error("Upload falhou");
+      if (!res.ok || !res.key) throw new Error("Upload falhou");
 
       const key = res.key;
       const url = API_BASE + "/file?key=" + encodeURIComponent(key);
 
       data[slot] = { url, key };
 
-      await saveState();
-      build();
-      toast("✓ Guardado!");
+await saveState();
+build();
+toast("✓ Guardado!");
     })
-    .catch(() => {
-      toast("Erro no upload");
-    });
+    .catch(() => toast("Erro no upload"));
 }
 
 /* ------------------------------
@@ -788,7 +675,7 @@ function verSlot(idx) {
   fscont.innerHTML = "";
   btnIdx.classList.add("gone");
 
-  const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(s.url);
+  const isVideo = s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i);
 
   if (isVideo) {
     const v = document.createElement("video");
@@ -796,16 +683,10 @@ function verSlot(idx) {
     v.controls = true;
     v.playsInline = true;
 
-    // 🔧 importante: evita autoplay prematuro em alguns browsers
-    v.preload = "metadata";
-
     fscont.appendChild(v);
 
     v.load();
-
-    v.onloadeddata = () => {
-      v.play().catch(() => {});
-    };
+    v.play().catch(() => {});
 
     const enableSound = () => {
       v.muted = false;
@@ -819,10 +700,6 @@ function verSlot(idx) {
   } else {
     const img = document.createElement("img");
     img.src = s.url;
-
-    // 🔧 evita layout shift e loads “estranhos”
-    img.loading = "eager";
-
     fscont.appendChild(img);
   }
 
@@ -874,13 +751,9 @@ function apagarSlot(idx) {
   })
     .then((r) => {
       if (!r.ok) throw new Error();
-
-      data[idx] = null;
-
-      const slot = slots.children[idx];
-      if (slot) slot.remove();
-
+      data[idx] = { url: null, key: null };
       saveState();
+      build();
       toast("✓ Apagado!");
     })
     .catch(() => toast("Erro ao apagar"));
@@ -896,54 +769,40 @@ btnIdx.onclick = () => {
 /* ------------------------------
    INICIAR
 --------------------------------*/
- function lazyVideos() {
+  function lazyVideos(){
   const vids = document.querySelectorAll("video.m");
 
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      const v = e.target;
-
-      if (e.isIntersecting) {
-        if (!v.dataset.loaded) {
-          v.load();              // evita “play imediato pesado”
-          v.dataset.loaded = "1";
-        }
-
-        v.play().catch(() => {});
-      } else {
-        v.pause(); // liberta CPU/memória
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const v = e.target;
+        v.play().catch(()=>{});
+        obs.unobserve(v);
       }
     });
-  }, { threshold: 0.25 });
+  }, { threshold: 0.5 });
 
-  vids.forEach(v => obs.observe(v));
+  vids.forEach(v=>obs.observe(v));
 }
-
 (async () => {
   await loadState();
   build();
-
-  // dá 1 frame para DOM estabilizar antes de observar vídeos
-  requestAnimationFrame(() => {
-    lazyVideos();
-  });
+  lazyVideos();
 })();
-
-function setVH() {
+  function setVH(){
   document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
 }
 
 setVH();
 window.addEventListener('resize', setVH);
-
-fscls.onclick = (e) => {
+  fscls.onclick = (e) => {
   e.stopPropagation();
 
   const v = fscont.querySelector("video");
 
   if (v) {
     v.pause();
-    v.removeAttribute("src"); // mais seguro que src=""
+    v.src = "";
     v.load();
   }
 
