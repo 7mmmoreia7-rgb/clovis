@@ -222,7 +222,7 @@ bottom:10.30%;
   left:0;
   right:0;
 
-  display:flex !important;
+  display:flex;
   justify-content:center;
   gap:4px;
 
@@ -232,7 +232,8 @@ bottom:10.30%;
   opacity:0;
   transition:opacity .25s;
 
-  z-index:999;          /* <- isto é o que estava a matar as de baixo */
+  z-index:10;
+
   pointer-events:none;
 }
 
@@ -252,7 +253,12 @@ bottom:10.30%;
   transition:background .15s;
 }
 .sc:hover{background:rgba(255,255,255,.38);}
-
+#slots::before,
+#slots::after,
+#vline1,
+#vline2{
+  pointer-events:none;
+}
 /* FULLSCREEN */
 #fsmod {
   display: none;
