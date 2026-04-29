@@ -599,10 +599,9 @@ if (isVideo) {
   d.innerHTML = `
     <video class="m" src="${s.url}" muted playsinline preload="none"></video>
   `;
+} else {
+  d.innerHTML = `<img class="m" loading="lazy" src="${s.url}">`;
 }
-      } else {
-        d.innerHTML = `<img class="m" loading="lazy" src="${s.url}">`;
-      }
 
       d.innerHTML += `
         <div class="slot-ctrl">
