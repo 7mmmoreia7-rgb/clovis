@@ -514,7 +514,7 @@ async function loadState() {
   if (Array.isArray(json)) {
   data = json.map(x => ({
     ...x,
-    url: x.url || (x.key ? API_BASE + "/file?key=" + x.key : null)
+   url: x.url || (x.key ? API_BASE + "/file?key=" + encodeURIComponent(x.key) : null)
   }));
 }
 }
@@ -593,11 +593,13 @@ slots.innerHTML = `
         </div>
       `;
     } else {
-      if (s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i)) {
-       d.innerHTML = `
- <video class="m" src="${s.url}" muted playsinline preload="none"></video>
- 
-`;
+const isVideo = s.key && s.key.match(/\.(mp4|mov|webm|mkv|avi)$/i);
+
+if (isVideo) {
+  d.innerHTML = `
+    <video class="m" src="${s.url}" muted playsinline preload="none"></video>
+  `;
+}
       } else {
         d.innerHTML = `<img class="m" loading="lazy" src="${s.url}">`;
       }
