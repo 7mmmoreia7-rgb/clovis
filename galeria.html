@@ -647,15 +647,16 @@ function uploadStorage(file, slot) {
     body: form,
   })
     .then((r) => r.json())
-    .then((res) => {
+    .then(async (res) => {
       if (!res.ok || !res.key) throw new Error("Upload falhou");
 
       const key = res.key;
       const url = API_BASE + "/file?key=" + encodeURIComponent(key);
 
       data[slot] = { url, key };
-      saveState();
-    build();
+
+await saveState();
+build();
 toast("✓ Guardado!");
     })
     .catch(() => toast("Erro no upload"));
@@ -784,21 +785,16 @@ btnIdx.onclick = () => {
   try {
     await loadState();
   } catch (e) {
-    console.error("Falha ao carregar galeria:", e);
+    console.error("Erro loadState:", e);
 
-    // fallback para não rebentar tudo
     data = Array(9).fill(null).map(() => ({
       url: null,
       key: null
     }));
   }
 
-  try {
-    build();
-    lazyVideos();
-  } catch (e) {
-    console.error("Erro no build:", e);
-  }
+  build();
+  lazyVideos();
 })();
   function setVH(){
   document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
