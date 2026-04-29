@@ -155,7 +155,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:url("https://pub-4f2
   <img id="bg-isto" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png" alt="">
   <video id="meu-video" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/interativo/voador.mp4" playsinline preload="auto"></video>
   <button id="btn-play" onclick="iniciarVideo()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png" alt="Play"></button>
-  <button id="btn-skip" onclick="fazTransicao()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skipa.png" alt="Skip"></button>
+  <button id="btn-skip" onclick="onclick="goGallery()"><img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/skipa.png" alt="Skip"></button>
 </div>
 <div id="overlay-fade"></div>
 
@@ -788,7 +788,7 @@ function expGaleria(){
       .then(data => {
         if (!data || !data.ok) throw new Error("upload falhou");
 
-       const url = 'https://hidden-hall-2a03.7mmmoreia7.workers.dev/file?key=' + data.key;
+        const url = 'https://hidden-hall-2a03.7mmmoreia7.workers.dev/file?key=' + data.key;
 
         let galeria = [];
         try {
@@ -802,23 +802,24 @@ function expGaleria(){
           url
         });
 
-    localStorage.setItem('galeria', JSON.stringify(galeria));
+        localStorage.setItem('galeria', JSON.stringify(galeria));
 
-// 🔥 NOVO: sincronizar com servidor (R2)
-fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/save-gallery', {
-  method: 'POST',
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify(galeria)
-})
-.then(() => {
-  alert("Enviado para galeria!");
-})
-.catch(err => {
-  console.error("Erro ao sincronizar galeria:", err);
-  alert("Erro no upload (sync falhou)");
-});
+        // 🔥 sync com servidor
+        return fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/save-gallery', {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(galeria)
+        });
+      })
+      .then(() => {
+        alert("Enviado para galeria!");
+      })
+      .catch(err => {
+        console.error("Erro:", err);
+        alert("Erro no upload");
+      });
 
     }, 'image/jpeg', 0.92);
   });
