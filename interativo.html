@@ -802,14 +802,23 @@ function expGaleria(){
           url
         });
 
-        localStorage.setItem('galeria', JSON.stringify(galeria));
+    localStorage.setItem('galeria', JSON.stringify(galeria));
 
-        alert("Enviado para galeria!");
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Erro no upload");
-      });
+// 🔥 NOVO: sincronizar com servidor (R2)
+fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/save-gallery', {
+  method: 'POST',
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(galeria)
+})
+.then(() => {
+  alert("Enviado para galeria!");
+})
+.catch(err => {
+  console.error("Erro ao sincronizar galeria:", err);
+  alert("Erro no upload (sync falhou)");
+});
 
     }, 'image/jpeg', 0.92);
   });
