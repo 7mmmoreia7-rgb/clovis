@@ -621,9 +621,12 @@ if (!mediaRef) {
   slots.appendChild(d);
   return;
 }
-      const isVideo =
-        /\.mp4|\.mov|\.webm|\.mkv|\.avi/i.test(key) ||
-        /\.mp4|\.mov|\.webm|\.mkv|\.avi/i.test(url);
+     const isVideo =
+  (s.key || s.url || "").toLowerCase().includes(".mp4") ||
+  (s.key || s.url || "").toLowerCase().includes(".mov") ||
+  (s.key || s.url || "").toLowerCase().includes(".webm") ||
+  (s.key || s.url || "").toLowerCase().includes(".mkv") ||
+  (s.key || s.url || "").toLowerCase().includes(".avi");
 
       if (isVideo) {
         d.innerHTML = `
@@ -636,7 +639,7 @@ if (!mediaRef) {
             onerror="this.parentElement.innerHTML=
               '<div class=slot-add onclick=openImport(${idx})>\
               <svg viewBox=0 0 24 24>\
-              <path fill=currentColor d=\'M12 5v14m-7-7h14\'/>\
+             <path fill="currentColor" d="M12 5v14m-7-7h14"/>
               </svg><span>Adicionar</span></div>';">
           </video>
         `;
