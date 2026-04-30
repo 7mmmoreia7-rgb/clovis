@@ -592,9 +592,9 @@ function build() {
     d.className = "slot";
 
    
-    const key = typeof s?.key === "string" ? s.key.trim() : "";
+ const key = typeof s?.key === "string" ? s.key.trim() : "";
 
-    const hasMedia = !!(url || key);
+const hasMedia = !!key;
 
     // SLOT VAZIO
     if (!hasMedia) {
@@ -668,12 +668,13 @@ function updateSlot(idx) {
   const old = slots.children[idx];
   if (!old) return;
 
-  const s = data[idx];
+ const s = data[idx];
 
-  const key = typeof s?.key === "string" ? s.key : "";
+const key = typeof s?.key === "string" ? s.key : "";
 
-  const mediaRef =
-    url || (key ? API_BASE + "/file?key=" + encodeURIComponent(key) : "");
+const mediaRef = key
+  ? API_BASE + "/file?key=" + encodeURIComponent(key)
+  : "";
 
   const d = document.createElement("div");
   d.className = "slot";
