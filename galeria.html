@@ -591,11 +591,10 @@ function build() {
   data.forEach((s, idx) => {
     const d = document.createElement("div");
     d.className = "slot";
+const url = typeof s?.url === "string" ? s.url : "";
+const key = typeof s?.key === "string" ? s.key : "";
 
-    const url = s?.url || "";
-    const key = s?.key || "";
-
-    const hasMedia = url.trim() !== "" || key.trim() !== "";
+const hasMedia = url !== "" || key !== "";
 
     if (!hasMedia) {
       d.innerHTML = `
@@ -607,8 +606,21 @@ function build() {
         </div>
       `;
     } else {
-      const mediaRef = url || (API_BASE + "/file?key=" + encodeURIComponent(key));
-
+    const mediaRef = url !== ""
+  ? url
+  : (key ? API_BASE + "/file?key=" + encodeURIComponent(key) : "");
+if (!mediaRef) {
+  d.innerHTML = `
+    <div class="slot-add" onclick="openImport(${idx})">
+      <svg viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 5v14m-7-7h14"/>
+      </svg>
+      <span>Adicionar</span>
+    </div>
+  `;
+  slots.appendChild(d);
+  return;
+}
       const isVideo =
         /\.mp4|\.mov|\.webm|\.mkv|\.avi/i.test(key) ||
         /\.mp4|\.mov|\.webm|\.mkv|\.avi/i.test(url);
