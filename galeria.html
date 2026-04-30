@@ -579,9 +579,7 @@ function toast(msg) {
   tt = setTimeout(() => t.classList.remove("on"), 2600);
 }
 
-/* ------------------------------
-   BUILD DAS SLOTS
---------------------------------*/
+
 /* ------------------------------
    BUILD DAS SLOTS (CORRIGIDO)
 --------------------------------*/
@@ -690,7 +688,7 @@ fsin.onchange = () => {
 };
 
 /* ------------------------------
-   UPLOAD (via Worker)
+   UPLOAD (via Worker) - FIX ESTÁVEL
 --------------------------------*/
 function uploadStorage(file, slot) {
   toast("A enviar...");
@@ -709,11 +707,19 @@ function uploadStorage(file, slot) {
       const key = res.key;
       const url = API_BASE + "/file?key=" + encodeURIComponent(key);
 
+      // atualiza dados
       data[slot] = { url, key };
 
-await saveState();
-build();
-toast("✓ Guardado!");
+      // guarda no servidor
+      await saveState();
+
+      // ❌ NÃO reconstruir tudo (isto matava vídeos)
+      //updateSlot(slot);
+
+      // ✅ atualiza só o slot afetado
+      updateSlot(slot);
+
+      toast("✓ Guardado!");
     })
     .catch(() => toast("Erro no upload"));
 }
@@ -728,7 +734,7 @@ function verSlot(idx) {
   fscont.innerHTML = "";
   btnIdx.classList.add("gone");
 
-  const isVideo = s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i);
+ const isVideo = (s.url || "").match(/\.(mp4|mov|webm|mkv|avi)$/i);
 
   if (isVideo) {
     const v = document.createElement("video");
@@ -804,9 +810,19 @@ function apagarSlot(idx) {
   })
     .then((r) => {
       if (!r.ok) throw new Error();
+
+      // limpa dados
       data[idx] = { url: null, key: null };
+
+      // guarda no servidor
       saveState();
-      build();
+
+      // ❌ NÃO reconstruir tudo (isto matava vídeos)
+      // build();
+
+      // ✅ atualizar só o slot
+      updateSlot(idx);
+
       toast("✓ Apagado!");
     })
     .catch(() => toast("Erro ao apagar"));
@@ -869,6 +885,54 @@ fsmod.onclick = (e) => {
     fscls.onclick(e);
   }
 };
+  function updateSlot(idx) {
+  const old = slots.children[idx];
+  if (!old) return;
+
+  const s = data[idx];
+
+  const url = typeof s?.url === "string" ? s.url : "";
+  const key = typeof s?.key === "string" ? s.key : "";
+
+  const mediaRef = url || (key ? API_BASE + "/file?key=" + encodeURIComponent(key) : "");
+
+  const d = document.createElement("div");
+  d.className = "slot";
+
+  if (!mediaRef) {
+    d.innerHTML = `
+      <div class="slot-add" onclick="openImport(${idx})">
+        <svg viewBox="0 0 24 24">
+          <path fill="currentColor" d="M12 5v14m-7-7h14"/>
+        </svg>
+        <span>Adicionar</span>
+      </div>
+    `;
+    slots.replaceChild(d, old);
+    return;
+  }
+
+  const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(mediaRef);
+
+  if (isVideo) {
+    d.innerHTML = `
+      <video class="m" src="${mediaRef}" muted playsinline preload="metadata"></video>
+    `;
+  } else {
+    d.innerHTML = `
+      <img class="m" src="${mediaRef}" loading="lazy">
+    `;
+  }
+
+  d.innerHTML += `
+    <div class="slot-ctrl">
+      <button class="sc" onclick="verSlot(${idx})">👁 Ver</button>
+      <button class="sc" onclick="apagarSlot(${idx})">🗑 Apagar</button>
+    </div>
+  `;
+
+  slots.replaceChild(d, old);
+}
 </script>
 
 </body>
