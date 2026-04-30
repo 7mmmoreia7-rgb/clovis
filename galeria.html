@@ -663,7 +663,56 @@ function build() {
 
   lazyVideos();
 }
+  
+function updateSlot(idx) {
+  const old = slots.children[idx];
+  if (!old) return;
 
+  const s = data[idx];
+
+  const url = typeof s?.url === "string" ? s.url : "";
+  const key = typeof s?.key === "string" ? s.key : "";
+
+  const mediaRef =
+    url || (key ? API_BASE + "/file?key=" + encodeURIComponent(key) : "");
+
+  const d = document.createElement("div");
+  d.className = "slot";
+
+  if (!mediaRef) {
+    d.innerHTML = `
+      <div class="slot-add" onclick="openImport(${idx})">
+        <svg viewBox="0 0 24 24">
+          <path fill="currentColor" d="M12 5v14m-7-7h14"/>
+        </svg>
+        <span>Adicionar</span>
+      </div>
+    `;
+    slots.replaceChild(d, old);
+    return;
+  }
+
+  const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(mediaRef);
+
+  if (isVideo) {
+    d.innerHTML = `
+      <video class="m" src="${mediaRef}" muted playsinline preload="metadata"></video>
+    `;
+  } else {
+    d.innerHTML = `
+      <img class="m" src="${mediaRef}" loading="lazy">
+    `;
+  }
+
+  d.innerHTML += `
+    <div class="slot-ctrl">
+      <button class="sc" onclick="verSlot(${idx})">👁 Ver</button>
+      <button class="sc" onclick="apagarSlot(${idx})">🗑 Apagar</button>
+    </div>
+  `;
+
+  slots.replaceChild(d, old);
+}
 /* ------------------------------
    IMPORTAR
 --------------------------------*/
@@ -711,11 +760,13 @@ function uploadStorage(file, slot) {
       // guarda no servidor
       await saveState();
 
-      // ❌ NÃO reconstruir tudo (isto matava vídeos)
-      //updateSlot(slot);
-
-      // ✅ atualiza só o slot afetado
-      updateSlot(slot);
+      // 🔥 SEGURANÇA: garante que o DOM existe
+      if (typeof updateSlot === "function" && slots.children[slot]) {
+        updateSlot(slot);
+      } else {
+        // fallback seguro (último recurso)
+        build();
+      }
 
       toast("✓ Guardado!");
     })
@@ -814,9 +865,7 @@ function apagarSlot(idx) {
 
       // guarda no servidor
       saveState();
-
-      // ❌ NÃO reconstruir tudo (isto matava vídeos)
-      // build();
+updateSlot(idx);
 
       // ✅ atualizar só o slot
       updateSlot(idx);
@@ -884,7 +933,7 @@ fsmod.onclick = (e) => {
   }
 };
   function updateSlot(idx) {
-  const old = slots.children[idx];
+ const old = slots.querySelectorAll(".slot")[idx];
   if (!old) return;
 
   const s = data[idx];
