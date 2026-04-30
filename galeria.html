@@ -525,56 +525,71 @@ const mediaRef = s.key ? keyToUrl(s.key) : null;
   }
 
   // Slot com media
-if (isVideoRef(mediaRef)) {
-  const v = document.createElement("video");
-  v.className = "m";
-  v.src = mediaRef;
+function createSlotEl(idx) {
+  const s = data[idx] || { key: null };
+  const mediaRef = s.key ? keyToUrl(s.key) : null;
 
-  v.crossOrigin = "anonymous";
-  v.preload = "metadata";
-  v.playsInline = true;
-  v.muted = true;
-  v.controls = false;
+  const d = document.createElement("div");
+  d.className = "slot";
 
-  v.load();
+  if (!mediaRef) {
+    const add = document.createElement("div");
+    add.className = "slot-add";
+    add.innerHTML = `
+      <svg viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 5v14m-7-7h14"/>
+      </svg>
+      <span>Adicionar</span>`;
+    add.onclick = () => openImport(idx);
+    d.appendChild(add);
+    return d;
+  }
 
-  // 👇 AQUI (onde perguntaste)
-  v.addEventListener("loadeddata", () => {
-    console.log("video ready:", mediaRef);
-  });
+  if (isVideoRef(mediaRef)) {
+    const v = document.createElement("video");
+    v.className = "m";
+    v.src = mediaRef;
 
-  // fallback se o vídeo falhar
-  v.addEventListener("error", (e) => {
-    console.warn("video error:", e);
-  });
+    v.playsInline = true;
+    v.muted = true;
+    v.preload = "auto";
+    v.controls = false;
 
-  d.appendChild(v);
-}
+    v.addEventListener("loadeddata", () => {
+      console.log("video ready:", mediaRef);
+    });
+
+    v.addEventListener("error", (e) => {
+      console.warn("video error:", e);
+    });
+
+    d.appendChild(v);
   } else {
     const img = document.createElement("img");
     img.className = "m";
     img.src = mediaRef;
     img.loading = "lazy";
-    img.addEventListener("error", () => {
-      data[idx] = { key: null, url: null };
-      d.replaceWith(createSlotEl(idx));
-    });
     d.appendChild(img);
   }
 
-  // Controlos
   const ctrl = document.createElement("div");
   ctrl.className = "slot-ctrl";
 
   const btnVer = document.createElement("button");
   btnVer.className = "sc";
   btnVer.innerHTML = "👁 Ver";
-  btnVer.addEventListener("click", (e) => { e.stopPropagation(); verSlot(idx); });
+  btnVer.onclick = (e) => {
+    e.stopPropagation();
+    verSlot(idx);
+  };
 
   const btnDel = document.createElement("button");
   btnDel.className = "sc";
   btnDel.innerHTML = "🗑 Apagar";
-  btnDel.addEventListener("click", (e) => { e.stopPropagation(); apagarSlot(idx); });
+  btnDel.onclick = (e) => {
+    e.stopPropagation();
+    apagarSlot(idx);
+  };
 
   ctrl.appendChild(btnVer);
   ctrl.appendChild(btnDel);
@@ -582,7 +597,6 @@ if (isVideoRef(mediaRef)) {
 
   return d;
 }
-
 /* --------------------------------
    BUILD COMPLETO DA GALERIA
 -------------------------------- */
@@ -607,7 +621,7 @@ function updateSlot(idx) {
   const old = slotEls[idx];
   if (!old) return;
   const novo = createSlotEl(idx);
-  slots.replaceChild(novo, old);
+  old.replaceWith(novo);
   // Se o novo slot tem vídeo, observa-o
   const v = novo.querySelector("video.m");
   if (v) observeVideo(v);
