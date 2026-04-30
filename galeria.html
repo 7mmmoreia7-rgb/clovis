@@ -506,25 +506,23 @@ async function loadState() {
     cache: "no-store"
   });
 
-  console.log("load-gallery status:", res.status);
-
   const json = await res.json();
-  console.log("galeria recebida:", json);
 
-  if (Array.isArray(json)) {
-    data = Array(9).fill(null).map((_, i) => {
-      const x = json[i] || {};
+  if (!Array.isArray(json)) return;
 
-      return {
-        key: x.key || null,
-        url: x.url || (
-          x.key
-            ? API_BASE + "/file?key=" + encodeURIComponent(x.key)
-            : null
-        )
-      };
-    });
-  }
+  data = json.map(x => {
+    const key = typeof x?.key === "string" ? x.key : null;
+
+    // ❌ rejeitar urls inválidos (blob, data, etc.)
+    const url = (typeof x?.url === "string" && x.url.startsWith(API_BASE))
+      ? x.url
+      : null;
+
+    return {
+      key,
+      url: key ? `${API_BASE}/file?key=${encodeURIComponent(key)}` : url
+    };
+  });
 }
 /* ------------------------------
    PLAY / SKIP
