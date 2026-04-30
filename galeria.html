@@ -591,7 +591,7 @@ function build() {
     const d = document.createElement("div");
     d.className = "slot";
 
-    const url = typeof s?.url === "string" ? s.url.trim() : "";
+   
     const key = typeof s?.key === "string" ? s.key.trim() : "";
 
     const hasMedia = !!(url || key);
@@ -670,7 +670,6 @@ function updateSlot(idx) {
 
   const s = data[idx];
 
-  const url = typeof s?.url === "string" ? s.url : "";
   const key = typeof s?.key === "string" ? s.key : "";
 
   const mediaRef =
@@ -752,10 +751,7 @@ function uploadStorage(file, slot) {
       if (!res.ok || !res.key) throw new Error("Upload falhou");
 
       const key = res.key;
-      const url = API_BASE + "/file?key=" + encodeURIComponent(key);
-
-      // atualiza dados
-      data[slot] = { url, key };
+      data[slot] = { key };
 
       // guarda no servidor
       await saveState();
