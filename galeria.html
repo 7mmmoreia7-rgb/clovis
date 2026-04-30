@@ -505,7 +505,7 @@ function toast(msg) {
 -------------------------------- */
 function createSlotEl(idx) {
   const s      = data[idx] || { key: null, url: null };
-  const mediaRef = s.url || null;
+const mediaRef = s.key ? keyToUrl(s.key) : null;
 
   const d = document.createElement("div");
   d.className = "slot";
@@ -681,7 +681,7 @@ function uploadStorage(file, slotIdx) {
 function verSlot(idx) {
   const s = data[idx];
   // FIX: usa s.url que é sempre preenchido (seja de loadState ou de upload)
-  const mediaRef = s?.url || null;
+  const mediaRef = s?.key ? keyToUrl(s.key) : null;
   if (!mediaRef) return;
 
   fscont.innerHTML = "";
