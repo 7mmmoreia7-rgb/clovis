@@ -428,7 +428,7 @@ function isVideoRef(ref) {
 -------------------------------- */
 async function saveState() {
   // Guarda só os campos necessários (key + url)
-  const payload = data.map(s => ({ key: s.key || null }));
+  const payload = data.filter(s => s?.key);
   await fetch(API_BASE + "/save-gallery", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
