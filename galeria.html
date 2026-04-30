@@ -525,25 +525,31 @@ const mediaRef = s.key ? keyToUrl(s.key) : null;
   }
 
   // Slot com media
-  if (isVideoRef(mediaRef)) {
-    const v = document.createElement("video");
-    v.className = "m";
-    v.src = mediaRef;
-    v.crossOrigin = "anonymous";
-v.preload = "metadata";
-    v.load(); // 👈 ISTO FALTAVA
-v.playsInline = true;
-v.muted = true;
-v.controls = false;
-    v.muted = true;
-    v.playsInline = true;
-    v.preload = "metadata";
-    // fallback se o vídeo falhar
-    v.addEventListener("error", () => {
-      data[idx] = { key: null, url: null };
-      d.replaceWith(createSlotEl(idx));
-    });
-    d.appendChild(v);
+if (isVideoRef(mediaRef)) {
+  const v = document.createElement("video");
+  v.className = "m";
+  v.src = mediaRef;
+
+  v.crossOrigin = "anonymous";
+  v.preload = "metadata";
+  v.playsInline = true;
+  v.muted = true;
+  v.controls = false;
+
+  v.load();
+
+  // 👇 AQUI (onde perguntaste)
+  v.addEventListener("loadeddata", () => {
+    console.log("video ready:", mediaRef);
+  });
+
+  // fallback se o vídeo falhar
+  v.addEventListener("error", (e) => {
+    console.warn("video error:", e);
+  });
+
+  d.appendChild(v);
+}
   } else {
     const img = document.createElement("img");
     img.className = "m";
