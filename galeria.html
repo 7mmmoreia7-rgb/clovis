@@ -531,14 +531,14 @@ function createSlotEl(idx) {
     v.className = "m";
     v.playsInline = true;
 v.muted = true;
-v.preload = "auto";
+v.preload = "metadata";
 v.controls = false;
 
 v.src = mediaRef;
 
 console.log("VIDEO SLOT:", idx, mediaRef);
 
-v.load();
+
 
     v.addEventListener("loadeddata", () => {
       console.log("video ready:", mediaRef);
@@ -553,7 +553,7 @@ v.load();
     const img = document.createElement("img");
     img.className = "m";
     img.src = mediaRef;
-    img.loading = "lazy";
+   
     d.appendChild(img);
   }
 
