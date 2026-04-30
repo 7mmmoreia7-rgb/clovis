@@ -582,6 +582,9 @@ function toast(msg) {
 /* ------------------------------
    BUILD DAS SLOTS
 --------------------------------*/
+/* ------------------------------
+   BUILD DAS SLOTS (CORRIGIDO)
+--------------------------------*/
 function build() {
   slots.innerHTML = `
     <div id="vline1"></div>
@@ -591,11 +594,13 @@ function build() {
   data.forEach((s, idx) => {
     const d = document.createElement("div");
     d.className = "slot";
-const url = typeof s?.url === "string" ? s.url : "";
-const key = typeof s?.key === "string" ? s.key : "";
 
-const hasMedia = url !== "" || key !== "";
+    const url = typeof s?.url === "string" ? s.url.trim() : "";
+    const key = typeof s?.key === "string" ? s.key.trim() : "";
 
+    const hasMedia = !!(url || key);
+
+    // SLOT VAZIO
     if (!hasMedia) {
       d.innerHTML = `
         <div class="slot-add" onclick="openImport(${idx})">
@@ -605,65 +610,57 @@ const hasMedia = url !== "" || key !== "";
           <span>Adicionar</span>
         </div>
       `;
-    } else {
-    const mediaRef = url !== ""
-  ? url
-  : (key ? API_BASE + "/file?key=" + encodeURIComponent(key) : "");
-if (!mediaRef) {
-  d.innerHTML = `
-    <div class="slot-add" onclick="openImport(${idx})">
-      <svg viewBox="0 0 24 24">
-        <path fill="currentColor" d="M12 5v14m-7-7h14"/>
-      </svg>
-      <span>Adicionar</span>
-    </div>
-  `;
-  slots.appendChild(d);
-  return;
-}
-     const isVideo =
-  (s.key || s.url || "").toLowerCase().includes(".mp4") ||
-  (s.key || s.url || "").toLowerCase().includes(".mov") ||
-  (s.key || s.url || "").toLowerCase().includes(".webm") ||
-  (s.key || s.url || "").toLowerCase().includes(".mkv") ||
-  (s.key || s.url || "").toLowerCase().includes(".avi");
+      slots.appendChild(d);
+      return;
+    }
 
-      if (isVideo) {
-        d.innerHTML = `
-          <video
-            class="m"
-            src="${mediaRef}"
-            muted
-            playsinline
-            preload="metadata"
-            onerror="this.parentElement.innerHTML=
-              '<div class=slot-add onclick=openImport(${idx})>\
-              <svg viewBox=0 0 24 24>\
-             <path fill="currentColor" d="M12 5v14m-7-7h14"/>
-              </svg><span>Adicionar</span></div>';">
-          </video>
-        `;
-      } else {
-        d.innerHTML = `
-          <img
-            class="m"
-            src="${mediaRef}"
-            loading="lazy"
-            onerror="this.parentElement.innerHTML=
-              '<div class=slot-add onclick=openImport(${idx})>\
-              <svg viewBox=0 0 24 24>\
-              <path fill=currentColor d=\'M12 5v14m-7-7h14\'/>\
-              </svg><span>Adicionar</span></div>';">
-        `;
-      }
+    // URL FINAL SEGURA
+    const mediaRef = url || (key ? API_BASE + "/file?key=" + encodeURIComponent(key) : "");
 
-      d.innerHTML += `
-        <div class="slot-ctrl">
-          <button class="sc" onclick="verSlot(${idx})">👁 Ver</button>
-          <button class="sc" onclick="apagarSlot(${idx})">🗑 Apagar</button>
+    if (!mediaRef) {
+      d.innerHTML = `
+        <div class="slot-add" onclick="openImport(${idx})">
+          <svg viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 5v14m-7-7h14"/>
+          </svg>
+          <span>Adicionar</span>
         </div>
       `;
+      slots.appendChild(d);
+      return;
     }
+
+    // DETECÇÃO VIDEO MAIS SEGURA
+    const isVideo =
+      /\.(mp4|mov|webm|mkv|avi)(\?|$)/i.test(mediaRef);
+
+    if (isVideo) {
+      d.innerHTML = `
+        <video
+          class="m"
+          src="${mediaRef}"
+          muted
+          playsinline
+          preload="metadata"
+          onerror="this.replaceWith(document.createTextNode(''))">
+        </video>
+      `;
+    } else {
+      d.innerHTML = `
+        <img
+          class="m"
+          src="${mediaRef}"
+          loading="lazy"
+          onerror="this.replaceWith(document.createTextNode(''))">
+      `;
+    }
+
+    d.innerHTML += `
+      <div class="slot-ctrl">
+        <button class="sc" onclick="verSlot(${idx})">👁 Ver</button>
+        <button class="sc" onclick="apagarSlot(${idx})">🗑 Apagar</button>
+      </div>
+    `;
 
     slots.appendChild(d);
   });
