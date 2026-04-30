@@ -529,12 +529,16 @@ function createSlotEl(idx) {
   if (isVideoRef(mediaRef)) {
     const v = document.createElement("video");
     v.className = "m";
-    v.src = mediaRef;
-
     v.playsInline = true;
-    v.muted = true;
-    v.preload = "auto";
-    v.controls = false;
+v.muted = true;
+v.preload = "auto";
+v.controls = false;
+
+v.src = mediaRef;
+
+console.log("VIDEO SLOT:", idx, mediaRef);
+
+v.load();
 
     v.addEventListener("loadeddata", () => {
       console.log("video ready:", mediaRef);
