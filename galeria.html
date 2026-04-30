@@ -674,7 +674,7 @@ function uploadStorage(file, slotIdx) {
       const url = keyToUrl(key);
 
       // FIX: guarda key E url para que verSlot e updateSlot funcionem
-      data[slotIdx] = { key };
+      data[slotIdx] = { key, type: file.type };
 
       await saveState();
       updateSlot(slotIdx);
@@ -698,7 +698,9 @@ function verSlot(idx) {
   fscont.innerHTML = "";
   btnIdx.classList.add("gone");
 
-  if (isVideoRef(mediaRef)) {
+  function isVideoRef(s) {
+  return (s?.type || "").startsWith("video/");
+}
     const v = document.createElement("video");
     v.src = mediaRef;
     v.controls = true;
