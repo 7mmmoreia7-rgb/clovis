@@ -428,7 +428,7 @@ function isVideoRef(ref) {
 -------------------------------- */
 async function saveState() {
   // Guarda só os campos necessários (key + url)
-  const payload = data.map(s => ({ key: s.key || null, url: s.url || null }));
+  const payload = data.map(s => ({ key: s.key || null }));
   await fetch(API_BASE + "/save-gallery", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -663,7 +663,7 @@ function uploadStorage(file, slotIdx) {
       const url = keyToUrl(key);
 
       // FIX: guarda key E url para que verSlot e updateSlot funcionem
-      data[slotIdx] = { key, url };
+      data[slotIdx] = { key };
 
       await saveState();
       updateSlot(slotIdx);
