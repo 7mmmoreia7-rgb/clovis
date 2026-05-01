@@ -673,8 +673,7 @@ if (!cv) {
   if (fc && fc.style.display !== 'none' && fc.width > 0) {
     c.drawImage(fc, 0, 0, W, H);
   } else {
-    c.fillStyle = '#cfc0a0';
-    c.fillRect(0, 0, W, H);
+   c.clearRect(0, 0, W, H);
   }
 
   // 2. fundo imagem ou vídeo
