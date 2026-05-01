@@ -674,7 +674,7 @@ function uploadStorage(file, slotIdx) {
       const url = keyToUrl(key);
 
       // FIX: guarda key E url para que verSlot e updateSlot funcionem
-      data[slotIdx] = { key, type: file.type };
+      data[slotIdx] = { key };
 
       await saveState();
       updateSlot(slotIdx);
@@ -691,21 +691,17 @@ function uploadStorage(file, slotIdx) {
 -------------------------------- */
 function verSlot(idx) {
   const s = data[idx];
-  // FIX: usa s.url que é sempre preenchido (seja de loadState ou de upload)
   const mediaRef = s?.key ? keyToUrl(s.key) : null;
   if (!mediaRef) return;
 
   fscont.innerHTML = "";
   btnIdx.classList.add("gone");
 
-  function isVideoRef(s) {
-  return (s?.type || "").startsWith("video/");
-}
+  if (isVideoRef(mediaRef)) {
     const v = document.createElement("video");
     v.src = mediaRef;
     v.controls = true;
     v.playsInline = true;
-    // Começa sem som para contornar autoplay policies; o utilizador pode carregar
     v.muted = false;
     v.volume = 1;
 
@@ -714,7 +710,8 @@ function verSlot(idx) {
       v.volume = 1;
       v.play().catch(() => {});
     };
-    v.addEventListener("click",      enableSound, { once: true });
+
+    v.addEventListener("click", enableSound, { once: true });
     v.addEventListener("touchstart", enableSound, { once: true });
 
     fscont.appendChild(v);
@@ -728,7 +725,6 @@ function verSlot(idx) {
 
   fsmod.classList.add("on");
 }
-
 /* --------------------------------
    FECHAR FULLSCREEN
 -------------------------------- */
