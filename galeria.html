@@ -486,34 +486,29 @@ const fscls = document.getElementById("fscls");
 const fsdl = document.getElementById("fsdl");
 
 /* ------------------------------
-   DADOS + PERSISTÊNCIA (SERVER SYNC)
+   DADOS + PERSISTÊNCIA
 --------------------------------*/
 let data = Array(9).fill(null).map(() => ({ url: null, key: null }));
 let activeSlot = null;
 
-/* SALVAR NO SERVIDOR (R2 via Worker) */
 function saveState() {
-  fetch(API_BASE + "/save-gallery", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  }).catch(() => {});
+ localStorage.setItem("galeria", JSON.stringify(data));
 }
 
-/* CARREGAR DO SERVIDOR */
-async function loadState() {
-  try {
-    const res = await fetch(API_BASE + "/load-gallery");
-    const json = await res.json();
+function loadState() {
+  const raw = localStorage.getItem("galeria");
+  if (!raw) return;
 
-    if (Array.isArray(json)) {
-      data = json;
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      data = parsed;
     }
   } catch (e) {
-    console.warn("loadState error:", e);
-    data = Array(9).fill(null).map(() => ({ url: null, key: null }));
+    console.error("Erro ao carregar galeria:", e);
   }
 }
+
 /* ------------------------------
    PLAY / SKIP
 --------------------------------*/
