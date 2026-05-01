@@ -491,24 +491,24 @@ const fsdl = document.getElementById("fsdl");
 let data = Array(9).fill(null).map(() => ({ url: null, key: null }));
 let activeSlot = null;
 
-function saveState() {
- localStorage.setItem("galeria", JSON.stringify(data));
+// SUBSTITUI POR:
+async function saveState() {
+  await fetch(API_BASE + "/save-gallery", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
 }
 
-function loadState() {
-  const raw = localStorage.getItem("galeria");
-  if (!raw) return;
-
+async function loadState() {
   try {
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) {
-      data = parsed;
-    }
+    const res = await fetch(API_BASE + "/load-gallery");
+    const parsed = await res.json();
+    if (Array.isArray(parsed)) data = parsed;
   } catch (e) {
     console.error("Erro ao carregar galeria:", e);
   }
 }
-
 /* ------------------------------
    PLAY / SKIP
 --------------------------------*/
@@ -640,20 +640,19 @@ function uploadStorage(file, slot) {
     body: form,
   })
     .then((r) => r.json())
-    .then((res) => {
+    .then(async (res) => {
       if (!res.ok || !res.key) throw new Error("Upload falhou");
 
       const key = res.key;
       const url = API_BASE + "/file?key=" + encodeURIComponent(key);
 
       data[slot] = { url, key };
-      saveState();
-    build();
-toast("✓ Guardado!");
+      await saveState();
+      build();
+      toast("✓ Guardado!");
     })
     .catch(() => toast("Erro no upload"));
 }
-
 /* ------------------------------
    FULLSCREEN
 --------------------------------*/
@@ -738,10 +737,10 @@ function apagarSlot(idx) {
   fetch(API_BASE + "/file?key=" + encodeURIComponent(s.key), {
     method: "DELETE",
   })
-    .then((r) => {
+    .then(async (r) => {
       if (!r.ok) throw new Error();
       data[idx] = { url: null, key: null };
-      saveState();
+      await saveState();
       build();
       toast("✓ Apagado!");
     })
@@ -773,9 +772,11 @@ btnIdx.onclick = () => {
 
   vids.forEach(v=>obs.observe(v));
 }
-loadState();
-build();
-lazyVideos();
+// SUBSTITUI POR:
+loadState().then(() => {
+  build();
+  lazyVideos();
+});
   function setVH(){
   document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
 }
