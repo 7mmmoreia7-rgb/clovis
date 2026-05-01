@@ -775,62 +775,52 @@ function expDispositivo(){
 
 function expGaleria(){
   gerarCanvas(t=>{
-    if (!t) {
-      alert('Erro ao gerar canvas');
-      return;
-    }
+    if (!t) { alert('Erro ao gerar canvas'); return; }
 
-    t.toBlob(blob=>{
-      if (!blob) {
-        alert('Erro ao gerar imagem');
-        return;
-      }
+    t.toBlob(async blob=>{
+      if (!blob) { alert('Erro ao gerar imagem'); return; }
 
-      const fd = new FormData();
-      fd.append('file', blob, 'desenho_' + Date.now() + '.jpg');
+      try {
+        // 1. Upload do ficheiro
+        const fd = new FormData();
+        fd.append('file', blob, 'desenho_' + Date.now() + '.png');
 
-      fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload', {
-        method: 'POST',
-        body: fd
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (!data || !data.ok) throw new Error("upload falhou");
-
-        const url = `https://hidden-hall-2a03.7mmmoreia7.workers.dev/file?key=${encodeURIComponent(data.key)}`;
-
-        let galeria = [];
-        try {
-          galeria = JSON.parse(localStorage.getItem('galeria')) || [];
-        } catch (e) {
-          galeria = [];
-        }
-
-        galeria.unshift({
-          key: data.key,
-          url
-        });
-
-        localStorage.setItem('galeria', JSON.stringify(galeria));
-
-        // 🔥 sync com servidor
-        return fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/save-gallery', {
+        const upRes = await fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload', {
           method: 'POST',
-          headers: {
-            "Content-Type": "application/json"
-          },
+          body: fd
+        });
+        const upData = await upRes.json();
+        if (!upData.ok) throw new Error("upload falhou");
+
+        const key = upData.key;
+        const url = `https://hidden-hall-2a03.7mmmoreia7.workers.dev/file?key=${encodeURIComponent(key)}`;
+
+        // 2. Buscar galeria atual do servidor
+        const galRes = await fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/load-gallery');
+        let galeria = await galRes.json();
+        if (!Array.isArray(galeria)) galeria = Array(9).fill(null).map(() => ({ url: null, key: null }));
+
+        // 3. Encontrar primeiro slot vazio
+        const idx = galeria.findIndex(s => !s || !s.url);
+        if (idx === -1) { alert('A galeria está cheia!'); return; }
+
+        galeria[idx] = { url, key };
+
+        // 4. Guardar galeria atualizada no servidor
+        await fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/save-gallery', {
+          method: 'POST',
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(galeria)
         });
-      })
-      .then(() => {
-        alert("Enviado para galeria!");
-      })
-      .catch(err => {
+
+        alert("✓ Enviado para a galeria!");
+
+      } catch(err) {
         console.error("Erro:", err);
         alert("Erro no upload");
-      });
+      }
 
-    }, 'image/jpeg', 0.92);
+    }, 'image/png');
   });
 }
 /* ══════════════════════════════════════════════════════
