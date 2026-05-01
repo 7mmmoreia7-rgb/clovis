@@ -443,11 +443,13 @@ async function loadState() {
     if (!Array.isArray(json)) return;
 
     // Normaliza: key tem prioridade; url é sempre reconstruído de key
-    data = json.slice(0, 9).map(x => {
-      const key = (typeof x?.key === "string" && x.key.trim()) ? x.key.trim() : null;
-      const url = key ? keyToUrl(key) : null;
-      return { key, url };
-    });
+   data = json.slice(0, 9).map(x => {
+  const key = x?.key?.trim?.() || null;
+  return {
+    key,
+    url: key ? keyToUrl(key) : null
+  };
+});
 
     // Garante sempre 9 posições
     while (data.length < 9) data.push({ key: null, url: null });
@@ -671,10 +673,10 @@ function uploadStorage(file, slotIdx) {
       if (!res.ok || !res.key) throw new Error("Upload falhou");
 
       const key = res.key;
-      const url = keyToUrl(key);
+      
 
       // FIX: guarda key E url para que verSlot e updateSlot funcionem
-      data[slotIdx] = { key };
+     data[slotIdx] = { key, url: keyToUrl(key) };
 
       await saveState();
       updateSlot(slotIdx);
