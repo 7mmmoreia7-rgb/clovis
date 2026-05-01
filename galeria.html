@@ -432,37 +432,33 @@ function isVideoRef(ref) {
 -------------------------------- */
 async function saveState() {
   // Guarda só os campos necessários (key + url)
-  const payload = data.filter(s => s?.key);
+async function saveState() {
   await fetch(API_BASE + "/save-gallery", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(data) // FIX: mantém posições 0–8
   });
 }
 
 async function loadState() {
   try {
-    const res  = await fetch(API_BASE + "/load-gallery");
+    const res = await fetch(API_BASE + "/load-gallery");
     const json = await res.json();
+
     if (!Array.isArray(json)) return;
 
-    // Normaliza: key tem prioridade; url é sempre reconstruído de key
-data = json.slice(0, 9).map(x => {
-  const rawKey = x?.key;
+    const fixed = Array(9).fill(null).map(() => ({ key: null, url: null }));
 
-  const key =
-    typeof rawKey === "string" && rawKey.trim().startsWith("media/")
-      ? rawKey.trim()
-      : null;
+    json.slice(0, 9).forEach((x, i) => {
+      if (x?.key) {
+        fixed[i] = {
+          key: x.key,
+          url: keyToUrl(x.key)
+        };
+      }
+    });
 
-  return {
-    key,
-    url: key ? keyToUrl(key) : null
-  };
-});
-
-    // Garante sempre 9 posições
-    while (data.length < 9) data.push({ key: null, url: null });
+    data = fixed;
 
   } catch (e) {
     console.warn("loadState error:", e);
@@ -794,13 +790,16 @@ function apagarSlot(idx) {
 
   toast("A apagar...");
 
-  fetch(API_BASE + "/file?key=" + encodeURIComponent(s.key), { method: "DELETE" })
-    .then(r => {
-      if (!r.ok) throw new Error("Delete falhou");
+  fetch(API_BASE + "/file?key=" + encodeURIComponent(s.key), {
+    method: "DELETE"
+  })
+    .then(async (r) => {
+      // não assumes sucesso
+      if (!r.ok && r.status !== 204) throw new Error("Delete falhou");
 
       data[idx] = { key: null, url: null };
-      saveState();       // não precisa de await aqui
-      updateSlot(idx);   // FIX: chamado só UMA vez
+      await saveState();
+      updateSlot(idx);
       toast("✓ Apagado!");
     })
     .catch(() => toast("Erro ao apagar"));
