@@ -443,8 +443,14 @@ async function loadState() {
     if (!Array.isArray(json)) return;
 
     // Normaliza: key tem prioridade; url é sempre reconstruído de key
-   data = json.slice(0, 9).map(x => {
-  const key = x?.key?.trim?.() || null;
+data = json.slice(0, 9).map(x => {
+  const rawKey = x?.key;
+
+  const key =
+    typeof rawKey === "string" && rawKey.trim().startsWith("media/")
+      ? rawKey.trim()
+      : null;
+
   return {
     key,
     url: key ? keyToUrl(key) : null
