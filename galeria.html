@@ -37,6 +37,7 @@ html,body{
   background: url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
 }
 
+/* remover preto atrás do vídeo */
 #vid{
   position:absolute;
   inset:0;
@@ -48,6 +49,7 @@ html,body{
   transition: opacity .6s ease;
 }
 
+/* PLAY */
 #play{
   position:absolute;
   left:50%;
@@ -78,19 +80,22 @@ html,body{
 #slots{
   position:absolute;
   left:9.10%;
-  top:11.50%;
-  width:81.40%;
-  bottom:10.30%;
+top:11.50%;
+width:81.40%;
+bottom:10.30%;
+
   display:grid;
   grid-template-columns:repeat(3,1fr);
   grid-template-rows:repeat(3,1fr);
   gap:0;
+ 
   z-index:5;
   opacity:0;
   transition:opacity 1.4s ease;
 }
 #slots.show{ opacity:1; }
 
+/* Cada slot */
 .slot{
   position:relative;
   width:100%;
@@ -115,8 +120,8 @@ html,body{
   position:absolute;
   left:0;
   right:0;
-  height:3px;
-  background:#7a6245;
+  height:3px;               /* espessura da linha */
+  background:#7a6245;       /* cor da linha */
   z-index:6;
 }
 #slots::before{ top:calc(100%/3); }
@@ -128,7 +133,7 @@ html,body{
   position:absolute;
   top:0;
   bottom:0;
-  width:3px;
+  width:3px;                /* espessura da linha */
   background:#7a6245;
   z-index:6;
   pointer-events:none;
@@ -136,6 +141,7 @@ html,body{
 #vline1{ left:calc(100%/3 - 1.5px); }
 #vline2{ left:calc(200%/3 - 1.5px); }
 
+/* BOTÃO ÍNDICE */
 #btn-idx{
   position:fixed;
   bottom:3.5%;
@@ -151,8 +157,8 @@ html,body{
     drop-shadow(0 0 6px rgba(255,255,255,0.25));
 }
 #btn-idx.show{opacity:1;pointer-events:all;}
-#btn-idx.gone{opacity:0 !important;pointer-events:none !important;}
 
+/* SKIP */
 #btn-skip{
   position:fixed;
   bottom:3.5%;
@@ -184,6 +190,7 @@ html,body{
   pointer-events:none !important;
 }
 
+/* IMPORTS — ADICIONADOS */
 .slot-add{
   position:absolute;inset:0;
   display:flex;flex-direction:column;
@@ -222,6 +229,7 @@ html,body{
 }
 .sc:hover{background:rgba(255,255,255,.38);}
 
+/* FULLSCREEN */
 #fsmod {
   display: none;
   position: absolute;
@@ -233,8 +241,12 @@ html,body{
   justify-content: center;
   gap: 10px;
 }
-#fsmod.on { display: flex; }
 
+#fsmod.on {
+  display: flex;
+}
+
+/* FULLSCREEN CONTENT */
 #fscont {
   width: 100%;
   height: calc(100% - 60px);
@@ -244,6 +256,7 @@ html,body{
   position: relative;
 }
 
+/* MEDIA */
 #fscont img,
 #fscont video {
   max-width: 90%;
@@ -254,33 +267,16 @@ html,body{
   background: transparent !important;
 }
 
-#fscont img { pointer-events: none; }
-#fscont video { pointer-events: auto; }
+/* REMOVE INTERAÇÃO DO MEDIA */
+#fscont img {
+  pointer-events: none;
+}
 
 #fscont video {
-  background: transparent !important;
-  width: auto !important;
-  height: auto !important;
-  max-width: 90% !important;
-  max-height: 90% !important;
-  object-fit: contain !important;
-  border: none !important;
-  outline: none !important;
+  pointer-events: auto;
 }
 
-#fscont video::-webkit-media-controls-enclosure {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-#fscont video::-webkit-media-controls-panel {
-  transform: scale(0.85);
-  transform-origin: bottom center;
-  background: rgba(0,0,0,0.2) !important;
-  border-radius: 8px;
-}
-
+/* Barra de botões */
 #fsbar {
   position: absolute;
   bottom: 10px;
@@ -291,20 +287,28 @@ html,body{
   z-index: 9999;
 }
 
+/* Botões mais pequenos (reduz ~3–4 cm visualmente) */
 .fsbtn {
   background: rgba(255,255,255,.18);
   border: 1px solid rgba(255,255,255,.3);
   color: #fff;
   border-radius: 8px;
-  padding: 8px 14px;
+  padding: 8px 14px; /* ← diminuir aqui reduz o tamanho */
   font-family: sans-serif;
-  font-size: clamp(10px, 0.9vw, 13px);
+  font-size: clamp(10px, 0.9vw, 13px); /* ← reduz ainda mais */
   font-weight: 600;
   cursor: pointer;
   transition: background .2s;
+  transform: scale(1); /* ← isto reduz ~3–4 cm visualmente */
 }
-.fsbtn:hover { background: rgba(255,255,255,.32); }
 
+.fsbtn:hover {
+  background: rgba(255,255,255,.32);
+}
+
+
+
+/* TOAST */
 #toast{
   position:absolute;
   bottom:3%;
@@ -316,28 +320,88 @@ html,body{
   border-radius:22px;
   opacity:0;
   transition:.4s;
-  z-index:200;
 }
 #toast.on{
   transform:translateX(-50%) translateY(0);
   opacity:1;
 }
-
-@media (max-width: 1024px) and (orientation: portrait){
-  #slots{
-    position:absolute;
-    left:9.2%;
-    right:9.5%;
-    top:9.5%;
-    bottom:9.5%;
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    grid-template-rows:repeat(3,1fr);
-    z-index:5;
-    opacity:0;
-    transition:opacity 1.4s ease;
-  }
+  #fscont video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
 }
+
+#fsbar {
+  z-index: 9999;
+}
+
+#btn-idx.gone {
+  display: none !important;
+}
+/* Remove a caixa preta e o estilo nativo do player */
+#fscont video {
+  background: transparent !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 90% !important;
+  max-height: 90% !important;
+  object-fit: contain !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Remove a moldura e a caixa dos comandos */
+#fscont video::-webkit-media-controls-enclosure {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+/* Reduz a barra de comandos sem mexer no vídeo */
+#fscont video::-webkit-media-controls-panel {
+  transform: scale(0.85);
+  transform-origin: bottom center;
+  background: rgba(0,0,0,0.2) !important; /* podes pôr transparente */
+  border-radius: 8px;
+}
+/* REMOVE COMPLETAMENTE O RETÂNGULO ESCURO DO PLAYER NATIVO */
+#fscont video::-webkit-media-controls-enclosure {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* REMOVE O FUNDO ESCURO POR TRÁS DOS COMANDOS */
+#fscont video::-webkit-media-controls-panel {
+  background: transparent !important;
+}
+
+/* GARANTE QUE O VÍDEO NÃO GANHA FUNDO PRETO */
+#fscont video {
+  background: transparent !important;
+}
+@media (max-width: 1024px) and (orientation: portrait){
+
+#slots{
+  position:absolute;
+  left:9.2%;
+  right:9.5%;
+  top:9.5%;
+  bottom:9.5%;
+
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);
+
+  z-index:5;
+  opacity:0;
+  transition:opacity 1.4s ease;
+}
+  }
 </style>
 </head>
 
@@ -345,26 +409,37 @@ html,body{
 
 <div id="wrap">
   <div id="stage">
-<video
+
+   <video
   id="vid"
   src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/galeria/galeria.mp4"
   poster="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png"
   preload="auto"
-  playsinline
-  muted
-  controls>
+  playsinline>
 </video>
 
-<img
-  id="play"
-  src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png"
-  alt="">
+    <img id="play" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 
     <img id="gbg" src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/galeria/isto%20n%C3%A3o%20%C3%A9%20para%20todos.png">
 
-    <div id="slots">
-      <!-- slots gerados pelo JS -->
-    </div>
+<div id="slots">
+
+  <!-- LINHAS VERTICAIS -->
+  <div id="vline1"></div>
+  <div id="vline2"></div>
+
+  <!-- AS 9 SLOTS -->
+  <div class="slot"></div>
+  <div class="slot"></div>
+  <div class="slot"></div>
+  <div class="slot"></div>
+  <div class="slot"></div>
+  <div class="slot"></div>
+  <div class="slot"></div>
+  <div class="slot"></div>
+  <div class="slot"></div>
+
+</div>
 
     <div id="fsmod">
       <div id="fscont"></div>
@@ -388,265 +463,151 @@ html,body{
 <input type="file" id="fsin" accept="image/*,video/*" style="display:none">
 
 <script>
-/* --------------------------------
-   CONFIG
--------------------------------- */
+/* ------------------------------
+   CONFIG WORKER / R2
+--------------------------------*/
 const API_BASE = "https://hidden-hall-2a03.7mmmoreia7.workers.dev";
+const FILE_URL = API_BASE + "/file?key=";
 
-/* --------------------------------
+/* ------------------------------
    ELEMENTOS
--------------------------------- */
-const vid    = document.getElementById("vid");
-const play   = document.getElementById("play");
-const btnSkip= document.getElementById("btn-skip");
-const gbg    = document.getElementById("gbg");
-const slots  = document.getElementById("slots");
+--------------------------------*/
+const vid = document.getElementById("vid");
+const play = document.getElementById("play");
+const btnSkip = document.getElementById("btn-skip");
+const gbg = document.getElementById("gbg");
+const slots = document.getElementById("slots");
 const btnIdx = document.getElementById("btn-idx");
-const fsin   = document.getElementById("fsin");
-const fsmod  = document.getElementById("fsmod");
+const fsin = document.getElementById("fsin");
+
+const fsmod = document.getElementById("fsmod");
 const fscont = document.getElementById("fscont");
-const fscls  = document.getElementById("fscls");
-const fsdl   = document.getElementById("fsdl");
+const fscls = document.getElementById("fscls");
+const fsdl = document.getElementById("fsdl");
 
-/* --------------------------------
-   ESTADO
--------------------------------- */
-// Cada entrada tem sempre { key, url } — url é sempre derivado de key
-let data = Array(9).fill(null).map(() => ({ key: null, url: null }));
+/* ------------------------------
+   DADOS + PERSISTÊNCIA
+--------------------------------*/
+let data = Array(9).fill(null).map(() => ({ url: null, key: null }));
 let activeSlot = null;
-let toastTimer = null;
 
-/* ---- helper: URL canónico a partir de key ---- */
-function keyToUrl(key) {
-  if (!key || typeof key !== "string") return null;
-  return API_BASE + "/file?key=" + encodeURIComponent(key.trim());
+function saveState() {
+ localStorage.setItem("galeria", JSON.stringify(data));
 }
 
-/* ---- helper: é vídeo? ---- */
-function isVideoRef(ref) {
-  return /\.(mp4|mov|webm|mkv|avi)(\?|$)/i.test(ref || "");
-}
+function loadState() {
+  const raw = localStorage.getItem("galeria");
+  if (!raw) return;
 
-/* --------------------------------
-   PERSISTÊNCIA
--------------------------------- */
-async function saveState() {
-  await fetch(API_BASE + "/save-gallery", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-}
-async function loadState() {
   try {
-    const res = await fetch(API_BASE + "/load-gallery");
-    const json = await res.json();
-
-    if (!Array.isArray(json)) {
-      data = Array(9).fill(null).map(() => ({ key: null, url: null }));
-      return;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      data = parsed;
     }
-
-    const fixed = Array(9).fill(null).map(() => ({ key: null, url: null }));
-
-    for (let i = 0; i < 9; i++) {
-      const x = json[i];
-      if (x && x.key) {
-        fixed[i] = {
-          key: x.key,
-          url: keyToUrl(x.key)
-        };
-      }
-    }
-
-    data = fixed;
-
   } catch (e) {
-    console.warn("loadState error:", e);
-    data = Array(9).fill(null).map(() => ({ key: null, url: null }));
+    console.error("Erro ao carregar galeria:", e);
   }
 }
-/* --------------------------------
+
+/* ------------------------------
    PLAY / SKIP
--------------------------------- */
+--------------------------------*/
 play.onclick = () => {
   play.classList.add("gone");
   btnSkip.classList.add("gone");
+
   vid.style.opacity = "1";
-  vid.play().catch(() => { vid.muted = true; vid.play(); });
+
+  vid.play().catch(() => {
+    vid.muted = true;
+    vid.play();
+  });
 };
 
 btnSkip.onclick = () => {
   play.classList.add("gone");
   btnSkip.classList.add("gone");
   vid.pause();
-  if (!isNaN(vid.duration)) vid.currentTime = vid.duration;
+
+  if (!isNaN(vid.duration)) {
+    vid.currentTime = vid.duration;
+  }
+
   goGallery();
 };
 
 vid.onended = () => goGallery();
 
-/* --------------------------------
+/* ------------------------------
    MOSTRAR GALERIA
--------------------------------- */
+--------------------------------*/
 function goGallery() {
   vid.pause();
   vid.style.opacity = "0";
+
   gbg.classList.add("show");
   slots.classList.add("show");
   btnIdx.classList.add("show");
 }
 
-/* --------------------------------
+/* ------------------------------
    TOAST
--------------------------------- */
+--------------------------------*/
+let tt;
 function toast(msg) {
   const t = document.getElementById("toast");
   t.textContent = msg;
   t.classList.add("on");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove("on"), 2600);
+  clearTimeout(tt);
+  tt = setTimeout(() => t.classList.remove("on"), 2600);
 }
 
-/* --------------------------------
-   CRIAR ELEMENTO DE UM SLOT
-   (função pura — não toca no DOM)
--------------------------------- */
-
-
-  // Slot com media
-function createSlotEl(idx) {
-  const s = data[idx] || { key: null };
-  const mediaRef = s.key ? keyToUrl(s.key) : null;
-
-  const d = document.createElement("div");
-  d.className = "slot";
-
-  if (!mediaRef) {
-    const add = document.createElement("div");
-    add.className = "slot-add";
-    add.innerHTML = `
-      <svg viewBox="0 0 24 24">
-        <path fill="currentColor" d="M12 5v14m-7-7h14"/>
-      </svg>
-      <span>Adicionar</span>`;
-    add.onclick = () => openImport(idx);
-    d.appendChild(add);
-    return d;
-  }
-
-  if (isVideoRef(mediaRef)) {
-    const v = document.createElement("video");
-    v.className = "m";
-    v.playsInline = true;
-v.muted = true;
-v.preload = "metadata";
-v.controls = false;
-
-v.src = mediaRef;
-
-console.log("VIDEO SLOT:", idx, mediaRef);
-
-
-
-    v.addEventListener("loadeddata", () => {
-      console.log("video ready:", mediaRef);
-    });
-
-    v.addEventListener("error", (e) => {
-      console.warn("video error:", e);
-    });
-
-    d.appendChild(v);
-  } else {
-    const img = document.createElement("img");
-    img.className = "m";
-    img.src = mediaRef;
-   
-    d.appendChild(img);
-  }
-
-  const ctrl = document.createElement("div");
-  ctrl.className = "slot-ctrl";
-
-  const btnVer = document.createElement("button");
-  btnVer.className = "sc";
-  btnVer.innerHTML = "👁 Ver";
-  btnVer.onclick = (e) => {
-    e.stopPropagation();
-    verSlot(idx);
-  };
-
-  const btnDel = document.createElement("button");
-  btnDel.className = "sc";
-  btnDel.innerHTML = "🗑 Apagar";
-  btnDel.onclick = (e) => {
-    e.stopPropagation();
-    apagarSlot(idx);
-  };
-
-  ctrl.appendChild(btnVer);
-  ctrl.appendChild(btnDel);
-  d.appendChild(ctrl);
-
-  return d;
-}
-/* --------------------------------
-   BUILD COMPLETO DA GALERIA
--------------------------------- */
+/* ------------------------------
+   BUILD DAS SLOTS
+--------------------------------*/
 function build() {
-  // Limpa tudo e recoloca as vlines + 9 slots
-  slots.innerHTML = `
-    <div id="vline1"></div>
-    <div id="vline2"></div>
-  `;
-  for (let i = 0; i < 9; i++) {
-    slots.appendChild(createSlotEl(i));
-  }
+slots.innerHTML = `
+  <div id="vline1"></div>
+  <div id="vline2"></div>
+`;
+
+  data.forEach((s, idx) => {
+    const d = document.createElement("div");
+    d.className = "slot";
+
+    if (!s.url) {
+      d.innerHTML = `
+        <div class="slot-add" onclick="openImport(${idx})">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5v14m-7-7h14"/></svg>
+          <span>Adicionar</span>
+        </div>
+      `;
+    } else {
+      if (s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i)) {
+       d.innerHTML = `
+ <video class="m" src="${s.url}" muted playsinline preload="none"></video>
+ 
+`;
+      } else {
+        d.innerHTML = `<img class="m" src="${s.url}">`;
+      }
+
+      d.innerHTML += `
+        <div class="slot-ctrl">
+          <button class="sc" onclick="verSlot(${idx})">👁 Ver</button>
+          <button class="sc" onclick="apagarSlot(${idx})">🗑 Apagar</button>
+        </div>
+      `;
+    }
+
+    slots.appendChild(d);
+  });
   lazyVideos();
 }
 
-/* --------------------------------
-   ATUALIZAR SÓ UM SLOT (sem tocar nos outros)
--------------------------------- */
-function updateSlot(idx) {
-  // Os 2 primeiros filhos são vline1 e vline2, slots começam no índice 2
-  const slotEls = slots.querySelectorAll(".slot");
-  const old = slotEls[idx];
-  if (!old) return;
-  const novo = createSlotEl(idx);
-  old.replaceWith(novo);
-  // Se o novo slot tem vídeo, observa-o
-  const v = novo.querySelector("video.m");
-  if (v) observeVideo(v);
-}
-
-/* --------------------------------
-   LAZY VIDEOS
--------------------------------- */
-let videoObserver = null;
-
-function observeVideo(v) {
-  if (!videoObserver) {
-    videoObserver = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.play().catch(() => {});
-          videoObserver.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.5 });
-  }
-  videoObserver.observe(v);
-}
-
-function lazyVideos() {
-  slots.querySelectorAll("video.m").forEach(v => observeVideo(v));
-}
-
-/* --------------------------------
-   IMPORTAR FICHEIRO
--------------------------------- */
+/* ------------------------------
+   IMPORTAR
+--------------------------------*/
 function openImport(idx) {
   activeSlot = idx;
   fsin.value = "";
@@ -665,54 +626,56 @@ fsin.onchange = () => {
   uploadStorage(f, activeSlot);
 };
 
-/* --------------------------------
-   UPLOAD
--------------------------------- */
-function uploadStorage(file, slotIdx) {
+/* ------------------------------
+   UPLOAD (via Worker)
+--------------------------------*/
+function uploadStorage(file, slot) {
   toast("A enviar...");
 
   const form = new FormData();
   form.append("file", file);
 
-  fetch(API_BASE + "/upload", { method: "POST", body: form })
-    .then(r => r.json())
-    .then(async res => {
+  fetch(API_BASE + "/upload", {
+    method: "POST",
+    body: form,
+  })
+    .then((r) => r.json())
+    .then((res) => {
       if (!res.ok || !res.key) throw new Error("Upload falhou");
 
       const key = res.key;
-      
+      const url = API_BASE + "/file?key=" + encodeURIComponent(key);
 
-      // FIX: guarda key E url para que verSlot e updateSlot funcionem
-     data[slotIdx] = { key, url: keyToUrl(key) };
-
-      await saveState();
-      updateSlot(slotIdx);
-      toast("✓ Guardado!");
+      data[slot] = { url, key };
+      saveState();
+    build();
+toast("✓ Guardado!");
     })
-    .catch(err => {
-      console.error(err);
-      toast("Erro no upload");
-    });
+    .catch(() => toast("Erro no upload"));
 }
 
-/* --------------------------------
+/* ------------------------------
    FULLSCREEN
--------------------------------- */
+--------------------------------*/
 function verSlot(idx) {
   const s = data[idx];
-  const mediaRef = s?.key ? keyToUrl(s.key) : null;
-  if (!mediaRef) return;
+  if (!s || !s.url) return;
 
   fscont.innerHTML = "";
   btnIdx.classList.add("gone");
 
-  if (isVideoRef(mediaRef)) {
+  const isVideo = s.url.match(/\.(mp4|mov|webm|mkv|avi)$/i);
+
+  if (isVideo) {
     const v = document.createElement("video");
-    v.src = mediaRef;
+    v.src = s.url;
     v.controls = true;
     v.playsInline = true;
-    v.muted = false;
-    v.volume = 1;
+
+    fscont.appendChild(v);
+
+    v.load();
+    v.play().catch(() => {});
 
     const enableSound = () => {
       v.muted = false;
@@ -720,71 +683,52 @@ function verSlot(idx) {
       v.play().catch(() => {});
     };
 
-    v.addEventListener("click", enableSound, { once: true });
-    v.addEventListener("touchstart", enableSound, { once: true });
+    v.addEventListener("click", enableSound);
+    v.addEventListener("touchstart", enableSound);
 
-    fscont.appendChild(v);
-    v.load();
-    v.play().catch(() => {});
   } else {
     const img = document.createElement("img");
-    img.src = mediaRef;
+    img.src = s.url;
     fscont.appendChild(img);
   }
 
   fsmod.classList.add("on");
 }
-/* --------------------------------
-   FECHAR FULLSCREEN
--------------------------------- */
-function closeFullscreen() {
-  const v = fscont.querySelector("video");
-  if (v) { v.pause(); v.src = ""; v.load(); }
-  fscont.innerHTML = "";
-  fsmod.classList.remove("on");
-  btnIdx.classList.remove("gone");
-}
-
-fscls.addEventListener("click", (e) => {
-  e.stopPropagation();
-  closeFullscreen();
-});
-
-fsmod.addEventListener("click", (e) => {
-  if (e.target === fsmod) closeFullscreen();
-});
-
-/* --------------------------------
-   DOWNLOAD
--------------------------------- */
-fsdl.addEventListener("click", async (e) => {
+/* ------------------------------
+   DOWNLOAD (Guardar no dispositivo)
+--------------------------------*/
+fsdl.onclick = async (e) => {
   e.preventDefault();
   e.stopPropagation();
 
-  const el = fscont.querySelector("img, video");
+  const el = fscont.querySelector("img,video");
   if (!el) return;
 
   try {
-    const res  = await fetch(el.src);
+    const res = await fetch(el.src);
     const blob = await res.blob();
-    const url  = URL.createObjectURL(blob);
+
+    const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
     a.href = url;
     a.download = "media";
+
     document.body.appendChild(a);
     a.click();
     a.remove();
+
     URL.revokeObjectURL(url);
+
   } catch (err) {
     console.error(err);
     toast("Erro ao descarregar");
   }
-});
+};
 
-/* --------------------------------
-   APAGAR SLOT
--------------------------------- */
+/* ------------------------------
+   APAGAR PERMANENTE
+--------------------------------*/
 function apagarSlot(idx) {
   const s = data[idx];
   if (!s || !s.key) return;
@@ -792,43 +736,73 @@ function apagarSlot(idx) {
   toast("A apagar...");
 
   fetch(API_BASE + "/file?key=" + encodeURIComponent(s.key), {
-    method: "DELETE"
+    method: "DELETE",
   })
-    .then(async (r) => {
-      // não assumes sucesso
-      if (!r.ok && r.status !== 204) throw new Error("Delete falhou");
-
-      data[idx] = { key: null, url: null };
-      await saveState();
-      updateSlot(idx);
+    .then((r) => {
+      if (!r.ok) throw new Error();
+      data[idx] = { url: null, key: null };
+      saveState();
+      build();
       toast("✓ Apagado!");
     })
     .catch(() => toast("Erro ao apagar"));
 }
 
-/* --------------------------------
+/* ------------------------------
    BOTÃO ÍNDICE
--------------------------------- */
+--------------------------------*/
 btnIdx.onclick = () => {
   window.location.href = "indice.html?skip=1";
 };
 
-/* --------------------------------
-   VIEWPORT HEIGHT
--------------------------------- */
-function setVH() {
-  document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
-}
-setVH();
-window.addEventListener("resize", setVH);
-
-/* --------------------------------
+/* ------------------------------
    INICIAR
--------------------------------- */
-(async () => {
-  await loadState();
-  build();           // FIX: lazyVideos já é chamado dentro de build(), não duplicar
-})();
+--------------------------------*/
+  function lazyVideos(){
+  const vids = document.querySelectorAll("video.m");
+
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const v = e.target;
+        v.play().catch(()=>{});
+        obs.unobserve(v);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  vids.forEach(v=>obs.observe(v));
+}
+loadState();
+build();
+lazyVideos();
+  function setVH(){
+  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+}
+
+setVH();
+window.addEventListener('resize', setVH);
+  fscls.onclick = (e) => {
+  e.stopPropagation();
+
+  const v = fscont.querySelector("video");
+
+  if (v) {
+    v.pause();
+    v.src = "";
+    v.load();
+  }
+
+  fscont.innerHTML = "";
+  fsmod.classList.remove("on");
+  btnIdx.classList.remove("gone");
+};
+
+fsmod.onclick = (e) => {
+  if (e.target === fsmod) {
+    fscls.onclick(e);
+  }
+};
 </script>
 
 </body>
