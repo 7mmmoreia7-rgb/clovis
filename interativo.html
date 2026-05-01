@@ -779,7 +779,13 @@ function expGaleria(){
 
     t.toBlob(async blob=>{
       if (!blob) { alert('Erro ao gerar imagem'); return; }
-
+// TESTE — apaga depois
+const testRes = await fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload', {
+  method: 'POST',
+  body: (() => { const f = new FormData(); f.append('file', blob, 'teste.png'); return f; })()
+});
+const testJson = await testRes.json();
+console.log('UPLOAD RESPONSE:', JSON.stringify(testJson));
       try {
         // 1. Upload do ficheiro
         const fd = new FormData();
