@@ -790,7 +790,7 @@ function expGaleria(){
       .then(data => {
         if (!data || !data.ok) throw new Error("upload falhou");
 
-        const url = 'https://hidden-hall-2a03.7mmmoreia7.workers.dev/file?key=' + data.key;
+        const url = `https://hidden-hall-2a03.7mmmoreia7.workers.dev/file?key=${encodeURIComponent(data.key)}`;
 
         let galeria = [];
         try {
