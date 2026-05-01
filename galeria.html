@@ -431,15 +431,12 @@ function isVideoRef(ref) {
    PERSISTÊNCIA
 -------------------------------- */
 async function saveState() {
-  // Guarda só os campos necessários (key + url)
-async function saveState() {
   await fetch(API_BASE + "/save-gallery", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data) // FIX: mantém posições 0–8
+    body: JSON.stringify(data)
   });
 }
-
 async function loadState() {
   try {
     const res = await fetch(API_BASE + "/load-gallery");
