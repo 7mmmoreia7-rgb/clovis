@@ -721,11 +721,18 @@ const p1 = fm
         if (dv.style.fontSize) txDiv = dv;
       });
 
-      if (im){
-        return carregarImagem(im.getAttribute('src')).then(img=>{
-          if (img) c.drawImage(img, x, y, w, h);
-        });
-      }
+     if (im){
+  return carregarImagem(im.getAttribute('src')).then(async img=>{
+    if (!img) return;
+
+    if (img.decode) {
+      try { await img.decode(); } catch(e) {}
+
+    }
+
+    c.drawImage(img, x, y, w, h);
+  });
+}
 
       if (txDiv){
         const fs = parseFloat(getComputedStyle(txDiv).fontSize) || 32;
@@ -741,8 +748,8 @@ const p1 = fm
     });
 
     Promise.all(promises).then(()=>{
-      cb(tmp);
-    });
+  cb(tmp);
+});
   }).catch(err=>{
     console.error("Erro gerarCanvas:", err);
     cb(null);
