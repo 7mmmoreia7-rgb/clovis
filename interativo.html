@@ -779,15 +779,9 @@ function expGaleria(){
 
     t.toBlob(async blob=>{
       if (!blob) { alert('Erro ao gerar imagem'); return; }
-// TESTE — apaga depois
-const testRes = await fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/upload', {
-  method: 'POST',
-  body: (() => { const f = new FormData(); f.append('file', blob, 'teste.png'); return f; })()
-});
-const testJson = await testRes.json();
-console.log('UPLOAD RESPONSE:', JSON.stringify(testJson));
+
       try {
-        // 1. Upload do ficheiro
+        // 1. Upload
         const fd = new FormData();
         fd.append('file', blob, 'desenho_' + Date.now() + '.png');
 
@@ -806,13 +800,13 @@ console.log('UPLOAD RESPONSE:', JSON.stringify(testJson));
         let galeria = await galRes.json();
         if (!Array.isArray(galeria)) galeria = Array(9).fill(null).map(() => ({ url: null, key: null }));
 
-        // 3. Encontrar primeiro slot vazio
+        // 3. Primeiro slot vazio
         const idx = galeria.findIndex(s => !s || !s.url);
         if (idx === -1) { alert('A galeria está cheia!'); return; }
 
         galeria[idx] = { url, key };
 
-        // 4. Guardar galeria atualizada no servidor
+        // 4. Guardar no servidor
         await fetch('https://hidden-hall-2a03.7mmmoreia7.workers.dev/save-gallery', {
           method: 'POST',
           headers: { "Content-Type": "application/json" },
