@@ -438,7 +438,7 @@ async function saveState() {
 
 async function loadState() {
   try {
-    const res  = await fetch(API_BASE + "/load-gallery", { cache: "no-store" });
+    const res  = await fetch(API_BASE + "/load-gallery");
     const json = await res.json();
     if (!Array.isArray(json)) return;
 
