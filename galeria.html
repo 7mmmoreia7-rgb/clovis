@@ -445,26 +445,30 @@ async function loadState() {
     const res = await fetch(API_BASE + "/load-gallery");
     const json = await res.json();
 
-    if (!Array.isArray(json)) return;
+    if (!Array.isArray(json)) {
+      data = Array(9).fill(null).map(() => ({ key: null, url: null }));
+      return;
+    }
 
     const fixed = Array(9).fill(null).map(() => ({ key: null, url: null }));
 
-    json.slice(0, 9).forEach((x, i) => {
-      if (x?.key) {
+    for (let i = 0; i < 9; i++) {
+      const x = json[i];
+      if (x && x.key) {
         fixed[i] = {
           key: x.key,
           url: keyToUrl(x.key)
         };
       }
-    });
+    }
 
     data = fixed;
 
   } catch (e) {
     console.warn("loadState error:", e);
+    data = Array(9).fill(null).map(() => ({ key: null, url: null }));
   }
 }
-
 /* --------------------------------
    PLAY / SKIP
 -------------------------------- */
