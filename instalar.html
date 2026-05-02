@@ -62,120 +62,80 @@ src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/play.png">
 <div id="installZone"></div>
 
 <script>
-if (localStorage.getItem("app_instalada") === "true") {
-  window.location.href = "index.html";
-}  
+<script>
+// 👉 se já está em modo standalone (aberta pelo ícone) → vai direto
 const isStandalone =
   window.matchMedia('(display-mode: standalone)').matches ||
   window.navigator.standalone === true;
 
-// 👉 se já está instalada → vai direto à app
 if (isStandalone) {
-  window.location.href = "index.html";
+  window.location.replace("index.html");
 }
 
-// 👉 estado da instalação
-let deferredPrompt = null;
-let installAvailable = false;
+// 👉 se já foi instalada antes → vai direto
+if (localStorage.getItem("app_instalada") === "true") {
+  window.location.replace("index.html");
+}
 
-// 👉 captura do install prompt
-  
+let deferredPrompt = null;
+
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  installAvailable = true;
 });
-async function tryInstall() {
 
+async function tryInstall() {
   if (deferredPrompt) {
     deferredPrompt.prompt();
-
     const choice = await deferredPrompt.userChoice;
-
     if (choice.outcome === "accepted") {
       localStorage.setItem("app_instalada", "true");
     }
-
     deferredPrompt = null;
+    window.location.replace("index.html");
     return;
   }
-
   showFallbackInstall();
 }
-  function showFallbackInstall() {
 
+function showFallbackInstall() {
   const fallback = document.createElement("div");
-
   fallback.innerHTML = `
     <div style="
-      position:fixed;
-      inset:0;
-      background:black;
-      color:white;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      text-align:center;
-      font-family:sans-serif;
-      z-index:9999;
-      padding:20px;
-    ">
+      position:fixed;inset:0;background:black;color:white;
+      display:flex;flex-direction:column;justify-content:center;
+      align-items:center;text-align:center;font-family:sans-serif;
+      z-index:9999;padding:20px;">
       <h2>Instalar App</h2>
-      <p>Se não apareceu automaticamente:</p>
-      <p><b>Chrome → ⋮ → “Adicionar ao ecrã inicial”</b></p>
-      <p>ou “Instalar app” no menu do browser</p>
+      <p>Chrome → ⋮ → <b>"Adicionar ao ecrã inicial"</b></p>
     </div>
   `;
-
   document.body.appendChild(fallback);
 }
+
 const video = document.getElementById("video");
-  // 🔥 força primeiro frame (adeus flash preto)
-video.addEventListener("loadeddata", () => {
-  video.currentTime = 0.01;
-});
 const play = document.getElementById("play");
 const installZone = document.getElementById("installZone");
 
-// ▶️ play → inicia vídeo
+video.addEventListener("loadeddata", () => {
+  video.currentTime = 0.01;
+});
+
 play.onclick = async () => {
   play.style.display = "none";
-
-  video.muted = false; // 🔊 DEVOLVE O SOM
-
+  video.muted = false;
   await video.play().catch(() => {});
 };
 
-// 🎬 fim do vídeo → ativa clique
 video.onended = () => {
-  installZone.onclick = tryInstall;
   installZone.style.display = "block";
+  installZone.onclick = tryInstall;
 };
 
-// 🟡 clique → instalação + app
-installZone.onclick = async () => {
-
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-
-    const choice = await deferredPrompt.userChoice;
-
-    if (choice.outcome === "accepted") {
-      localStorage.setItem("app_instalada", "true");
-    }
-
-    deferredPrompt = null;
-  }
-
-  window.location.href = "index.html";
-};
-
-// service worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
-
+</script>
 </script>
 
 </body>
