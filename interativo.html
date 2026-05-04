@@ -722,15 +722,15 @@ const p1 = fm
         if (dv.style.fontSize) txDiv = dv;
       });
 
-     if (im){
+if (im){
   return carregarImagem(im.getAttribute('src')).then(async img=>{
     if (!img) return;
-
-    if (img.decode) {
-      try { await img.decode(); } catch(e) {}
-
-    }
-
+    await new Promise(r => {
+      if (img.complete && img.naturalWidth > 0) return r();
+      img.onload = r;
+      img.onerror = r;
+      setTimeout(r, 3000); // timeout de segurança
+    });
     c.drawImage(img, x, y, w, h);
   });
 }
