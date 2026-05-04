@@ -775,8 +775,10 @@ function expDispositivo(){
 }
 
 function expGaleria(){
-  gerarCanvas(t=>{
+  gerarCanvas(async t=>{
     if (!t) { alert('Erro ao gerar canvas'); return; }
+
+    await new Promise(r => setTimeout(r, 500));
 
     t.toBlob(async blob=>{
       if (!blob) { alert('Erro ao gerar imagem'); return; }
