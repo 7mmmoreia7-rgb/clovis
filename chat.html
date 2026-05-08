@@ -249,6 +249,13 @@ var nome='',ultimoId=0,idsEnviados={};
 // ─── login ───────────────────────────────────────────────────────────────────
 function entrar(){
   var v=document.getElementById('login-input').value.trim();if(!v)return;
+  
+  // 🔊 desbloqueia o som com a interação do login
+  SOM.play().then(function(){
+    SOM.pause();
+    SOM.currentTime=0;
+  }).catch(function(){});
+
   nome=v;
   document.getElementById('pag-login').style.display='none';
   document.getElementById('pag-chat').style.display='block';
