@@ -83,10 +83,44 @@
     var idx  = document.getElementById('btn-idx');
 
     play.onclick = function () {
-      play.style.opacity = '0';
-      play.style.pointerEvents = 'none';
-      vid.play();
-    };
+  // 🔊 SOM — motor de avião de papel
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // ruído de motor suave
+    var buf = ctx.createBuffer(1, ctx.sampleRate * 1.5, ctx.sampleRate);
+    var data = buf.getChannelData(0);
+    for(var i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.15;
+    var noise = ctx.createBufferSource();
+    noise.buffer = buf;
+    
+    var filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(400, ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 1.5);
+    
+    var gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 0.3);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+    
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    noise.start();
+    noise.stop(ctx.currentTime + 1.5);
+  } catch(e) {}
+
+  // ✈️ ANIMAÇÃO — inclina e levanta voo
+  play.style.transition = 'transform 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 1.5s ease';
+  play.style.transform = 'translate(150%, -120%) rotate(-25deg) scale(0.4)';
+  play.style.opacity = '0';
+
+  vid.play().catch(function(){
+    vid.muted = true;
+    vid.play();
+  });
+};
 
     vid.onended = function () {
       idx.classList.add('show');
