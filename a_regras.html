@@ -89,14 +89,37 @@
       play.style.display = 'none';
       idx.classList.add('show');
     }
+play.onclick = function() {
+  // 🔊 SOM — pop
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.15);
+    gain.gain.setValueAtTime(1.5, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.15);
+  } catch(e) {}
 
-    play.onclick = function () {
-      play.classList.add('gone');
-      vid.style.opacity = '1';
-      vid.play().catch(function(){
-        vid.muted = true;
-        vid.play();
-      });
+  // 💫 ANIMAÇÃO — expande ligeiro e pop
+  play.style.transition = 'transform 0.1s ease-out, opacity 0.15s ease';
+  play.style.transform = 'translate(-50%, -50%) scale(1.4)';
+  setTimeout(function(){
+    play.style.transition = 'transform 0.1s ease-in, opacity 0.1s ease';
+    play.style.transform = 'translate(-50%, -50%) scale(0)';
+    play.style.opacity = '0';
+  }, 100);
+  setTimeout(function(){
+    this.classList.add('gone');
+    vid.classList.add('show');
+    vid.play().catch(function(){ vid.muted=true; vid.play(); });
+  }.bind(this), 250);
+};
     };
 
     vid.onended = function () {
