@@ -131,7 +131,31 @@ function hideStartButtons() {
 
 /* PLAY */
 play.onclick = function () {
-  hideStartButtons();
+  // 🔊 SOM — whoosh suave gerado por código
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(300, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 1.2);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 1.2);
+  } catch(e) {}
+
+  // 🪶 ANIMAÇÃO — sobe e desvanece
+  play.style.transition = 'opacity 1.2s ease, transform 2s ease';
+  play.style.opacity = '0';
+  play.style.transform = 'translate(-50%, -180%) scale(0.6)';
+
+  setTimeout(function(){
+    skip.style.opacity = '0';
+    skip.style.pointerEvents = 'none';
+  }, 300);
 
   vid.play().catch(function(){
     vid.muted = true;
