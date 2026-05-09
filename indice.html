@@ -163,11 +163,56 @@ var vid=document.getElementById('vid');
 var play=document.getElementById('play');
 var skip=document.getElementById('skip');
 
-play.onclick=function(){
-  play.classList.add('gone');
-  skip.classList.add('gone');
-  vid.style.opacity='1';
-  vid.play().catch(function(){ vid.muted=true; vid.play(); });
+play.onclick = function(){
+  // 🔊 SOM — origami vivo (dois tons suaves)
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var o1 = ctx.createOscillator();
+    var o2 = ctx.createOscillator();
+    var g1 = ctx.createGain();
+    var g2 = ctx.createGain();
+    o1.connect(g1); g1.connect(ctx.destination);
+    o2.connect(g2); g2.connect(ctx.destination);
+    o1.type = 'sine';
+    o1.frequency.setValueAtTime(440, ctx.currentTime);
+    o1.frequency.setValueAtTime(550, ctx.currentTime + 0.15);
+    o1.frequency.setValueAtTime(440, ctx.currentTime + 0.3);
+    g1.gain.setValueAtTime(1.0, ctx.currentTime);
+    g1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    o2.type = 'sine';
+    o2.frequency.setValueAtTime(330, ctx.currentTime + 0.2);
+    o2.frequency.setValueAtTime(440, ctx.currentTime + 0.4);
+    g2.gain.setValueAtTime(0.0, ctx.currentTime);
+    g2.gain.setValueAtTime(1.0, ctx.currentTime + 0.2);
+    g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+    o1.start(ctx.currentTime); o1.stop(ctx.currentTime + 0.5);
+    o2.start(ctx.currentTime + 0.2); o2.stop(ctx.currentTime + 0.7);
+  } catch(e) {}
+
+  // 😮 ANIMAÇÃO — pisca olho e expande antes de voar
+  play.style.transition = 'transform 0.15s ease';
+  play.style.transform = 'translate(-50%, -50%) scale(1.3)';
+
+  setTimeout(function(){
+    play.style.transform = 'translate(-50%, -50%) scale(0.85)';
+  }, 150);
+
+  setTimeout(function(){
+    play.style.transform = 'translate(-50%, -50%) scale(1.15)';
+  }, 280);
+
+  setTimeout(function(){
+    play.style.transition = 'transform 1s ease-in, opacity 0.8s ease';
+    play.style.transform = 'translate(-50%, -280%) rotate(15deg) scale(0.3)';
+    play.style.opacity = '0';
+  }, 400);
+
+  setTimeout(function(){
+    play.classList.add('gone');
+    skip.classList.add('gone');
+    vid.style.opacity = '1';
+    vid.play().catch(function(){ vid.muted=true; vid.play(); });
+  }, 500);
 };
 
 skip.onclick=function(){
