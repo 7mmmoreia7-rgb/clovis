@@ -141,7 +141,7 @@ play.onclick = function () {
     osc.type = 'sine';
     osc.frequency.setValueAtTime(300, ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 1.2);
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.setValueAtTime(0.8, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 1.2);
