@@ -70,9 +70,51 @@ var play = document.getElementById('play');
 var vid  = document.getElementById('vid');
 
 play.onclick = function() {
-  this.classList.add('gone');
-  vid.classList.add('show');
-  vid.play().catch(function(){ vid.muted=true; vid.play(); });
+  // 🔊 SOM — whoosh longo
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(400, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 1.0);
+    gain.gain.setValueAtTime(1.5, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.0);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 1.0);
+  } catch(e) {}
+
+  // 🌈 ANIMAÇÃO — fantasmas
+  var el = this;
+  for(var g = 0; g < 4; g++){
+    (function(i){
+      setTimeout(function(){
+        var ghost = el.cloneNode();
+        ghost.style.opacity = (0.4 - i*0.08).toString();
+        ghost.style.transform = 'translate(-50%, -50%)';
+        ghost.style.pointerEvents = 'none';
+        ghost.style.transition = 'opacity 0.6s ease, transform 0.8s ease';
+        document.body.appendChild(ghost);
+        setTimeout(function(){
+          ghost.style.opacity = '0';
+          ghost.style.transform = 'translate('+(−50 + i*15)+'%, -50%)';
+        }, 50);
+        setTimeout(function(){ ghost.remove(); }, 700);
+      }, i * 80);
+    })(g);
+  }
+  setTimeout(function(){
+    el.style.transition = 'transform 0.8s ease, opacity 0.8s ease';
+    el.style.transform = 'translate(200%, -50%)';
+    el.style.opacity = '0';
+  }, 320);
+  setTimeout(function(){
+    el.classList.add('gone');
+    vid.classList.add('show');
+    vid.play().catch(function(){ vid.muted=true; vid.play(); });
+  }, 700);
 };
 
 vid.addEventListener('ended', function() {
