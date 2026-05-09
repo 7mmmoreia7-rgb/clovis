@@ -64,9 +64,33 @@ var play = document.getElementById('play');
 var vid  = document.getElementById('vid');
 
 play.onclick = function() {
-  this.classList.add('gone');
-  vid.classList.add('show');
-  vid.play().catch(function(){ vid.muted=true; vid.play(); });
+  // 🔊 SOM — explosão
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var buf = ctx.createBuffer(1, ctx.sampleRate * 0.4, ctx.sampleRate);
+    var data = buf.getChannelData(0);
+    for(var i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i/data.length);
+    var noise = ctx.createBufferSource();
+    noise.buffer = buf;
+    var gain = ctx.createGain();
+    gain.gain.setValueAtTime(1.5, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    noise.connect(gain);
+    gain.connect(ctx.destination);
+    noise.start();
+    noise.stop(ctx.currentTime + 0.4);
+  } catch(e) {}
+
+  // 💥 ANIMAÇÃO — expande e desaparece
+  play.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease';
+  play.style.transform = 'translate(-50%, -50%) scale(3)';
+  play.style.opacity = '0';
+
+  setTimeout(function(){
+    this.classList.add('gone');
+    vid.classList.add('show');
+    vid.play().catch(function(){ vid.muted=true; vid.play(); });
+  }.bind(this), 300);
 };
 
 vid.addEventListener('ended', function() {
