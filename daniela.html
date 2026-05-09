@@ -66,9 +66,36 @@ var play = document.getElementById('play');
 var vid  = document.getElementById('vid');
 
 play.onclick = function() {
-  this.classList.add('gone');
-  vid.classList.add('show');
-  vid.play().catch(function(){ vid.muted=true; vid.play(); });
+  // 🔊 SOM — snap de estilingue
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.3);
+    gain.gain.setValueAtTime(1.0, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.3);
+  } catch(e) {}
+
+  // 🚀 ANIMAÇÃO — estica para trás e dispara
+  play.style.transition = 'transform 0.1s ease-in';
+  play.style.transform = 'translate(-80%, -50%) scale(0.8)';
+  setTimeout(function(){
+    play.style.transition = 'transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.4s ease';
+    play.style.transform = 'translate(200%, -50%) scale(0.3)';
+    play.style.opacity = '0';
+  }, 120);
+
+  setTimeout(function(){
+    this.classList.add('gone');
+    vid.classList.add('show');
+    vid.play().catch(function(){ vid.muted=true; vid.play(); });
+  }.bind(this), 400);
 };
 
 vid.addEventListener('ended', function() {
