@@ -513,11 +513,69 @@ async function loadState() {
    PLAY / SKIP
 --------------------------------*/
 play.onclick = () => {
-  play.classList.add("gone");
+  // 🔊 SOM — explosão
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var buf = ctx.createBuffer(1, ctx.sampleRate * 0.4, ctx.sampleRate);
+    var data2 = buf.getChannelData(0);
+    for(var i = 0; i < data2.length; i++) data2[i] = (Math.random() * 2 - 1) * (1 - i/data2.length);
+    var noise = ctx.createBufferSource();
+    noise.buffer = buf;
+    var gain = ctx.createGain();
+    gain.gain.setValueAtTime(1.0, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    noise.connect(gain);
+    gain.connect(ctx.destination);
+    noise.start();
+    noise.stop(ctx.currentTime + 0.4);
+  } catch(e) {}
+
+  // 💥 ANIMAÇÃO — partículas a explodir
+  var x0 = window.innerWidth / 2;
+  var y0 = window.innerHeight / 2;
+  var cores = ['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#C77DFF','#FF9A3C'];
+  for(var p = 0; p < 12; p++){
+    (function(i){
+      var dot = document.createElement('div');
+      var angle = (i / 12) * Math.PI * 2;
+      var dist = 60 + Math.random() * 40;
+      dot.style.cssText = [
+        'position:fixed',
+        'width:12px',
+        'height:12px',
+        'border-radius:50%',
+        'background:'+cores[i % cores.length],
+        'left:'+(x0-6)+'px',
+        'top:'+(y0-6)+'px',
+        'z-index:9999',
+        'pointer-events:none',
+        'transition:all 0.5s ease-out',
+        'opacity:1'
+      ].join(';');
+      document.body.appendChild(dot);
+      setTimeout(function(){
+        dot.style.left = (x0 + Math.cos(angle)*dist - 6)+'px';
+        dot.style.top  = (y0 + Math.sin(angle)*dist - 6)+'px';
+        dot.style.opacity = '0';
+        dot.style.transform = 'scale(0.2)';
+      }, 20);
+      setTimeout(function(){ dot.remove(); }, 600);
+    })(p);
+  }
+
+  // play expande e desaparece
+  play.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease';
+  play.style.transform = 'translate(-50%, -50%) scale(2.5)';
+  play.style.opacity = '0';
+
+  // esconde skip
   btnSkip.classList.add("gone");
 
-  vid.style.opacity = "1";
+  setTimeout(function(){
+    play.classList.add("gone");
+  }, 300);
 
+  vid.style.opacity = "1";
   vid.play().catch(() => {
     vid.muted = true;
     vid.play();
