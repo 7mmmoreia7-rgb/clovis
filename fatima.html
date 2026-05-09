@@ -66,9 +66,46 @@ var play = document.getElementById('play');
 var vid  = document.getElementById('vid');
 
 play.onclick = function() {
-  this.classList.add('gone');
-  vid.classList.add('show');
-  vid.play().catch(function(){ vid.muted=true; vid.play(); });
+  // 🔊 SOM — vento
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var buf = ctx.createBuffer(1, ctx.sampleRate * 1.0, ctx.sampleRate);
+    var data = buf.getChannelData(0);
+    for(var i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.8;
+    var noise = ctx.createBufferSource();
+    noise.buffer = buf;
+    var filter = ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 800;
+    var gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 0.3);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.0);
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    noise.start();
+    noise.stop(ctx.currentTime + 1.0);
+  } catch(e) {}
+
+  // 🌬️ ANIMAÇÃO — treme e voa
+  var el = this;
+  var shakes = 0;
+  var shake = setInterval(function(){
+    shakes++;
+    el.style.transform = 'translate('+(−50 + (Math.random()*6-3))+'%, '+(−50 + (Math.random()*6-3))+'%)';
+    if(shakes > 8){
+      clearInterval(shake);
+      el.style.transition = 'transform 0.8s ease, opacity 0.8s ease';
+      el.style.transform = 'translate(-50%, -200%)';
+      el.style.opacity = '0';
+      setTimeout(function(){
+        el.classList.add('gone');
+        vid.classList.add('show');
+        vid.play().catch(function(){ vid.muted=true; vid.play(); });
+      }, 800);
+    }
+  }, 60);
 };
 
 vid.addEventListener('ended', function() {
