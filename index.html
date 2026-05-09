@@ -131,31 +131,131 @@ function hideStartButtons() {
 
 /* PLAY */
 play.onclick = function () {
-  // 🔊 SOM — whoosh suave gerado por código
+  // 🔊 SOM — fanfarra épica!
   try {
     var ctx = new (window.AudioContext || window.webkitAudioContext)();
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(300, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 1.2);
-    gain.gain.setValueAtTime(1.5, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 1.2);
+
+    // nota 1 — arranque
+    var o1 = ctx.createOscillator();
+    var g1 = ctx.createGain();
+    o1.connect(g1); g1.connect(ctx.destination);
+    o1.type = 'square';
+    o1.frequency.setValueAtTime(261, ctx.currentTime);
+    o1.frequency.setValueAtTime(329, ctx.currentTime + 0.12);
+    o1.frequency.setValueAtTime(392, ctx.currentTime + 0.24);
+    o1.frequency.setValueAtTime(523, ctx.currentTime + 0.36);
+    g1.gain.setValueAtTime(1.0, ctx.currentTime);
+    g1.gain.setValueAtTime(1.0, ctx.currentTime + 0.36);
+    g1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.9);
+    o1.start(ctx.currentTime);
+    o1.stop(ctx.currentTime + 0.9);
+
+    // nota 2 — eco suave
+    var o2 = ctx.createOscillator();
+    var g2 = ctx.createGain();
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.type = 'sine';
+    o2.frequency.setValueAtTime(523, ctx.currentTime + 0.3);
+    o2.frequency.setValueAtTime(659, ctx.currentTime + 0.5);
+    o2.frequency.setValueAtTime(784, ctx.currentTime + 0.7);
+    g2.gain.setValueAtTime(0.0, ctx.currentTime);
+    g2.gain.setValueAtTime(0.8, ctx.currentTime + 0.3);
+    g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+    o2.start(ctx.currentTime + 0.3);
+    o2.stop(ctx.currentTime + 1.2);
+
+    // bombo final
+    var o3 = ctx.createOscillator();
+    var g3 = ctx.createGain();
+    o3.connect(g3); g3.connect(ctx.destination);
+    o3.type = 'sine';
+    o3.frequency.setValueAtTime(120, ctx.currentTime + 0.36);
+    o3.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.7);
+    g3.gain.setValueAtTime(1.0, ctx.currentTime + 0.36);
+    g3.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+    o3.start(ctx.currentTime + 0.36);
+    o3.stop(ctx.currentTime + 0.7);
+
   } catch(e) {}
 
-  // 🪶 ANIMAÇÃO — sobe e desvanece
-  play.style.transition = 'opacity 1.2s ease, transform 2s ease';
+  // 🎆 ANIMAÇÃO — explosão de partículas + rotação + ascensão
+  var x0 = window.innerWidth / 2;
+  var y0 = window.innerHeight / 2;
+  var cores = ['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#C77DFF','#FF9A3C','#FF6BB5','#00C9A7'];
+
+  // onda 1 — partículas grandes
+  for(var p = 0; p < 16; p++){
+    (function(i){
+      setTimeout(function(){
+        var dot = document.createElement('div');
+        var angle = (i / 16) * Math.PI * 2;
+        var dist = 80 + Math.random() * 60;
+        dot.style.cssText = [
+          'position:fixed',
+          'width:14px',
+          'height:14px',
+          'border-radius:50%',
+          'background:' + cores[i % cores.length],
+          'left:'+(x0-7)+'px',
+          'top:'+(y0-7)+'px',
+          'z-index:9999',
+          'pointer-events:none',
+          'transition:all 0.7s cubic-bezier(0.25,0.46,0.45,0.94)',
+          'opacity:1'
+        ].join(';');
+        document.body.appendChild(dot);
+        setTimeout(function(){
+          dot.style.left = (x0 + Math.cos(angle)*dist - 7)+'px';
+          dot.style.top  = (y0 + Math.sin(angle)*dist - 7)+'px';
+          dot.style.opacity = '0';
+          dot.style.transform = 'scale(0.1)';
+        }, 20);
+        setTimeout(function(){ dot.remove(); }, 800);
+      }, i * 20);
+    })(p);
+  }
+
+  // onda 2 — partículas pequenas com delay
+  for(var q = 0; q < 12; q++){
+    (function(i){
+      setTimeout(function(){
+        var dot = document.createElement('div');
+        var angle = (i / 12) * Math.PI * 2 + 0.3;
+        var dist = 120 + Math.random() * 50;
+        dot.style.cssText = [
+          'position:fixed',
+          'width:8px',
+          'height:8px',
+          'border-radius:50%',
+          'background:' + cores[(i+3) % cores.length],
+          'left:'+(x0-4)+'px',
+          'top:'+(y0-4)+'px',
+          'z-index:9999',
+          'pointer-events:none',
+          'transition:all 0.9s ease-out',
+          'opacity:1'
+        ].join(';');
+        document.body.appendChild(dot);
+        setTimeout(function(){
+          dot.style.left = (x0 + Math.cos(angle)*dist - 4)+'px';
+          dot.style.top  = (y0 + Math.sin(angle)*dist - 4)+'px';
+          dot.style.opacity = '0';
+          dot.style.transform = 'scale(0.1)';
+        }, 20);
+        setTimeout(function(){ dot.remove(); }, 1000);
+      }, 150 + i * 25);
+    })(q);
+  }
+
+  // play — roda, expande e sobe
+  play.style.transition = 'transform 1.4s cubic-bezier(0.25,0.46,0.45,0.94), opacity 1s ease';
+  play.style.transform = 'translate(-50%, -220%) rotate(720deg) scale(0.1)';
   play.style.opacity = '0';
-  play.style.transform = 'translate(-50%, -180%) scale(0.6)';
 
   setTimeout(function(){
     skip.style.opacity = '0';
     skip.style.pointerEvents = 'none';
-  }, 300);
+  }, 200);
 
   vid.play().catch(function(){
     vid.muted = true;
