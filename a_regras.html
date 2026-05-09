@@ -120,7 +120,6 @@ play.onclick = function() {
     vid.play().catch(function(){ vid.muted=true; vid.play(); });
   }.bind(this), 250);
 };
-    };
 
     vid.onended = function () {
       idx.classList.add('show');
