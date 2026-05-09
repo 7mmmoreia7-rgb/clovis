@@ -927,6 +927,19 @@ const tip=document.getElementById('tip');
 function TT(e,t){tip.textContent=t;tip.style.left=(e.clientX+10)+'px';tip.style.top=(e.clientY+26)+'px';tip.classList.add('v');}
 function HT(){tip.classList.remove('v');}
 function irIndice(){window.location.href='indice.html?skip=1';}
+  let trOk=false;
+function fazTransicao(){
+  if(trOk)return;trOk=true;
+  const fade=document.getElementById('overlay-fade');fade.classList.add('ativo');
+  setTimeout(()=>{
+    document.getElementById('ecra-video').classList.add('oculto');
+    document.getElementById('ecra-quadro').classList.add('visivel');
+    document.getElementById('btn-idx').classList.add('show');
+    initCanvas();popularPopups();
+    atualizarCanvas();
+    setTimeout(()=>fade.classList.remove('ativo'),100);
+  },650);
+}
 function goGallery(){
   document.getElementById('btn-play').style.display='none';
   document.getElementById('btn-skip').classList.add('gone');
