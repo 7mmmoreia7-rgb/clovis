@@ -97,7 +97,7 @@ play.onclick = function() {
     if(shakes > 8){
       clearInterval(shake);
       el.style.transition = 'transform 0.8s ease, opacity 0.8s ease';
-      el.style.transform = 'translate(-50%, -200%)';
+     el.style.transform = 'translate('+(-50 + (Math.random()*6-3))+'%, '+(-50 + (Math.random()*6-3))+'%)';
       el.style.opacity = '0';
       setTimeout(function(){
         el.classList.add('gone');
