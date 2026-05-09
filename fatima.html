@@ -93,11 +93,13 @@ play.onclick = function() {
   var shakes = 0;
   var shake = setInterval(function(){
     shakes++;
-    el.style.transform = 'translate('+(−50 + (Math.random()*6-3))+'%, '+(−50 + (Math.random()*6-3))+'%)';
+    var rx = -50 + (Math.random()*6-3);
+    var ry = -50 + (Math.random()*6-3);
+    el.style.transform = 'translate('+rx+'%, '+ry+'%)';
     if(shakes > 8){
       clearInterval(shake);
       el.style.transition = 'transform 0.8s ease, opacity 0.8s ease';
-     el.style.transform = 'translate('+(-50 + (Math.random()*6-3))+'%, '+(-50 + (Math.random()*6-3))+'%)';
+      el.style.transform = 'translate(-50%, -200%)';
       el.style.opacity = '0';
       setTimeout(function(){
         el.classList.add('gone');
@@ -107,7 +109,6 @@ play.onclick = function() {
     }
   }, 60);
 };
-
 vid.addEventListener('ended', function() {
   document.getElementById('btn-idx').classList.add('show');
   document.getElementById('btn-email').classList.add('show');
