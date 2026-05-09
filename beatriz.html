@@ -99,7 +99,7 @@ play.onclick = function() {
         document.body.appendChild(ghost);
         setTimeout(function(){
           ghost.style.opacity = '0';
-          ghost.style.transform = 'translate('+(−50 + i*15)+'%, -50%)';
+         ghost.style.transform = 'translate('+(-50 + i*15)+'%, -50%)';
         }, 50);
         setTimeout(function(){ ghost.remove(); }, 700);
       }, i * 80);
@@ -107,7 +107,7 @@ play.onclick = function() {
   }
   setTimeout(function(){
     el.style.transition = 'transform 0.8s ease, opacity 0.8s ease';
-    el.style.transform = 'translate(200%, -50%)';
+   el.style.transform = 'translate('+(-50 + i*15)+'%, -50%)';
     el.style.opacity = '0';
   }, 320);
   setTimeout(function(){
