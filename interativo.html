@@ -272,6 +272,8 @@ window._playOk=false;
   v.addEventListener('play',function o(){if(!window._playOk)v.pause();else v.removeEventListener('play',o);});
 })();
 function iniciarVideo(){
+  // esconde o skip
+document.getElementById('btn-skip').classList.add('gone');
   // 🔊 SOM — rasto de tinta
   try {
     var ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -926,6 +928,10 @@ function TT(e,t){tip.textContent=t;tip.style.left=(e.clientX+10)+'px';tip.style.
 function HT(){tip.classList.remove('v');}
 function irIndice(){window.location.href='indice.html?skip=1';}
 function goGallery(){
+  document.getElementById('btn-play').style.display='none';
+  document.getElementById('btn-skip').classList.add('gone');
+  fazTransicao();
+}
   fazTransicao();
 }
 </script>
