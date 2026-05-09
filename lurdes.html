@@ -66,9 +66,46 @@ var play = document.getElementById('play');
 var vid  = document.getElementById('vid');
 
 play.onclick = function() {
-  this.classList.add('gone');
-  vid.classList.add('show');
-  vid.play().catch(function(){ vid.muted=true; vid.play(); });
+  // 🔊 SOM — snap + whoosh
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(80, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 0.15);
+    gain.gain.setValueAtTime(1.0, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.15);
+    var osc2 = ctx.createOscillator();
+    var gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(500, ctx.currentTime + 0.15);
+    osc2.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.7);
+    gain2.gain.setValueAtTime(1.0, ctx.currentTime + 0.15);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+    osc2.start(ctx.currentTime + 0.15);
+    osc2.stop(ctx.currentTime + 0.7);
+  } catch(e) {}
+
+  // 🎯 ANIMAÇÃO — recua e dispara
+  play.style.transition = 'transform 0.15s ease-in';
+  play.style.transform = 'translate(-50%, -20%) scale(0.7)';
+  setTimeout(function(){
+    play.style.transition = 'transform 0.4s cubic-bezier(0.5,-0.5,0.5,1.5), opacity 0.3s ease';
+    play.style.transform = 'translate(-50%, -300%) scale(0.2)';
+    play.style.opacity = '0';
+  }, 150);
+  setTimeout(function(){
+    this.classList.add('gone');
+    vid.classList.add('show');
+    vid.play().catch(function(){ vid.muted=true; vid.play(); });
+  }.bind(this), 500);
 };
 
 vid.addEventListener('ended', function() {
