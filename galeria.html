@@ -522,7 +522,7 @@ play.onclick = () => {
     var noise = ctx.createBufferSource();
     noise.buffer = buf;
     var gain = ctx.createGain();
-    gain.gain.setValueAtTime(1.0, ctx.currentTime);
+    gain.gain.setValueAtTime(1.5, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
     noise.connect(gain);
     gain.connect(ctx.destination);
