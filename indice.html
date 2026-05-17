@@ -183,9 +183,9 @@ var bolaVideo=null;
 var CDN='https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/indice/';
 var CLOVIS=[
   CDN+'clovis01.png',
-  CDN+'clovis02.png',
-  CDN+'clovis03.png',
   CDN+'clovis04.png',
+  CDN+'clovis03.png',
+  CDN+'clovis02.png',
   CDN+'clovis05.png'
 ];
 var VERDADEIRA_IDX=1;
@@ -347,40 +347,55 @@ function criarBolaSabao(x,y,sz,clovisUrl){
   if(clovisUrl){
     var img=document.createElement('img');
     img.src=clovisUrl;
-    img.style.cssText='width:88%;height:88%;object-fit:contain;position:relative;z-index:1;pointer-events:none;';
+    img.style.cssText='width:100%;height:100%;object-fit:contain;position:absolute;inset:0;z-index:1;pointer-events:none;';
     el.appendChild(img);
   }
 
   document.getElementById('stage').appendChild(el);
-  setTimeout(function(){el.style.opacity='1';},50);
+
+  // começa minúscula e cresce dramaticamente
+  el.style.transform='scale(0.05)';
+  el.style.transition='transform 0.8s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease';
+  setTimeout(function(){
+    el.style.opacity='1';
+    el.style.transform='scale(1)';
+  },50);
+
   return el;
 }
 
 function explodirBola(el,grande){
   var r=el.getBoundingClientRect();
   var cx=r.left+r.width/2, cy=r.top+r.height/2;
-  var n=grande?16:8;
+  var n=grande?24:14;
+  var tamanho=grande?28:16;
+  var distancia=grande?140:80;
   for(var p=0;p<n;p++){
     (function(i){
       var dot=document.createElement('div');
       var angle=(i/n)*Math.PI*2;
-      var dist=(grande?60:35)+Math.random()*25;
-      var cores=['rgba(180,220,255,0.9)','rgba(200,240,255,0.9)','rgba(150,200,255,0.9)','rgba(255,255,255,0.8)'];
+      var dist=distancia+Math.random()*60;
+      var sz=tamanho+Math.random()*tamanho;
+      var cores=['rgba(180,220,255,0.95)','rgba(200,240,255,0.95)','rgba(150,200,255,0.95)','rgba(255,255,255,0.9)','rgba(120,180,255,0.95)'];
       dot.style.cssText=[
         'position:fixed',
-        'width:'+(grande?10:6)+'px','height:'+(grande?10:6)+'px',
-        'border-radius:50%','background:'+cores[i%cores.length],
-        'left:'+(cx-3)+'px','top:'+(cy-3)+'px',
+        'width:'+sz+'px','height:'+sz+'px',
+        'border-radius:50%',
+        'background:'+cores[i%cores.length],
+        'box-shadow:0 0 '+sz+'px rgba(150,200,255,0.6)',
+        'left:'+(cx-sz/2)+'px','top:'+(cy-sz/2)+'px',
         'z-index:9999','pointer-events:none',
-        'transition:all 0.5s ease-out','opacity:1'
+        'transition:all 0.7s cubic-bezier(0.25,0.46,0.45,0.94)',
+        'opacity:1'
       ].join(';');
       document.body.appendChild(dot);
       setTimeout(function(){
-        dot.style.left=(cx+Math.cos(angle)*dist)+'px';
-        dot.style.top=(cy+Math.sin(angle)*dist)+'px';
-        dot.style.opacity='0';dot.style.transform='scale(0.1)';
+        dot.style.left=(cx+Math.cos(angle)*dist-sz/2)+'px';
+        dot.style.top=(cy+Math.sin(angle)*dist-sz/2)+'px';
+        dot.style.opacity='0';
+        dot.style.transform='scale(0.1)';
       },20);
-      setTimeout(function(){dot.remove();},600);
+      setTimeout(function(){dot.remove();},800);
     })(p);
   }
 }
@@ -410,15 +425,15 @@ function chuvaDeBolasSabao(cb){
 
         // cresce e rebenta
         setTimeout(function(){
-          el.style.transition='transform 0.6s ease-in, opacity 0.2s ease';
-          el.style.transform='scale(1.8)';
-          setTimeout(function(){
-            somPlock(0.6);
-            explodirBola(el,false);
-            el.style.opacity='0';
-            setTimeout(function(){el.remove();},400);
-          },600);
-        }, 1500+Math.random()*1000);
+  el.style.transition='transform 1s cubic-bezier(0.34,1.56,0.64,1)';
+  el.style.transform='scale(2.5)';
+  setTimeout(function(){
+    somPlock(0.8);
+    explodirBola(el,false);
+    el.style.opacity='0';
+    setTimeout(function(){el.remove();},500);
+  },900);
+}, 1500+Math.random()*1000);
 
       }, idx*80);
     })(i);
@@ -522,12 +537,14 @@ function criarBolaClovis(idx,clovisUrl,verdadeira){
 
 function estoirarClovis(el){
   if(!el.parentNode) return;
-  somPlock(1.2);
-  explodirBola(el,true);
-  el.style.transition='transform 0.2s ease, opacity 0.2s ease';
-  el.style.transform='scale(2)';
-  el.style.opacity='0';
-  setTimeout(function(){if(el.parentNode)el.remove();},300);
+  el.style.transition='transform 1s cubic-bezier(0.34,1.56,0.64,1)';
+  el.style.transform='scale(3)';
+  setTimeout(function(){
+    somPlock(1.5);
+    explodirBola(el,true);
+    el.style.opacity='0';
+    setTimeout(function(){if(el.parentNode)el.remove();},500);
+  },900);
 }
 
 function animarVerdadeira(el,sz){
