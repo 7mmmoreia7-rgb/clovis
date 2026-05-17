@@ -305,44 +305,65 @@ document.head.appendChild(styleAnim);
 
 function criarBolaSabao(x,y,sz,clovisUrl){
   var el=document.createElement('div');
-  el.style.cssText=[
-    'position:fixed',
-    'left:'+x+'px',
-    'top:'+y+'px',
-    'width:'+sz+'px',
-    'height:'+sz+'px',
-    'border-radius:50%',
-    'background:radial-gradient(circle at 35% 35%, rgba(255,255,255,0.6) 0%, rgba(200,230,255,0.15) 40%, rgba(150,200,255,0.05) 70%, transparent 100%)',
-    'box-shadow:inset -'+Math.round(sz*0.15)+'px -'+Math.round(sz*0.1)+'px '+Math.round(sz*0.3)+'px rgba(100,180,255,0.3), inset '+Math.round(sz*0.05)+'px '+Math.round(sz*0.05)+'px '+Math.round(sz*0.2)+'px rgba(255,255,255,0.5), 0 0 '+Math.round(sz*0.2)+'px rgba(150,200,255,0.2)',
-    'border:1.5px solid rgba(180,220,255,0.4)',
-    'pointer-events:all',
-    'cursor:pointer',
-    'z-index:200',
-    'display:flex',
-    'align-items:center',
-    'justify-content:center',
-    'overflow:hidden',
-    'transition:transform 0.3s ease, opacity 0.3s ease',
-    'opacity:0'
-  ].join(';');
+ el.style.cssText=[
+  'position:fixed',
+  'left:'+x+'px',
+  'top:'+y+'px',
+  'width:'+sz+'px',
+  'height:'+sz+'px',
+  'border-radius:50%',
+  'background:radial-gradient(circle at 30% 25%, rgba(255,255,255,0.85) 0%, rgba(220,240,255,0.4) 15%, rgba(180,220,255,0.1) 40%, rgba(150,200,255,0.05) 65%, transparent 85%)',
+  'box-shadow:inset -'+Math.round(sz*0.18)+'px -'+Math.round(sz*0.12)+'px '+Math.round(sz*0.35)+'px rgba(100,180,255,0.35), inset '+Math.round(sz*0.08)+'px '+Math.round(sz*0.08)+'px '+Math.round(sz*0.25)+'px rgba(255,255,255,0.7), inset 0 0 '+Math.round(sz*0.4)+'px rgba(150,200,255,0.15), 0 0 '+Math.round(sz*0.3)+'px rgba(150,200,255,0.25), 0 '+Math.round(sz*0.05)+'px '+Math.round(sz*0.15)+'px rgba(100,150,255,0.2)',
+  'border:1px solid rgba(220,240,255,0.5)',
+  'pointer-events:all',
+  'cursor:pointer',
+  'z-index:200',
+  'display:flex',
+  'align-items:center',
+  'justify-content:center',
+  'overflow:hidden',
+  'transition:transform 0.3s ease, opacity 0.3s ease',
+  'opacity:0'
+].join(';');
+var iris=document.createElement('div');
+iris.style.cssText=[
+  'position:absolute',
+  'inset:0',
+  'border-radius:50%',
+  'background:conic-gradient(from 180deg at 70% 60%, rgba(255,80,80,0.12), rgba(255,180,80,0.12), rgba(80,255,120,0.12), rgba(80,180,255,0.14), rgba(180,80,255,0.12), rgba(255,80,180,0.12), rgba(255,80,80,0.12))',
+  'animation:rodarIris '+(5+Math.random()*4)+'s linear infinite',
+  'pointer-events:none',
+  'mix-blend-mode:screen'
+].join(';');
+el.appendChild(iris);
 
-  var iris=document.createElement('div');
-  iris.style.cssText=[
-    'position:absolute','inset:0','border-radius:50%',
-    'background:conic-gradient(from 0deg, rgba(255,100,100,0.08), rgba(255,200,100,0.08), rgba(100,255,100,0.08), rgba(100,200,255,0.08), rgba(200,100,255,0.08), rgba(255,100,100,0.08))',
-    'animation:rodarIris '+(4+Math.random()*3)+'s linear infinite',
-    'pointer-events:none'
-  ].join(';');
-  el.appendChild(iris);
+// reflexo principal — grande e suave
+var ref=document.createElement('div');
+ref.style.cssText=[
+  'position:absolute',
+  'width:38%','height:22%',
+  'background:radial-gradient(ellipse, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+  'border-radius:50%',
+  'top:10%','left:15%',
+  'transform:rotate(-35deg)',
+  'pointer-events:none',
+  'filter:blur(1px)'
+].join(';');
+el.appendChild(ref);
 
-  var ref=document.createElement('div');
-  ref.style.cssText=[
-    'position:absolute','width:30%','height:20%',
-    'background:rgba(255,255,255,0.5)','border-radius:50%',
-    'top:15%','left:20%','transform:rotate(-30deg)',
-    'pointer-events:none','filter:blur(2px)'
-  ].join(';');
-  el.appendChild(ref);
+// reflexo secundário — pequeno em baixo
+var ref2=document.createElement('div');
+ref2.style.cssText=[
+  'position:absolute',
+  'width:15%','height:10%',
+  'background:radial-gradient(ellipse, rgba(255,255,255,0.7) 0%, transparent 100%)',
+  'border-radius:50%',
+  'bottom:18%','right:20%',
+  'transform:rotate(-20deg)',
+  'pointer-events:none',
+  'filter:blur(1px)'
+].join(';');
+el.appendChild(ref2);
 
   if(clovisUrl){
     var img=document.createElement('img');
