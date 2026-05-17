@@ -347,19 +347,15 @@ function criarBolaSabao(x,y,sz,clovisUrl){
   if(clovisUrl){
     var img=document.createElement('img');
     img.src=clovisUrl;
-    img.style.cssText='width:100%;height:100%;object-fit:contain;position:absolute;inset:0;z-index:1;pointer-events:none;';
+    img.style.cssText='width:95%;height:95%;object-fit:contain;position:absolute;inset:0;z-index:1;pointer-events:none;';
     el.appendChild(img);
   }
 
-  document.getElementById('stage').appendChild(el);
+document.getElementById('stage').appendChild(el);
 
-  // começa minúscula e cresce dramaticamente
+  // nasce minúscula em baixo
   el.style.transform='scale(0.05)';
-  el.style.transition='transform 0.8s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease';
-  setTimeout(function(){
-    el.style.opacity='1';
-    el.style.transform='scale(1)';
-  },50);
+  el.style.opacity='0';
 
   return el;
 }
@@ -395,8 +391,11 @@ function explodirBola(el,grande){
         dot.style.opacity='0';
         dot.style.transform='scale(0.1)';
       },20);
-      setTimeout(function(){dot.remove();},800);
-    })(p);
+   setTimeout(function(){
+    el.style.transition='transform 1.2s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease';
+    el.style.opacity='1';
+    el.style.transform='scale(1)';
+  },50);
   }
 }
 
@@ -407,39 +406,47 @@ function chuvaDeBolasSabao(cb){
   for(var i=0;i<n;i++){
     (function(idx){
       setTimeout(function(){
-        var sz=40+Math.random()*50;
+        // tamanho FINAL grande
+        var sz=80+Math.random()*70;
         var x,y;
 
         if(idx<11){
-          // 60% concentradas lado direito
           x=W*0.55+Math.random()*W*0.38;
-          y=Math.random()*(H-sz);
         } else {
-          // resto espalhado
           x=Math.random()*(W-sz);
-          y=Math.random()*(H-sz);
         }
 
+        // começa em baixo
+        y=H-sz;
+
         var el=criarBolaSabao(x,y,sz,null);
-        el.style.animation='flutuarBola '+(1.5+Math.random())+'s ease-in-out infinite';
 
-        // cresce e rebenta
+        // aparece e sobe crescendo ao mesmo tempo
         setTimeout(function(){
-  el.style.transition='transform 1s cubic-bezier(0.34,1.56,0.64,1)';
-  el.style.transform='scale(2.5)';
-  setTimeout(function(){
-    somPlock(0.8);
-    explodirBola(el,false);
-    el.style.opacity='0';
-    setTimeout(function(){el.remove();},500);
-  },900);
-}, 1500+Math.random()*1000);
+          el.style.transition='transform 2.5s ease-out, top 2.5s ease-out, opacity 0.4s ease';
+          el.style.opacity='1';
+          el.style.transform='scale(1)';
+          // sobe até posição aleatória
+          el.style.top=(H*0.1+Math.random()*H*0.6)+'px';
+        },50);
 
-      }, idx*80);
+        // quando chega ao tamanho máximo — cresce mais e PLOCK
+        setTimeout(function(){
+          el.style.transition='transform 0.8s cubic-bezier(0.34,1.56,0.64,1)';
+          el.style.transform='scale(2.8)';
+          setTimeout(function(){
+            somPlock(0.8);
+            explodirBola(el,false);
+            el.style.opacity='0';
+            setTimeout(function(){el.remove();},500);
+          },700);
+        }, 2800+Math.random()*800);
+
+      }, idx*120);
     })(i);
   }
 
-  setTimeout(cb, n*80+2800);
+  setTimeout(cb, n*120+4500);
 }
 
 var bolasClovis=[];
