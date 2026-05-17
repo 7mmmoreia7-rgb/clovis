@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Álbum</title>
+<link rel="icon" href="/icon-192.png" />
+<link rel="apple-touch-icon" href="/icon-512.png" />
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:url("https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/isto.png") center/cover no-repeat;
+}
+
+#stage{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:20px;
+}
+
+/* FAIXA AMARELA DE OBRAS */
+#faixa{
+  position:fixed;top:0;left:0;right:0;
+  height:28px;
+  background:repeating-linear-gradient(
+    -45deg,
+    #FFD700 0px, #FFD700 20px,
+    #1a1a1a 20px, #1a1a1a 40px
+  );
+  z-index:10;
+  box-shadow:0 3px 10px rgba(0,0,0,0.4);
+}
+#faixa2{
+  position:fixed;bottom:0;left:0;right:0;
+  height:28px;
+  background:repeating-linear-gradient(
+    -45deg,
+    #FFD700 0px, #FFD700 20px,
+    #1a1a1a 20px, #1a1a1a 40px
+  );
+  z-index:10;
+  box-shadow:0 -3px 10px rgba(0,0,0,0.4);
+}
+
+/* CLOVIS */
+#clovis-wrap{
+  position:relative;
+  animation: balançar 2s ease-in-out infinite;
+}
+
+#clovis-wrap img{
+  width:min(35vw, 320px);
+  height:auto;
+  filter:drop-shadow(0 8px 24px rgba(0,0,0,0.4));
+}
+
+/* CHAPÉU DE OBRAS */
+#chapeu{
+  position:absolute;
+  top:-18%;
+  left:50%;
+  transform:translateX(-50%) rotate(-8deg);
+  font-size:min(12vw, 100px);
+  animation: chapeuBalança 2s ease-in-out infinite;
+  filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.4));
+  z-index:5;
+}
+
+/* PLACA */
+#placa{
+  background:rgba(245,235,210,0.95);
+  border:4px solid #7a6245;
+  border-radius:16px;
+  padding:18px 36px;
+  text-align:center;
+  box-shadow:0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.6);
+  animation: placaSobe 3s ease-in-out infinite;
+  max-width:85vw;
+}
+
+#placa h1{
+  font-family:'Pacifico',cursive;
+  font-size:min(6vw, 42px);
+  color:#7a3f00;
+  text-shadow:2px 2px 0 rgba(0,0,0,0.15);
+  margin-bottom:8px;
+  line-height:1.2;
+}
+
+#placa p{
+  font-family:'Nunito',sans-serif;
+  font-size:min(3vw, 18px);
+  color:#5a4020;
+  font-weight:900;
+}
+
+/* FERRAMENTAS ANIMADAS */
+#ferramentas{
+  display:flex;
+  gap:20px;
+  font-size:min(8vw, 52px);
+  animation: ferramentasRoda 0.5s ease-in-out infinite alternate;
+}
+
+/* BOTÃO ÍNDICE */
+#btn-idx{
+  position:fixed;
+  bottom:5%;
+  right:3.4%;
+  width:8%;
+  cursor:pointer;
+  z-index:900;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35)) drop-shadow(0 0 6px rgba(255,255,255,0.25));
+  transition:transform 0.2s ease;
+}
+#btn-idx:hover{transform:scale(1.1);}
+
+/* PARAFUSOS NOS CANTOS */
+.parafuso{
+  position:fixed;
+  font-size:28px;
+  z-index:5;
+  animation:rodarParafuso 3s linear infinite;
+}
+.p1{top:40px;left:20px;}
+.p2{top:40px;right:20px;}
+.p3{bottom:40px;left:20px;}
+.p4{bottom:40px;right:20px;}
+
+@keyframes balançar{
+  0%,100%{transform:rotate(-4deg) translateY(0);}
+  50%{transform:rotate(4deg) translateY(-8px);}
+}
+@keyframes chapeuBalança{
+  0%,100%{transform:translateX(-50%) rotate(-12deg);}
+  50%{transform:translateX(-50%) rotate(-4deg);}
+}
+@keyframes placaSobe{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-6px);}
+}
+@keyframes ferramentasRoda{
+  from{transform:rotate(-8deg);}
+  to{transform:rotate(8deg);}
+}
+@keyframes rodarParafuso{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+</style>
+</head>
+<body>
+
+<div id="faixa"></div>
+<div id="faixa2"></div>
+
+<div class="parafuso p1">⚙️</div>
+<div class="parafuso p2" style="animation-delay:0.5s">⚙️</div>
+<div class="parafuso p3" style="animation-delay:1s">⚙️</div>
+<div class="parafuso p4" style="animation-delay:1.5s">⚙️</div>
+
+<div id="stage">
+
+  <div id="clovis-wrap">
+   
+    <img src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/album/clovis_trolha.png" alt="Clovis">
+  </div>
+
+  <div id="placa">
+    <h1>🚧 Álbum em construção! 🚧</h1>
+    <p>O Clovis está a trabalhar nisso...<br>Volta em breve! 😄</p>
+  </div>
+
+  <div id="ferramentas">
+    <span>🔨</span>
+    <span style="animation-delay:0.25s">🪛</span>
+    <span style="animation-delay:0.5s">🔧</span>
+  </div>
+
+</div>
+
+<img id="btn-idx"
+  src="https://pub-4f2a2814e5924e32b4d88e68fc0f96d1.r2.dev/comuns/botao%20(2).png"
+  onclick="window.location.href='indice.html?skip=1'"
+/>
+
+<script src="/notif.js"></script>
+</body>
+</html>
