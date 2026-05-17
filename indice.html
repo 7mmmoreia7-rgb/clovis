@@ -347,7 +347,7 @@ function criarBolaSabao(x,y,sz,clovisUrl){
   if(clovisUrl){
     var img=document.createElement('img');
     img.src=clovisUrl;
-    img.style.cssText='width:95%;height:95%;object-fit:contain;position:absolute;inset:0;z-index:1;pointer-events:none;';
+    img.style.cssText='width:140%;height:140%;object-fit:contain;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;pointer-events:none;';
     el.appendChild(img);
   }
 
