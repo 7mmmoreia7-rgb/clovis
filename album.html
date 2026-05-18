@@ -16,10 +16,12 @@ html,body{
 }
 
 #stage{
+
   position:fixed;inset:0;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   gap:20px;
+  z-index:1;
 }
 
 /* FAIXA AMARELA DE OBRAS */
@@ -48,16 +50,19 @@ html,body{
 
 /* CLOVIS */
 #clovis-wrap{
-  position:relative;
+  position:fixed;
+  bottom:-15%;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:0;
   animation: balançar 2s ease-in-out infinite;
 }
 
 #clovis-wrap img{
-  width:min(35vw, 320px);
+  width:min(70vw, 600px);
   height:auto;
   filter:drop-shadow(0 8px 24px rgba(0,0,0,0.4));
 }
-
 /* CHAPÉU DE OBRAS */
 #chapeu{
   position:absolute;
